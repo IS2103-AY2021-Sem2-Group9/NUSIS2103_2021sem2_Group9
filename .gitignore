@@ -1,16 +1,41 @@
 # NetBeans specific #
-nbproject/private/
-build/
-nbbuild/
-dist/
-nbdist/
-nbactions.xml
-nb-configuration.xml
+EasyAppointment/nbproject/private/
+EasyAppointment/build/
+EasyAppointment/nbbuild/
+EasyAppointment/dist/
+EasyAppointment/nbdist/
+EasyAppointment/nbactions.xml
+EasyAppointment/nb-configuration.xml
+
+EasyAppointment/EasyAppointmentClient/nbproject/private/
+EasyAppointment/EasyAppointmentClient/build/
+EasyAppointment/EasyAppointmentClient/nbbuild/
+EasyAppointment/EasyAppointmentClient/dist/
+EasyAppointment/EasyAppointmentClient/nbdist/
+EasyAppointment/EasyAppointmentClient/nbactions.xml
+EasyAppointment/EasyAppointmentClient/nb-configuration.xml
+
+EasyAppointment/EasyAppointment-ejb/nbproject/private/
+EasyAppointment/EasyAppointment-ejb/build/
+EasyAppointment/EasyAppointment-ejb/nbbuild/
+EasyAppointment/EasyAppointment-ejb/dist/
+EasyAppointment/EasyAppointment-ejb/nbdist/
+EasyAppointment/EasyAppointment-ejb/nbactions.xml
+EasyAppointment/EasyAppointment-ejb/nb-configuration.xml
+
+EasyAppointment/EasyAppointmentLibrary/nbproject/private/
+EasyAppointment/EasyAppointmentLibrary/build/
+EasyAppointment/EasyAppointmentLibrary/nbbuild/
+EasyAppointment/EasyAppointmentLibrary/dist/
+EasyAppointment/EasyAppointmentLibrary/nbdist/
+EasyAppointment/EasyAppointmentLibrary/nbactions.xml
+EasyAppointment/EasyAppointmentLibrary/nb-configuration.xml
+
 
 # Class Files #
-*.class
+EasyAppointment/*.class
 
 # Package Files #
-*.jar
-*.war
-*.ear
+EasyAppointment/*.jar
+EasyAppointment/*.war
+EasyAppointment/*.ear
