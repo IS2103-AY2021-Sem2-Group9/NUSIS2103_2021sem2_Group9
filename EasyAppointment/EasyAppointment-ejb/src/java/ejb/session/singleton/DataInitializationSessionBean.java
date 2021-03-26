@@ -41,6 +41,6 @@ public class DataInitializationSessionBean {
     
     public void initializeData() 
     {
-        adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("terry@easyadmin.com", "password"));
+        adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("terry@easyadmin.com", "password", "Terry", "Tan"));
     }
 }

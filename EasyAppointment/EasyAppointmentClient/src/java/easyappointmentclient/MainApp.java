@@ -1,10 +1,14 @@
 package easyappointmentclient;
 
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
+import entity.AdminEntity;
 import java.util.Scanner;
+import util.exception.InvalidLoginException;
 
 public class MainApp {
     private AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
+    
+    private AdminEntity loggedInAdminEntity;
 
     public MainApp() 
     {
@@ -35,8 +39,16 @@ public class MainApp {
                 
                 if (response == 1) 
                 {
-                    //doLogin();
-                    System.out.println("Logging in..");
+                    try
+                    {
+                        doLogin();
+                        System.out.println("Login successful!");
+                        System.out.println("Logged in as " + loggedInAdminEntity.getFirstName());
+                    }
+                    catch (InvalidLoginException ex)
+                    {
+                        System.out.println("An error has occurred while logging in: " + ex.getMessage() + "\n");
+                    }
                 } else if (response == 2) {
                     break;
                 } else {
@@ -52,7 +64,24 @@ public class MainApp {
         }   
     }
     
-    public void doLogin() {
+    public void doLogin() throws InvalidLoginException {
+        Scanner scanner = new Scanner(System.in);
+        String email = "";
+        String password = "";
         
+        System.out.println("*** Admin Terminal :: Login ***\n");
+        System.out.print("Enter Email Address> ");
+        email = scanner.nextLine().trim();
+        System.out.print("Enter Password> ");
+        password = scanner.nextLine().trim();
+        
+        if(email.length() > 0 && password.length() > 0)
+        {
+            loggedInAdminEntity = adminEntitySessionBeanRemote.adminLogin(email, password);
+        }
+        else
+        {
+            throw new InvalidLoginException("Missing login credentials!");
+        }
     }
 }
