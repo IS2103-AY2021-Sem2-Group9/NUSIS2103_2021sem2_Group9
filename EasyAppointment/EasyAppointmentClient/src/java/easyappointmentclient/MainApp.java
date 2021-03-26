@@ -1,32 +1,70 @@
 package easyappointmentclient;
 
+import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
 import entity.AdminEntity;
+
 import java.util.Scanner;
+
 import util.exception.InvalidLoginException;
 
 public class MainApp {
     private AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
+    private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
+    private ServiceProviderTerminal spTerminal;
     
     private AdminEntity loggedInAdminEntity;
-
-    public MainApp() 
-    {
+    
+    public MainApp() {
     }
 
-    public MainApp(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote) 
-    {
+    public MainApp(ServiceProviderEntitySessionBeanRemote sericeProviderSessionBeanRemote, AdminEntitySessionBeanRemote adminEntitySessionBeanRemote) {
+        this.serviceProviderSessionBeanRemote = sericeProviderSessionBeanRemote;
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
     }
     
-    public void runApp() 
+    public void runApp() {
+        Scanner scanner = new Scanner(System.in); 
+        Integer response = 0; 
+        
+        while(true) {
+            System.out.println("*** Welcome to EasyAppoinment ***"); 
+            System.out.println("1: Customer Terminal");
+            System.out.println("2: Service Provider Terminal");
+            System.out.println("3: Admin Terminal");
+            System.out.println("4: Exit");
+          
+            while (response < 1 || response > 4) {
+                System.out.print("> ");
+                response = scanner.nextInt();
+                
+                if(response == 1) {
+                    System.out.println("under development");
+                } else if(response == 2) {
+                    spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote);
+                    spTerminal.runApp();
+                } else if (response == 3) {
+                    adminTerminal();
+                } else if (response == 4) {
+                    break;
+                } else {
+                    System.out.println("Invalid option, please try again\n");
+                }
+            }
+            if (response == 4) {
+                System.out.println("Thank you!\n"); 
+                break;
+            }            
+        }
+    }
+
+    public void adminTerminal() 
     {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
         
         while (true)
         {
-            System.out.println("*** EasyAppointment ***\n");
             System.out.println("*** Welcome to the Admin Terminal ***\n");
             System.out.println("1: Login");
             System.out.println("2: Exit");

@@ -76,7 +76,7 @@ public class AdminEntity implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
-
+  
     public String getFirstName() {
         return firstName;
     }
