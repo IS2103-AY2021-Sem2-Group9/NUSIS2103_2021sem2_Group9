@@ -49,7 +49,10 @@ public class MainApp {
                 System.out.println("Thank you!");
                 break;
             }
-        }
+        }   
+    }
+    
+    public void doLogin() {
         
     }
 }
