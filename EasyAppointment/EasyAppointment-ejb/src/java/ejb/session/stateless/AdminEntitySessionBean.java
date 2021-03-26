@@ -15,7 +15,7 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.AdminNotFoundException;
-import util.exception.InvalidLoginException;
+import util.exception.InvalidLoginCredentialException;
 
 @Stateless
 @Local(AdminEntitySessionBeanLocal.class)
@@ -63,7 +63,7 @@ public class AdminEntitySessionBean implements AdminEntitySessionBeanRemote, Adm
     }
     
     @Override
-    public AdminEntity adminLogin(String email, String password) throws InvalidLoginException
+    public AdminEntity adminLogin(String email, String password) throws InvalidLoginCredentialException
     {
         try
         {
@@ -75,12 +75,12 @@ public class AdminEntitySessionBean implements AdminEntitySessionBeanRemote, Adm
             }
             else
             {
-                throw new InvalidLoginException("Invalid login credentials!");
+                throw new InvalidLoginCredentialException("Invalid login credentials!");
             }
         }
         catch (AdminNotFoundException ex)
         {
-            throw new InvalidLoginException("Invalid Login: " + ex.getMessage());
+            throw new InvalidLoginCredentialException("Invalid Login: " + ex.getMessage());
         }
     }
 }
