@@ -54,7 +54,7 @@ public class DataInitializationSessionBean {
         try {
             List<Boolean> availability =new ArrayList<Boolean>(Arrays.asList(new Boolean[10]));
             Collections.fill(availability, Boolean.TRUE);
-            adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("terry@easyadmin.com", "password"));
+            adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("terry@easyadmin.com", "password", "Terry", "Tan"));
             serviceProviderEntitySessionBeanLocal.createServiceProviderEntity(new ServiceProviderEntity("Kevin Paterson", "1", "1111001111", "Clementi", "93718799", "13, Clementi Road", "kevin@nuh.com.sg", 113322, availability));
         } catch (ServiceProviderAddressExistException | UnknownPersistenceException ex) {
             ex.printStackTrace();

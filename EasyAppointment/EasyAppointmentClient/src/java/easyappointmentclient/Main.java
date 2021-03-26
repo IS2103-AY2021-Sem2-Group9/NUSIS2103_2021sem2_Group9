@@ -7,17 +7,15 @@ import javax.ejb.EJB;
 import util.exception.AdminNotFoundException;
 
 public class Main {
-
    
     @EJB
-    private static ServiceProviderEntitySessionBeanRemote serviceProviderEntitySessionBeanRemote;
+    private static ServiceProviderEntitySessionBeanRemote serviceProviderEntitySessionBeanRemote;   
+    @EJB
+    private static AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
     
-    
-    public static void main(String[] args) {
-        
-        MainApp mainApp = new MainApp(serviceProviderEntitySessionBeanRemote);
+    public static void main(String[] args) throws AdminNotFoundException {
+        MainApp mainApp = new MainApp(adminEntitySessionBeanRemote, serviceProviderEntitySessionBeanRemote);
         mainApp.runApp();
-        
     }
     
 }
