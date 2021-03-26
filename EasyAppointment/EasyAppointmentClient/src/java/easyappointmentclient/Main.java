@@ -14,7 +14,7 @@ public class Main {
     private static AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
     
     public static void main(String[] args) throws AdminNotFoundException {
-        MainApp mainApp = new MainApp(adminEntitySessionBeanRemote, serviceProviderEntitySessionBeanRemote);
+        MainApp mainApp = new MainApp(serviceProviderEntitySessionBeanRemote, adminEntitySessionBeanRemote);
         mainApp.runApp();
     }
     

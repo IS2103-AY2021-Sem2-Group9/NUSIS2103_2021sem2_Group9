@@ -27,12 +27,12 @@ public class ServiceProviderTerminal {
         this.serviceProviderEntitySessionBeanRemote = serviceProviderEntitySessionBeanRemote;
     }
     
-    public void runApp() throws InvalidLoginCredentialException {
+    public void runApp() {
         Scanner scanner = new Scanner(System.in); 
         Integer response = 0;
         
         while(true) {
-            System.out.println("*** Welcome to Service provider terminal ***");
+            System.out.println("*** Welcome to the Service Provider Terminal ***\n");
             System.out.println("1: Registration");
             System.out.println("2: Login");
             System.out.println("3: Exit");
@@ -40,34 +40,46 @@ public class ServiceProviderTerminal {
             while (response < 1 || response > 4) {
                 System.out.print("> ");
                 response = scanner.nextInt(); 
-                if (response == 1) {
+                if (response == 1) 
+                {
                     doRegister();
-                } else if (response == 2) {
-                   // try {
+                } 
+                else if (response == 2) 
+                {
+                    try 
+                    {
                         doLogin();
-                        System.out.println("Login successful!");
+                        System.out.println("Login successful!\n");
                         serviceProviderModule = new ServiceProviderModule(serviceProviderEntitySessionBeanRemote, currentServiceProviderEntity);
                         serviceProviderModule.menuServiceProvider();
                         break;
-                    //} 
-                } else if (response == 3) { 
+                    }
+                    catch (InvalidLoginCredentialException ex)
+                    {
+                        System.out.println("An error occured while logging in: " + ex.getMessage());
+                    }
+                } else if (response == 3) 
+                { 
                     break;
-                } else {
+                } else 
+                {
                     System.out.println("Invalid option, please try again");
                 }
             }
-            if (response == 3) {
+            if (response == 3) 
+            {
                 break; 
             }
         }
     }
     
     
-    private void doRegister() {
+    private void doRegister() 
+    {
         Scanner scanner = new Scanner(System.in);
         ServiceProviderEntity spEntity = new ServiceProviderEntity(); 
        
-        System.out.println("*** Service Provider Terminal :: Registration Operation ***");
+        System.out.println("*** Service Provider Terminal :: Registration Operation ***\n");
         System.out.print("Enter Name> ");
         spEntity.setName(scanner.nextLine().trim());
         System.out.print("Enter Business Category> ");
@@ -87,12 +99,13 @@ public class ServiceProviderTerminal {
   
     }
     
-    private void doLogin() throws InvalidLoginCredentialException {
+    private void doLogin() throws InvalidLoginCredentialException 
+    {
         Scanner scanner = new Scanner(System.in);
         String email = "";
         Integer password; 
         
-        System.out.println("*** Service provider terminal :: Login ***");
+        System.out.println("*** Service provider terminal :: Login ***\n");
         System.out.print("Enter Email Address> ");
         email = scanner.nextLine().trim(); 
         System.out.print("Enter password> "); 

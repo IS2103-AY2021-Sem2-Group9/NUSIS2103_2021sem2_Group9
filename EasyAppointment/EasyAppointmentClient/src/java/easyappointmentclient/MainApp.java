@@ -28,11 +28,12 @@ public class MainApp {
         Integer response = 0; 
         
         while(true) {
-            System.out.println("*** Welcome to EasyAppoinment ***"); 
+            System.out.println("*** Welcome to EasyAppoinment ***\n"); 
             System.out.println("1: Customer Terminal");
             System.out.println("2: Service Provider Terminal");
             System.out.println("3: Admin Terminal");
             System.out.println("4: Exit");
+            response = 0;
           
             while (response < 1 || response > 4) {
                 System.out.print("> ");
@@ -96,7 +97,7 @@ public class MainApp {
             
             if (response == 2) 
             {
-                System.out.println("Thank you!");
+                System.out.println("Thank you!\n");
                 break;
             }
         }   
@@ -112,6 +113,7 @@ public class MainApp {
         email = scanner.nextLine().trim();
         System.out.print("Enter Password> ");
         password = scanner.nextLine().trim();
+        System.out.println("\n");
         
         if(email.length() > 0 && password.length() > 0)
         {
