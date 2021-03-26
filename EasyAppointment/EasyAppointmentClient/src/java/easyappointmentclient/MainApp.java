@@ -9,7 +9,7 @@ public class MainApp {
     private AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
     private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
     private ServiceProviderTerminal spTerminal;
-    private AdminModule adminModule;
+    private AdminTerminal adminTerminal;
     
     public MainApp() 
     {
@@ -42,8 +42,8 @@ public class MainApp {
                     spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote);
                     spTerminal.runApp();
                 } else if (response == 3) {
-                    adminModule = new AdminModule(adminEntitySessionBeanRemote);
-                    adminModule.adminTerminal();
+                    adminTerminal = new AdminTerminal(adminEntitySessionBeanRemote);
+                    adminTerminal.runApp();
                 } else if (response == 4) {
                     break;
                 } else {
