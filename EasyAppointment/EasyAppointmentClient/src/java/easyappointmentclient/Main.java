@@ -11,8 +11,8 @@ public class Main {
     private static AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
     
     public static void main(String[] args) throws AdminNotFoundException {
-        AdminEntity admin = adminEntitySessionBeanRemote.retrieveAdminEntityByAdminId(Long.valueOf("1"));
-        System.out.println("admin email: " + admin.getAdminEmail() + " admin password: " + admin.getPassword());
+        MainApp mainApp = new MainApp(adminEntitySessionBeanRemote);
+        mainApp.runApp();
     }
     
 }
