@@ -15,4 +15,5 @@ import javax.ejb.Stateless;
 @Remote(CustomerEntitySessionBeanRemote.class)
 public class CustomerEntitySessionBean implements CustomerEntitySessionBeanLocal, CustomerEntitySessionBeanRemote {
     
+    
 }
