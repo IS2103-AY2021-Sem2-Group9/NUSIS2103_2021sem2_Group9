@@ -2,10 +2,13 @@ package entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class CustomerEntity implements Serializable {
@@ -14,21 +17,31 @@ public class CustomerEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, length = 32)
     private String identityNumber;
+    @Column(nullable = false, length = 64)
     private String email;
+    @Column(nullable = false, length = 64)
     private Integer password;
+    @Column(nullable = false, length = 32)
     private String firstName;
+    @Column(nullable = false, length = 32)
     private String lastName;
+    @Column(nullable = false, length = 32)
     private Character gender;
+    @Column(nullable = false, length = 32)
     private Integer age;
+    @Column(nullable = false, length = 32)
     private String phoneNumber;
+    @Column(nullable = false, length = 128)
     private String address;
+    @Column(nullable = false, length = 32)
     private String city;
-//    @OneToMany(mappedBy="customer")
-//    private List<Appointment> appointments;
+    @OneToMany(mappedBy="customer")
+    private List<AppointmentEntity> appointments;
 
     public CustomerEntity() {
-//        this.appointments = new ArrayList<>();
+        this.appointments = new ArrayList<>();
     }
 
     public CustomerEntity(String identityNumber, String email, Integer password, String firstName, String lastName, Character gender, Integer age, String phoneNumber, String address, String city) {
@@ -43,7 +56,6 @@ public class CustomerEntity implements Serializable {
         this.address = address;
         this.city = city;
     }
-    
     
 
     public Long getId() {
@@ -194,6 +206,20 @@ public class CustomerEntity implements Serializable {
         this.city = city;
     }
     
+    /**
+     * @return the appointments
+     */
+    public List<AppointmentEntity> getAppointments() {
+        return appointments;
+    }
+
+    /**
+     * @param appointments the appointments to set
+     */
+    public void setAppointments(List<AppointmentEntity> appointments) {
+        this.appointments = appointments;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
@@ -218,4 +244,5 @@ public class CustomerEntity implements Serializable {
     public String toString() {
         return "entity.Customer[ id=" + id + " ]";
     }
+
 }
