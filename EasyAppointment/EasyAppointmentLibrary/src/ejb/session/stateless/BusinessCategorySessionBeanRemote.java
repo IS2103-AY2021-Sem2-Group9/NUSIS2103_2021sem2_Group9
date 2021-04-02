@@ -6,9 +6,16 @@
 package ejb.session.stateless;
 
 import entity.BusinessCategoryEntity;
+import java.util.List;
+import util.exception.BusinessCategoryNotFoundException;
 
 public interface BusinessCategorySessionBeanRemote {
-
     public String createBusinessCategoryEntity(BusinessCategoryEntity businessCategoryEntity);
+    
+    public List<BusinessCategoryEntity> retrieveAllBusinessCategories();
+
+    public BusinessCategoryEntity retrieveBusinessCategoryByName(String name) throws BusinessCategoryNotFoundException;
+
+    public String deleteBusinessCategory(String businessCategoryName) throws BusinessCategoryNotFoundException;
     
 }
