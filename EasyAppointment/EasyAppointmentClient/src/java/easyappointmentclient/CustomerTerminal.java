@@ -37,10 +37,13 @@ public class CustomerTerminal {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-                     // Do we need a try-catch here to catch same emails? 
+                     
                     try {
                         doRegistration();
                         System.out.println("Registration successful!\n");
+                        
+                        customerModule = new CustomerModule(customerEntitySessionBeanRemote, loggedInCustomerEntity);
+                        customerModule.mainMenu();
                     } catch (InvalidLoginCredentialException | CustomerExistException | UnknownPersistenceException ex) {
                         System.out.println(ex.getMessage());
                         System.out.println();
@@ -76,29 +79,29 @@ public class CustomerTerminal {
 
         System.out.println("*** Customer Terminal :: Registration ***\n");
 
-        System.out.println("Enter Identity Number> ");
+        System.out.print("Enter Identity Number> ");
         String iDNum = scanner.nextLine().trim();
-        System.out.println("Enter Email> ");
+        System.out.print("Enter Email> ");
         String email = scanner.nextLine().trim();
-        System.out.println("Enter Password> ");
+        System.out.print("Enter Password> ");
         Integer password = scanner.nextInt();
         scanner.nextLine();
-        System.out.println("Enter First Name> ");
+        System.out.print("Enter First Name> ");
         String firstName = scanner.nextLine().trim();
-        System.out.println("Enter Last Name> ");
+        System.out.print("Enter Last Name> ");
         String lastName = scanner.nextLine().trim();
-        System.out.println("Enter Gender> ");
+        System.out.print("Enter Gender> ");
         Character gender = scanner.next().charAt(0);
-        System.out.println("Enter Age> ");
+        System.out.print("Enter Age> ");
         Integer age = scanner.nextInt();
         scanner.nextLine();
-        System.out.println("Enter Phone Number> ");
+        System.out.print("Enter Phone Number> ");
         String phoneNum = scanner.nextLine().trim();
-        System.out.println("Enter Address> ");
+        System.out.print("Enter Address> ");
         String address = scanner.nextLine().trim();
-        System.out.println("Enter City> ");
+        System.out.print("Enter City> ");
         String city = scanner.nextLine().trim();
-
+        
         if (iDNum.length() > 0 && email.length() > 0 && password.toString().length() > 0
                 && firstName.length() > 0 && lastName.length() > 0 && gender.toString().length() > 0
                 && age.toString().length() > 0 && phoneNum.length() > 0 && address.length() > 0
@@ -106,6 +109,7 @@ public class CustomerTerminal {
 
             CustomerEntity customerEntity = new CustomerEntity(iDNum, email, password, firstName, lastName, gender, age, phoneNum, address, city);
             loggedInCustomerEntity = customerEntitySessionBeanRemote.createCustomerEntity(customerEntity);
+            
         } else {
             throw new InvalidLoginCredentialException("Missing Account Credentials");
         }

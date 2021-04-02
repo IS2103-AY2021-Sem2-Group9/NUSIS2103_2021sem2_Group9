@@ -18,9 +18,10 @@ public class MainApp {
     {
     }
 
-    public MainApp(ServiceProviderEntitySessionBeanRemote sericeProviderSessionBeanRemote, AdminEntitySessionBeanRemote adminEntitySessionBeanRemote) {
+    public MainApp(ServiceProviderEntitySessionBeanRemote sericeProviderSessionBeanRemote, AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote) {
         this.serviceProviderSessionBeanRemote = sericeProviderSessionBeanRemote;
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
+        this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
     }
     
     public void runApp() {

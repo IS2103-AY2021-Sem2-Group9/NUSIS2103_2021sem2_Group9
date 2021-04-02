@@ -26,9 +26,13 @@ public class CustomerEntitySessionBean implements CustomerEntitySessionBeanLocal
     @Override
     public CustomerEntity createCustomerEntity(CustomerEntity customerEntity) throws UnknownPersistenceException, CustomerExistException {
         try {
+            System.out.println("FIRSTLINE");
             em.persist(customerEntity);
+            System.out.println("PERSISTED");
             em.flush();
+            System.out.println("FLUSHED");
             return customerEntity;
+            
         } catch (PersistenceException ex) {
             if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) { // A database-related exception
                 if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) { // To get the internal error

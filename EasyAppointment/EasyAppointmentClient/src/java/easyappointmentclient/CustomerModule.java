@@ -1,11 +1,18 @@
 package easyappointmentclient;
 
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
+import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
+import entity.AppointmentEntity;
 import entity.CustomerEntity;
+import entity.ServiceProviderEntity;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Scanner;
 
 public class CustomerModule {
     private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
+    private ServiceProviderEntitySessionBeanRemote serviceProviderEntitySessionBeanRemote;
     private CustomerEntity loggedInCustomerEntity;
 
     public CustomerModule() {
@@ -78,25 +85,70 @@ public class CustomerModule {
         }
     }
     
-    public void searchOperation() {
+    public List<ServiceProviderEntity> searchOperation() {
         Scanner sc = new Scanner(System.in);
         
         System.out.println("*** Customer Terminal :: Search Operation ***\n");
         
-        System.out.println();
-        String businessCategory = sc.nextLine();
+        // Print out all the biz category here
+        
+        System.out.print("Enter business category> ");
+        Integer category = sc.nextInt(); 
+        sc.nextLine();
+        System.out.print("Enter city> ");
+        String city = sc.nextLine();
+        
+        System.out.print("Enter date> ");
+        String dateStr = sc.nextLine();
+        LocalDate date = LocalDate.parse(dateStr); // e.g. yyyy-MM-dd
+        
+        System.out.println("Retrieve and print out all available service provider for the day here.");
+        
+//        this.serviceProviderEntitySessionBeanRemote.retrieveAllAvailableServiceProviderForTheDay(categoryName, city, date); 
+
+        
+        return null; // Return list here
     }
     
     public void addAppointments() {
         Scanner sc = new Scanner(System.in);
         
-        System.out.println("*** Customer Terminal :: Add Appointments ***\n");
+        System.out.println("*** Customer Terminal :: Add Appointments ***\n");        
+        List<ServiceProviderEntity> serviceProviders = this.searchOperation();
+        
+        System.out.println("Enter 0 to go back to the previous menu.");
+        if (sc.nextInt() == 0) {
+            return; // Break out of the method
+        }
+        
+        System.out.print("Service provider Id> ");
+        Integer id = sc.nextInt();
+        
+        // TBC...
     }
     
     public void viewAppointments() {
         Scanner sc = new Scanner(System.in);
         
         System.out.println("*** Customer Terminal :: View Appointments ***\n");
+        
+        List<AppointmentEntity> appointments = this.loggedInCustomerEntity.getAppointments();
+        
+        if (!appointments.isEmpty()) {
+            
+            for (int i = 0; i < appointments.size(); i++) {
+                AppointmentEntity appt = appointments.get(i);
+                
+                System.out.print(appt.getAppointmentNum());
+                System.out.print(" | ");
+                System.out.print(appt.getAppointmentTime());
+                System.out.print(" | ");
+                System.out.print(appt.getAppointmentStatusEnum());
+                System.out.println();
+            }
+        } else {
+            System.out.println("There are currently no appointments.");
+        }
     }
     
     public void cancelAppointments() {

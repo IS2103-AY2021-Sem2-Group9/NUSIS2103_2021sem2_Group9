@@ -37,7 +37,7 @@ public class CustomerEntity implements Serializable {
     private String address;
     @Column(nullable = false, length = 32)
     private String city;
-    @OneToMany(mappedBy="customer")
+    @OneToMany(mappedBy="customerEntity")
     private List<AppointmentEntity> appointments;
 
     public CustomerEntity() {

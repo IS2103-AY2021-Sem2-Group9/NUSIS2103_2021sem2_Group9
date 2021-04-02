@@ -1,15 +1,15 @@
 package entity;
 
+import Enumeration.AppointmentStatusEnum;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 @Entity
 public class AppointmentEntity implements Serializable {
@@ -19,19 +19,31 @@ public class AppointmentEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false)
     private String appointmentNum;
-    @Column(nullable = false, length = 32)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date appointmentTimestamp;
-    @Column(nullable = false, length = 32)
-    private Boolean ongoing;
+    @Column(nullable = false)    
+    private LocalDate appointmentDate;
+    @Column(nullable = false)
+    private LocalTime appointmentTime;
+    @Column(nullable = false)
+    private AppointmentStatusEnum appointmentStatusEnum;
     
     @ManyToOne
     private CustomerEntity customerEntity;
     @ManyToOne
     private ServiceProviderEntity serviceProviderEntity;
 
+    public AppointmentEntity() {
+    }
+
+    public AppointmentEntity(String appointmentNum, LocalDate appointmentDate, LocalTime appointmentTime, AppointmentStatusEnum appointmentStatusEnum, CustomerEntity customerEntity, ServiceProviderEntity serviceProviderEntity) {
+        this.appointmentNum = appointmentNum;
+        this.appointmentDate = appointmentDate;
+        this.appointmentTime = appointmentTime;
+        this.appointmentStatusEnum = appointmentStatusEnum;
+        this.customerEntity = customerEntity;
+        this.serviceProviderEntity = serviceProviderEntity;
+    }  
     
     public Long getId() {
         return id;
@@ -40,8 +52,6 @@ public class AppointmentEntity implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-
-    
 
     @Override
     public String toString() {
@@ -61,33 +71,33 @@ public class AppointmentEntity implements Serializable {
     public void setAppointmentNum(String appointmentNum) {
         this.appointmentNum = appointmentNum;
     }
-
+    
     /**
-     * @return the appointmentTimestamp
+     * @return the appointmentDate
      */
-    public Date getAppointmentTimestamp() {
-        return appointmentTimestamp;
+    public LocalDate getAppointmentDate() {
+        return appointmentDate;
     }
 
     /**
-     * @param appointmentTimestamp the appointmentTimestamp to set
+     * @param appointmentDate the appointmentDate to set
      */
-    public void setAppointmentTimestamp(Date appointmentTimestamp) {
-        this.appointmentTimestamp = appointmentTimestamp;
+    public void setAppointmentDate(LocalDate appointmentDate) {
+        this.appointmentDate = appointmentDate;
     }
 
     /**
-     * @return the ongoing
+     * @return the appointmentTime
      */
-    public Boolean getOngoing() {
-        return ongoing;
+    public LocalTime getAppointmentTime() {
+        return appointmentTime;
     }
 
     /**
-     * @param ongoing the ongoing to set
+     * @param appointmentTime the appointmentTime to set
      */
-    public void setOngoing(Boolean ongoing) {
-        this.ongoing = ongoing;
+    public void setAppointmentTime(LocalTime appointmentTime) {
+        this.appointmentTime = appointmentTime;
     }
 
     /**
@@ -118,6 +128,20 @@ public class AppointmentEntity implements Serializable {
         this.serviceProviderEntity = serviceProviderEntity;
     }
     
+    /**
+     * @return the appointmentStatusEnum
+     */
+    public AppointmentStatusEnum getAppointmentStatusEnum() {
+        return appointmentStatusEnum;
+    }
+
+    /**
+     * @param appointmentStatusEnum the appointmentStatusEnum to set
+     */
+    public void setAppointmentStatusEnum(AppointmentStatusEnum appointmentStatusEnum) {
+        this.appointmentStatusEnum = appointmentStatusEnum;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
@@ -136,6 +160,6 @@ public class AppointmentEntity implements Serializable {
             return false;
         }
         return true;
-    }
+    }    
     
 }
