@@ -1,12 +1,15 @@
 package easyappointmentclient;
 
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
+import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import entity.AdminEntity;
+import entity.BusinessCategoryEntity;
 
 import java.util.Scanner;
 
 public class AdminModule {
     private AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
+    private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
     private AdminEntity loggedInAdminEntity;
     
     public AdminModule() 
@@ -66,7 +69,7 @@ public class AdminModule {
                 }
                 else if (response == 6) 
                 {
-                    System.out.println("work in progress...\n");
+                    createBusinessCategory();
                 }
                 else if (response == 7) 
                 {
@@ -92,5 +95,20 @@ public class AdminModule {
                 break;
             }
         }
+    }
+    
+    private void createBusinessCategory() 
+    {
+        System.out.println("*** Admin Terminal :: Add a Business Category ***\n");
+        Scanner scanner = new Scanner(System.in);
+        
+        BusinessCategoryEntity newBusinessCategory = new BusinessCategoryEntity();
+        String category = "";
+        System.out.print("Enter a new business category> ");
+        category = scanner.nextLine();
+        newBusinessCategory.setCategoryName(category);
+        
+        String addedCategory = businessCategorySessionBeanRemote.createBusinessCategoryEntity(newBusinessCategory);
+        System.out.println("The business category " + addedCategory + " is added.");
     }
 }
