@@ -16,8 +16,9 @@ public class AdminModule {
     {
     }
 
-    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, AdminEntity loggedInAdminEntity) {
+    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, AdminEntity loggedInAdminEntity) {
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
+        this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
         this.loggedInAdminEntity = loggedInAdminEntity;
     }
     
@@ -109,6 +110,6 @@ public class AdminModule {
         newBusinessCategory.setCategoryName(category);
         
         String addedCategory = businessCategorySessionBeanRemote.createBusinessCategoryEntity(newBusinessCategory);
-        System.out.println("The business category " + addedCategory + " is added.");
+        System.out.println("The business category " + addedCategory + " is added.\n");
     }
 }
