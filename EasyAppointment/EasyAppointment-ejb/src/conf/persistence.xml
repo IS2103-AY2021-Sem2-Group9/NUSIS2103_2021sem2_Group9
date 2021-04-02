@@ -4,6 +4,7 @@
     <jta-data-source>jdbc/easyAppointment</jta-data-source>
     <class>entity.AdminEntity</class>
     <class>entity.ServiceProviderEntity</class>
+    <class>entity.BusinessCategoryEntity</class>
     <class>entity.AppointmentEntity</class>
     <class>entity.CustomerEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
