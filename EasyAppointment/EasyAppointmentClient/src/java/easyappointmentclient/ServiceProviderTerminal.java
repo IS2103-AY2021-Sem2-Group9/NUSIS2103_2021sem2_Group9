@@ -128,6 +128,7 @@ public class ServiceProviderTerminal {
         } catch(UnknownPersistenceException ex ) {
             System.out.println("Error registering " + ex.getMessage());
         }
+
     }
     
     private void doLogin() throws InvalidLoginCredentialException 

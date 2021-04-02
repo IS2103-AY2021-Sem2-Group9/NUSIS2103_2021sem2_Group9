@@ -2,22 +2,26 @@ package easyappointmentclient;
 
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
+import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 
 import java.util.Scanner;
 
 public class MainApp {
     private AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
     private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
+    private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
     private ServiceProviderTerminal spTerminal;
     private AdminTerminal adminTerminal;
+    private CustomerTerminal customerTerminal;
     
     public MainApp() 
     {
     }
 
-    public MainApp(ServiceProviderEntitySessionBeanRemote sericeProviderSessionBeanRemote, AdminEntitySessionBeanRemote adminEntitySessionBeanRemote) {
+    public MainApp(ServiceProviderEntitySessionBeanRemote sericeProviderSessionBeanRemote, AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote) {
         this.serviceProviderSessionBeanRemote = sericeProviderSessionBeanRemote;
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
+        this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
     }
     
     public void runApp() {
@@ -37,7 +41,8 @@ public class MainApp {
                 response = scanner.nextInt();
                 
                 if(response == 1) {
-                    System.out.println("under development");
+                    customerTerminal = new CustomerTerminal(customerEntitySessionBeanRemote);
+                    customerTerminal.runApp();
                 } else if(response == 2) {
                     spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote);
                     spTerminal.runApp();

@@ -4,6 +4,8 @@
     <jta-data-source>jdbc/easyAppointment</jta-data-source>
     <class>entity.AdminEntity</class>
     <class>entity.ServiceProviderEntity</class>
+    <class>entity.AppointmentEntity</class>
+    <class>entity.CustomerEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>
