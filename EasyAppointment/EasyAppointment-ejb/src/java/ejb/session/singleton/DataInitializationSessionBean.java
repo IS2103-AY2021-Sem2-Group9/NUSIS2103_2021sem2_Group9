@@ -5,6 +5,7 @@
  */
 package ejb.session.singleton;
 
+import Enumeration.ServiceProviderStatus;
 import ejb.session.stateless.AdminEntitySessionBeanLocal;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanLocal;
 import entity.AdminEntity;
@@ -19,7 +20,7 @@ import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
 import javax.ejb.Startup;
 import util.exception.AdminNotFoundException;
-import util.exception.ServiceProviderAddressExistException;
+import util.exception.ServiceProviderEmailExistException;
 import util.exception.UnknownPersistenceException;
 
 @Singleton
@@ -55,9 +56,12 @@ public class DataInitializationSessionBean {
             List<Boolean> availability =new ArrayList<Boolean>(Arrays.asList(new Boolean[10]));
             Collections.fill(availability, Boolean.TRUE);
             adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("terry@easyadmin.com", "password", "Terry", "Tan"));
-            serviceProviderEntitySessionBeanLocal.createServiceProviderEntity(new ServiceProviderEntity("Kevin Paterson", "1", "1111001111", "Clementi", "93718799", "13, Clementi Road", "kevin@nuh.com.sg", 113322, availability));
-        } catch (ServiceProviderAddressExistException | UnknownPersistenceException ex) {
+            adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("1", "1", "Test", "Test"));
+            serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(new ServiceProviderEntity("Kevin Paterson", "1", "1111001111", "Clementi", "93718799", "13, Clementi Road", "kevin@nuh.com.sg", 113322, availability, ServiceProviderStatus.APPROVED));
+        } catch (ServiceProviderEmailExistException | UnknownPersistenceException ex) {
             ex.printStackTrace();
         }
     }
+    
+    
 }

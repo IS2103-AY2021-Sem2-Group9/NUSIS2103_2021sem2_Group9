@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ejb.session.stateless;
 
+import Enumeration.ServiceProviderStatus;
 import entity.ServiceProviderEntity;
 import javax.ejb.Stateless;
 import javax.ejb.Local;
@@ -15,14 +11,10 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.exception.InvalidLoginCredentialException;
-import util.exception.ServiceProviderAddressExistException;
+import util.exception.ServiceProviderEmailExistException;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UnknownPersistenceException;
 
-/**
- *
- * @author marcuslee
- */
 @Stateless
 @Local(ServiceProviderEntitySessionBeanLocal.class)
 @Remote(ServiceProviderEntitySessionBeanRemote.class)
@@ -32,7 +24,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     private EntityManager em;
 
     @Override
-    public ServiceProviderEntity createServiceProviderEntity(ServiceProviderEntity newServiceProvider) throws ServiceProviderAddressExistException, UnknownPersistenceException {
+    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider) throws ServiceProviderEmailExistException, UnknownPersistenceException {
         try {
             em.persist(newServiceProvider);
             em.flush();
@@ -44,7 +36,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
             {
                 if(ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException"))
                 {
-                    throw new ServiceProviderAddressExistException();
+                    throw new ServiceProviderEmailExistException("Try again, service provider email address exists");
                 }
                 else
                 {
@@ -76,18 +68,19 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     public ServiceProviderEntity serviceProviderLogin(String email, Integer password) throws InvalidLoginCredentialException {
         try {
             ServiceProviderEntity currentServiceProviderEntity = retrieveServiceProviderByServiceProviderAddress(email);
-            if(currentServiceProviderEntity.getPassword().equals(password)) {
+            if(currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.APPROVED) {
                 return currentServiceProviderEntity;
                 
-            }  else {
-                throw new InvalidLoginCredentialException("Email address does not exist or invalid password");
+            }  else if (currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.PENDING) {
+                throw new InvalidLoginCredentialException("Your account is still pending administrator's approval. Please try again later!");
+            } else if (currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.BLOCKED) {
+                throw new InvalidLoginCredentialException("Your account has been blocked by an administrator.");
+            } else {
+                throw new InvalidLoginCredentialException("Email address does not exist or invalid password.");
             }
-            
-           
         } catch (ServiceProviderEntityNotFoundException ex) {
             throw new InvalidLoginCredentialException("Email address does not exist or invalid password");
         }
     }
- 
     
 }

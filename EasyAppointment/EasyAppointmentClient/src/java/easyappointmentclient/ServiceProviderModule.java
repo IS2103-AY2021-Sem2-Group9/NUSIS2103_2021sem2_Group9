@@ -29,8 +29,10 @@ public class ServiceProviderModule {
             System.out.println("5: Logout");
             response = 0; 
             
+            
             while (response < 1 || response > 6) {
                 System.out.print("> ");
+                response = sc.nextInt();
                 if (response == 1) {
                     
                 } else if (response == 2) {
@@ -42,7 +44,7 @@ public class ServiceProviderModule {
                 } else if(response == 5) {
                     break;
                 } else {
-                    System.out.println("Invalid option, please try again");
+                    System.out.println("Invalid option, please key in 1 ~ 5 only.");
                 }
             }
             if (response == 5) {

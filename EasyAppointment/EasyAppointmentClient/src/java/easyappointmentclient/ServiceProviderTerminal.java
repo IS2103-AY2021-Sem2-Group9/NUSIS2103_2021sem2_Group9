@@ -1,9 +1,16 @@
 package easyappointmentclient;
 
+import Enumeration.ServiceProviderStatus;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.ServiceProviderEntity;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.ServiceProviderEmailExistException;
+import util.exception.UnknownPersistenceException;
 
 public class ServiceProviderTerminal {
     
@@ -27,6 +34,7 @@ public class ServiceProviderTerminal {
             System.out.println("1: Registration");
             System.out.println("2: Login");
             System.out.println("3: Exit");
+            response = 0;
                 
             while (response < 1 || response > 4) {
                 System.out.print("> ");
@@ -87,7 +95,25 @@ public class ServiceProviderTerminal {
         spEntity.setEmail(scanner.nextLine().trim());
         System.out.print("Enter Password> ");
         spEntity.setPassword(scanner.nextInt());
-  
+        
+        //dummy data for availability, will replace with list of appointments instead
+        List<Boolean> availability =new ArrayList<Boolean>(Arrays.asList(new Boolean[10]));
+        Collections.fill(availability, Boolean.TRUE);
+        spEntity.setAvailability(availability);
+        
+        spEntity.setStatus(ServiceProviderStatus.PENDING);
+        
+        try {
+            spEntity = serviceProviderEntitySessionBeanRemote.registerNewServiceProvider(spEntity);
+            System.out.println("You have registered successfully!"); 
+            
+            System.out.println("Enter 0 to go back to the previous menu"); 
+            System.out.print("> "); 
+        } catch(ServiceProviderEmailExistException ex ) {
+            System.out.println("Error registering " + ex.getMessage());
+        } catch(UnknownPersistenceException ex ) {
+            System.out.println("Error registering " + ex.getMessage());
+        }
     }
     
     private void doLogin() throws InvalidLoginCredentialException 
