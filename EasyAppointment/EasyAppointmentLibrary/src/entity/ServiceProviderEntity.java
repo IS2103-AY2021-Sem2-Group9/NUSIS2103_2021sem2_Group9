@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package entity;
 
 import java.io.Serializable;
@@ -13,10 +8,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-/**
- *
- * @author marcuslee
- */
+import Enumeration.ServiceProviderStatus;
+
+
 @Entity
 public class ServiceProviderEntity implements Serializable {
 
@@ -36,17 +30,20 @@ public class ServiceProviderEntity implements Serializable {
     private String phoneNumber; 
     @Column(nullable = false, length = 128)
     private String address; 
-    @Column(nullable = false, length = 64)
+    @Column(nullable = false, length = 64, unique = true)
     private String email; 
     @Column(nullable = false, length = 64)
     private Integer password; 
     @Column(nullable = false)
     private List<Boolean> availability;
+    
+    @Column (nullable = false)
+    private ServiceProviderStatus status;
 
     public ServiceProviderEntity() {
     }
 
-    public ServiceProviderEntity(String name, String category, String uen, String city, String phoneNumber, String address, String email, Integer password, List<Boolean> availability) {
+    public ServiceProviderEntity(String name, String category, String uen, String city, String phoneNumber, String address, String email, Integer password, List<Boolean> availability, ServiceProviderStatus status) {
         this.name = name;
         this.category = category;
         this.uen = uen;
@@ -56,6 +53,15 @@ public class ServiceProviderEntity implements Serializable {
         this.email = email;
         this.password = password;
         this.availability = availability;
+        this.status = status;
+    }
+
+    public ServiceProviderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ServiceProviderStatus status) {
+        this.status = status;
     }
 
     public String getCity() {
