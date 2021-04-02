@@ -42,6 +42,16 @@ public class ServiceProviderTerminal {
                 if (response == 1) 
                 {
                     doRegister();
+                    System.out.println("You have registered successfully! \n"); 
+                    System.out.println("Enter 0 to go back to the previous menu");
+                    System.out.print("> ");
+                    Integer regResponse = 0; 
+                    regResponse = scanner.nextInt();
+                    if(regResponse == 0) {
+                        break;
+                    } else {
+                        continue;
+                    }
                 } 
                 else if (response == 2) 
                 {
@@ -77,6 +87,14 @@ public class ServiceProviderTerminal {
     {
         Scanner scanner = new Scanner(System.in);
         ServiceProviderEntity spEntity = new ServiceProviderEntity(); 
+        String name = ""; 
+        String category = ""; 
+        String uen = ""; 
+        String city = ""; 
+        String phone = "";
+        String address = "";
+        String email = "";
+        String password = "";
        
         System.out.println("*** Service Provider Terminal :: Registration Operation ***\n");
         System.out.print("Enter Name> ");
@@ -104,11 +122,7 @@ public class ServiceProviderTerminal {
         spEntity.setStatus(ServiceProviderStatus.PENDING);
         
         try {
-            spEntity = serviceProviderEntitySessionBeanRemote.registerNewServiceProvider(spEntity);
-            System.out.println("You have registered successfully!"); 
-            
-            System.out.println("Enter 0 to go back to the previous menu"); 
-            System.out.print("> "); 
+            spEntity = serviceProviderEntitySessionBeanRemote.registerNewServiceProvider(spEntity);            
         } catch(ServiceProviderEmailExistException ex ) {
             System.out.println("Error registering " + ex.getMessage());
         } catch(UnknownPersistenceException ex ) {

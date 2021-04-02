@@ -3,6 +3,8 @@ package easyappointmentclient;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.ServiceProviderEntity;
 import java.util.Scanner;
+import util.exception.ServiceProviderEntityNotFoundException;
+import util.exception.UpdateServiceProviderException;
 
 public class ServiceProviderModule {
     
@@ -34,9 +36,18 @@ public class ServiceProviderModule {
                 System.out.print("> ");
                 response = sc.nextInt();
                 if (response == 1) {
-                    
+                   doViewProfile();
+                   System.out.println("Enter 0 to go back to the previous menu");
+                   System.out.print("> ");
+                   Integer viewResponse = 0; 
+                   viewResponse = sc.nextInt();
+                   if (viewResponse == 0) {
+                       break;
+                   } else {
+                       continue;
+                   }
                 } else if (response == 2) {
-                    
+                    doEditProfile(currentServiceProviderEntity);
                 } else if (response == 3) {
                     
                 } else if (response == 4) {
@@ -53,5 +64,74 @@ public class ServiceProviderModule {
         }
         
     }
+    
+    public void doViewProfile() { 
+        System.out.println("*** Service Provider Terminal :: View Profile ***");
+        
+        System.out.println("Name: " + currentServiceProviderEntity.getName());
+        System.out.println("Category: " + currentServiceProviderEntity.getCategory());
+        System.out.println("Business Registration Number: " + currentServiceProviderEntity.getUen());
+        System.out.println("City: " + currentServiceProviderEntity.getCity());
+        System.out.println("Phone: " + currentServiceProviderEntity.getPhoneNumber());
+        System.out.println("Business Address: " + currentServiceProviderEntity.getAddress());
+        System.out.println("Email: " + currentServiceProviderEntity.getEmail() + "\n");  
+    }
+    
+    
+   public void doEditProfile(ServiceProviderEntity currentServiceProviderEntity) {
+       System.out.println("*** Service Provider Terminal :: Edit Profile ***"); 
+       
+       Scanner scanner = new Scanner(System.in); 
+       String input; 
+       
+        System.out.print("Enter Name (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0) {
+            currentServiceProviderEntity.setName(input);
+        }
+        
+        System.out.print("Enter Business Category (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0) {
+            currentServiceProviderEntity.setCategory(input);
+        }
+        
+        System.out.print("Enter Business Registration Number (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0) {
+            currentServiceProviderEntity.setUen(input);
+        }
+        
+        System.out.print("Enter City (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0) {
+            currentServiceProviderEntity.setCity(input);
+        }
+        
+        System.out.print("Enter Phone (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0) {
+            currentServiceProviderEntity.setPhoneNumber(input);
+        }
+        
+        System.out.print("Enter Business Address (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0) {
+            currentServiceProviderEntity.setAddress(input);
+        }
+        
+        System.out.print("Enter Password (blank if no change)> ");
+        Integer newPassword = scanner.nextInt();
+        if(input.length() > 0) {
+            currentServiceProviderEntity.setPassword(newPassword);
+        }
+        
+        try {
+            serviceProviderEntitySessionBeanRemote.updateServiceProvider(currentServiceProviderEntity);
+            System.out.println("Service Provider Profile updated successfully!\n");
+        } catch(ServiceProviderEntityNotFoundException | UpdateServiceProviderException ex) {
+            System.out.println("An error has occured while updating staff: " + ex.getMessage() + "\n");
+        }
+   }
     
 }

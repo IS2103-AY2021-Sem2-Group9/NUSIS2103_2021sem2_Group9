@@ -14,6 +14,7 @@ import util.exception.InvalidLoginCredentialException;
 import util.exception.ServiceProviderEmailExistException;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateServiceProviderException;
 
 @Stateless
 @Local(ServiceProviderEntitySessionBeanLocal.class)
@@ -59,7 +60,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         try {
             return (ServiceProviderEntity)query.getSingleResult();
         } catch (NoResultException ex) {
-            throw new ServiceProviderEntityNotFoundException("Service Provider address " + email + " does not exist!");
+            throw new ServiceProviderEntityNotFoundException("Service Provider email " + email + " does not exist!");
         }
     }
    
@@ -81,6 +82,39 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         } catch (ServiceProviderEntityNotFoundException ex) {
             throw new InvalidLoginCredentialException("Email address does not exist or invalid password");
         }
+    }
+    
+    @Override
+    public ServiceProviderEntity retrieveServiceProviderByServiceProviderId(Long serviceProviderId) throws ServiceProviderEntityNotFoundException {
+        ServiceProviderEntity serviceProviderEntity = em.find(ServiceProviderEntity.class, serviceProviderId);
+        if(serviceProviderEntity != null) {
+            return serviceProviderEntity;
+        }
+        else {
+            throw new ServiceProviderEntityNotFoundException("Service Provier ID " + serviceProviderId + " does not exist");
+        }
+    }
+    
+    @Override
+    public void updateServiceProvider(ServiceProviderEntity serviceProviderEntity) throws ServiceProviderEntityNotFoundException, UpdateServiceProviderException {
+        if(serviceProviderEntity.getServiceProviderId() != null) {
+            ServiceProviderEntity serviceProviderEntityToUpdate = retrieveServiceProviderByServiceProviderId(serviceProviderEntity.getServiceProviderId());
+            
+            if(serviceProviderEntityToUpdate.getEmail().equals(serviceProviderEntity.getEmail())) {
+                serviceProviderEntityToUpdate.setName(serviceProviderEntity.getName());
+                serviceProviderEntityToUpdate.setCategory(serviceProviderEntity.getCategory());
+                serviceProviderEntityToUpdate.setUen(serviceProviderEntity.getUen());
+                serviceProviderEntityToUpdate.setCity(serviceProviderEntity.getCity());
+                serviceProviderEntityToUpdate.setPhoneNumber(serviceProviderEntity.getPhoneNumber());
+                serviceProviderEntityToUpdate.setAddress(serviceProviderEntity.getAddress());
+                serviceProviderEntityToUpdate.setPassword(serviceProviderEntity.getPassword());
+
+            } else {
+                throw new UpdateServiceProviderException("Username of service provider to be updated does not match the existing record");
+            }
+        } else {
+            throw new ServiceProviderEntityNotFoundException("Service Provider does not exist!");   
+        }   
     }
     
 }
