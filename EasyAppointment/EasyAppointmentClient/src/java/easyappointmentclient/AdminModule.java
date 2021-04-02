@@ -105,11 +105,51 @@ public class AdminModule {
         
         BusinessCategoryEntity newBusinessCategory = new BusinessCategoryEntity();
         String category = "";
-        System.out.print("Enter a new business category> ");
-        category = scanner.nextLine();
-        newBusinessCategory.setCategoryName(category);
+        Integer zero = 1;
         
-        String addedCategory = businessCategorySessionBeanRemote.createBusinessCategoryEntity(newBusinessCategory);
-        System.out.println("The business category " + addedCategory + " is added.\n");
+        while (true)
+        {
+            System.out.println("Enter 0 to go back to the previous menu.");
+            System.out.print("Enter a new business category> ");
+            category = scanner.nextLine();
+            
+            if (category.length() > 1)
+            {
+                newBusinessCategory.setCategoryName(category);
+
+                String addedCategory = businessCategorySessionBeanRemote.createBusinessCategoryEntity(newBusinessCategory);
+                System.out.println("The business category " + addedCategory + " is added.\n");
+                break;
+            }
+            else if (category.length() == 1)
+            {
+                try
+                {
+                    zero = Integer.valueOf(category);
+                }
+                catch (NumberFormatException ex)
+                {
+                    newBusinessCategory.setCategoryName(category);
+
+                    String addedCategory = businessCategorySessionBeanRemote.createBusinessCategoryEntity(newBusinessCategory);
+                    System.out.println("The business category " + addedCategory + " is added.\n");
+                    break;
+                }
+                
+                if (zero == 0) 
+                {
+                    break;
+                } 
+                else 
+                {
+                    System.out.println("Please enter 0 if you would like to go back to the previous menu.");
+                    System.out.println("Single digits are not allowed to be category names.");
+                }
+            }
+            else
+            {
+                continue;
+            }
+        }
     }
 }
