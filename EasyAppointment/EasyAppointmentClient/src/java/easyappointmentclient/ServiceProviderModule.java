@@ -48,6 +48,7 @@ public class ServiceProviderModule {
                    }
                 } else if (response == 2) {
                     doEditProfile(currentServiceProviderEntity);
+                    System.out.println("Profile successfully updated!");
                 } else if (response == 3) {
                     
                 } else if (response == 4) {
@@ -121,10 +122,16 @@ public class ServiceProviderModule {
         }
         
         System.out.print("Enter Password (blank if no change)> ");
-        Integer newPassword = scanner.nextInt();
+        input = scanner.nextLine().trim();
         if(input.length() > 0) {
-            currentServiceProviderEntity.setPassword(newPassword);
+            try {
+                Integer newPassword = Integer.valueOf(input);
+                currentServiceProviderEntity.setPassword(newPassword);
+            } catch (NumberFormatException ex) {
+                System.out.println("Please input a password consisting of numebers only!");
+            }
         }
+     
         
         try {
             serviceProviderEntitySessionBeanRemote.updateServiceProvider(currentServiceProviderEntity);
