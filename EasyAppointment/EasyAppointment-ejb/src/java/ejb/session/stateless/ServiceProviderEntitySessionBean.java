@@ -1,7 +1,10 @@
 package ejb.session.stateless;
 
 import Enumeration.ServiceProviderStatus;
+import entity.BusinessCategoryEntity;
 import entity.ServiceProviderEntity;
+import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -10,7 +13,10 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import util.exception.BusinessCategoryNotFoundException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.ServiceProviderAlreadyApprovedException;
+import util.exception.ServiceProviderAlreadyBlockedException;
 import util.exception.ServiceProviderEmailExistException;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -23,10 +29,17 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
 
     @PersistenceContext(unitName = "EasyAppointment-ejbPU")
     private EntityManager em;
-
+    
+    @EJB
+    private BusinessCategorySessionBeanLocal businessCategorySessionBeanLocal;
+    
     @Override
-    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider) throws ServiceProviderEmailExistException, UnknownPersistenceException {
-        try {
+    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException 
+    {
+        try 
+        {
+            String currBusinessCategory = newServiceProvider.getCategory();
+            BusinessCategoryEntity businessCategory = businessCategorySessionBeanLocal.retrieveBusinessCategoryByName(currBusinessCategory);
             em.persist(newServiceProvider);
             em.flush();
             return newServiceProvider;
@@ -49,6 +62,10 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
                 throw new UnknownPersistenceException(ex.getMessage());
             }
         }
+        catch(BusinessCategoryNotFoundException ex)
+        {
+            throw new BusinessCategoryNotFoundException(ex.getMessage());
+        }
         
     }
             
@@ -64,14 +81,14 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         }
     }
    
-    
+   
     @Override
     public ServiceProviderEntity serviceProviderLogin(String email, Integer password) throws InvalidLoginCredentialException {
         try {
             ServiceProviderEntity currentServiceProviderEntity = retrieveServiceProviderByServiceProviderAddress(email);
             if(currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.APPROVED) {
                 return currentServiceProviderEntity;
-                
+
             }  else if (currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.PENDING) {
                 throw new InvalidLoginCredentialException("Your account is still pending administrator's approval. Please try again later!");
             } else if (currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.BLOCKED) {
@@ -83,7 +100,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
             throw new InvalidLoginCredentialException("Email address does not exist or invalid password");
         }
     }
-    
+
     @Override
     public ServiceProviderEntity retrieveServiceProviderByServiceProviderId(Long serviceProviderId) throws ServiceProviderEntityNotFoundException {
         ServiceProviderEntity serviceProviderEntity = em.find(ServiceProviderEntity.class, serviceProviderId);
@@ -117,4 +134,52 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         }   
     }
     
+    @Override
+    public List<ServiceProviderEntity> retrieveAllServiceProviders()
+    {
+        Query query = em.createQuery("SELECT s FROM ServiceProviderEntity s");
+        
+        return query.getResultList();
+    }
+    
+    @Override
+    public List<ServiceProviderEntity> retrieveServiceProvidersByStatus(ServiceProviderStatus status)
+    {
+        Query query = em.createQuery("SELECT s FROM ServiceProviderEntity s WHERE s.status = :currStatus");
+        query.setParameter("currStatus", status);
+        
+        return query.getResultList();
+    }
+    
+    @Override
+    public String approveServiceProviderById(Long id) throws ServiceProviderEntityNotFoundException, ServiceProviderAlreadyApprovedException
+    {
+        ServiceProviderEntity sp = retrieveServiceProviderByServiceProviderId(id);
+        if (sp.getStatus() == ServiceProviderStatus.APPROVED) 
+        {
+            throw new ServiceProviderAlreadyApprovedException("Service Provider has already been approved!");
+        } 
+        else
+        {
+            sp.setStatus(ServiceProviderStatus.APPROVED);
+        }
+        
+        return sp.getName();
+    }
+    
+    @Override
+    public String blockServiceProviderById(Long id) throws ServiceProviderEntityNotFoundException, ServiceProviderAlreadyBlockedException
+    {
+        ServiceProviderEntity sp = retrieveServiceProviderByServiceProviderId(id);
+        if (sp.getStatus() == ServiceProviderStatus.BLOCKED) 
+        {
+            throw new ServiceProviderAlreadyBlockedException("Service Provider has already been blocked!");
+        } 
+        else
+        {
+            sp.setStatus(ServiceProviderStatus.BLOCKED);
+        }
+        
+        return sp.getName();
+    }
 }

@@ -1,26 +1,42 @@
 package easyappointmentclient;
 
+import Enumeration.ServiceProviderStatus;
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
 import ejb.session.stateless.BusinessCategorySessionBeanRemote;
+import ejb.session.stateless.CustomerEntitySessionBeanRemote;
+import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.AdminEntity;
 import entity.BusinessCategoryEntity;
+import entity.CustomerEntity;
+import entity.ServiceProviderEntity;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 
 import java.util.Scanner;
 import util.exception.BusinessCategoryNotFoundException;
+import util.exception.CustomerNotFoundException;
+import util.exception.DeleteCustomerException;
+import util.exception.ServiceProviderAlreadyApprovedException;
+import util.exception.ServiceProviderAlreadyBlockedException;
+import util.exception.ServiceProviderEntityNotFoundException;
 
 public class AdminModule {
     private AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
     private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
+    private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
+    private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
     private AdminEntity loggedInAdminEntity;
     
     public AdminModule() 
     {
     }
 
-    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, AdminEntity loggedInAdminEntity) {
+    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntity loggedInAdminEntity) {
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
         this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
+        this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
+        this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
         this.loggedInAdminEntity = loggedInAdminEntity;
     }
     
@@ -41,7 +57,8 @@ public class AdminModule {
             System.out.println("6: Add Business category");
             System.out.println("7: Remove Business category");
             System.out.println("8: Send reminder email");
-            System.out.println("9: Logout");
+            System.out.println("9: Delete customer");
+            System.out.println("10: Logout");
             
             response = 0;
             
@@ -60,15 +77,15 @@ public class AdminModule {
                 }
                 else if (response == 3) 
                 {
-                    System.out.println("work in progress...\n");
+                    viewServiceProviders();
                 }
                 else if (response == 4) 
                 {
-                    System.out.println("work in progress...\n");
+                    approveServiceProvider();
                 }
                 else if (response == 5) 
                 {
-                    System.out.println("work in progress...\n");
+                    blockServiceProvider();
                 }
                 else if (response == 6) 
                 {
@@ -84,6 +101,10 @@ public class AdminModule {
                 }
                 else if (response == 9) 
                 {
+                    deleteCustomer();
+                }
+                else if (response == 10) 
+                {
                     break;
                 }
                 else 
@@ -92,10 +113,120 @@ public class AdminModule {
                 }
             }
             
-            if (response == 9) 
+            if (response == 10) 
             {
                 System.out.println("Thank you! Logging out...\n");
                 break;
+            }
+        }
+    }
+    
+    private void viewServiceProviders()
+    {
+        System.out.println("*** Admin Terminal :: View Service Providers ***\n");
+        Scanner scanner = new Scanner(System.in);
+        List<ServiceProviderEntity> serviceProviders = serviceProviderSessionBeanRemote.retrieveAllServiceProviders();
+        
+        System.out.printf("%-18s%-20s%-15s%-18s%-10s\n", "Name", "| Business Category", "| City", "| Overall Rating", "| Status");
+        
+        for (ServiceProviderEntity sp : serviceProviders)
+        {
+            System.out.printf("%-18s%-20s%-15s%-18s%-10s\n", sp.getName(), "| " + sp.getCategory(), "| " + sp.getCity(), "| " + "<rating>", "| " + sp.getStatus());
+        }
+        
+        System.out.println();
+    }
+    
+    private void approveServiceProvider()
+    {
+        System.out.println("*** Admin Terminal :: Approve Service Provider ***\n");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("List of service providers with pending approval: \n");
+        List<ServiceProviderEntity> serviceProviders = serviceProviderSessionBeanRemote.retrieveServiceProvidersByStatus(ServiceProviderStatus.PENDING);
+        
+        System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone");
+        
+        for (ServiceProviderEntity sp : serviceProviders)
+        {
+            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber());
+        }
+        
+        System.out.println();
+        
+        while (true)
+        {
+            System.out.println("Enter 0 to go back to the previous menu.");
+            System.out.print("Enter Service Provider ID> ");
+            
+            try
+            {
+                Long id = scanner.nextLong();
+                scanner.nextLine();
+                if (id == 0)
+                {
+                   break;
+                }
+                String approvedSp = serviceProviderSessionBeanRemote.approveServiceProviderById(id);
+                System.out.println(approvedSp + "'s registration is approved.\n");
+                break;
+            }
+            catch (ServiceProviderEntityNotFoundException | ServiceProviderAlreadyApprovedException ex)
+            {
+                System.err.println("Error occured while approving Service Provider: " + ex.getMessage());
+            }
+            catch (InputMismatchException ex)
+            {
+                System.err.println("Please only enter digits!");
+                scanner.next();
+            }
+        }
+    }
+    
+        private void blockServiceProvider()
+    {
+        System.out.println("*** Admin Terminal :: Block Service Provider ***\n");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("List of service providers: \n");
+        List<ServiceProviderEntity> approvedServiceProviders = serviceProviderSessionBeanRemote.retrieveServiceProvidersByStatus(ServiceProviderStatus.APPROVED);
+        List<ServiceProviderEntity> pendingServiceProviders = serviceProviderSessionBeanRemote.retrieveServiceProvidersByStatus(ServiceProviderStatus.PENDING);
+        List<ServiceProviderEntity> totalServiceProviders = new ArrayList<>();
+        totalServiceProviders.addAll(approvedServiceProviders);
+        totalServiceProviders.addAll(pendingServiceProviders);
+        
+        System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone", "| Status");
+        
+        for (ServiceProviderEntity sp : totalServiceProviders)
+        {
+            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber(), "| " + sp.getStatus());
+        }
+        
+        System.out.println();
+        
+        while (true)
+        {
+            System.out.println("Enter 0 to go back to the previous menu.");
+            System.out.print("Enter Service Provider ID> ");
+
+            try
+            {
+                Long id = scanner.nextLong();
+                scanner.nextLine();
+                if (id == 0)
+                {
+                   break;
+                }
+                String blockedSp = serviceProviderSessionBeanRemote.blockServiceProviderById(id);
+                System.out.println("Service Provider: " + blockedSp + " has been blocked.\n");
+                break;
+            }
+            catch (ServiceProviderEntityNotFoundException | ServiceProviderAlreadyBlockedException ex)
+            {
+                System.err.println("Error occured while blocking Service Provider: " + ex.getMessage());
+            }
+            catch (InputMismatchException ex)
+            {
+                System.err.println("Please only enter digits!");
+                scanner.next();
             }
         }
     }
@@ -219,6 +350,55 @@ public class AdminModule {
             {
                 System.out.println("Error removing Business Category: " + ex.getMessage() + "\n");
             }
+        }
+    }
+    
+    private void deleteCustomer()
+    {
+        Scanner scanner = new Scanner(System.in);        
+        Long id;
+        String response;
+        CustomerEntity deletingCustomer;
+        
+        System.out.println("*** Admin Terminal :: Delete Customer's Account ***\n");
+        
+        while (true)
+        {
+            System.out.println("Enter 0 to go back.");
+            System.out.printf("Enter Customer ID to delete> ");
+            response = "";
+
+            try 
+            {
+                id = scanner.nextLong();
+                scanner.nextLine();
+                if (id == 0)
+                {
+                    break;
+                }
+                deletingCustomer = customerEntitySessionBeanRemote.retrieveCustomerEntityById(id);
+                System.out.printf("Confirm deletion of " + deletingCustomer.getFirstName() + " " + deletingCustomer.getLastName() + " (Enter 'Y' to delete)> ");
+                response = scanner.nextLine().trim().toUpperCase();
+                if (response.equals("Y"))
+                {
+                    customerEntitySessionBeanRemote.deleteCustomerEntity(id);
+                    System.out.println("Customer " + deletingCustomer.getFirstName() + " deleted successfully!\n");
+                }
+                else
+                {
+                    System.out.println("Customer " + deletingCustomer.getFirstName() + " not deleted!\n");
+                }
+            }
+            catch (CustomerNotFoundException | DeleteCustomerException ex)
+            {
+                System.err.println("Error while deleting customer: " + ex.getMessage() + "\n");
+            }
+            catch (InputMismatchException ex)
+            {
+                System.err.println("Please enter digits only for Customer ID!");
+                scanner.next();
+            }
+            
         }
     }
 }

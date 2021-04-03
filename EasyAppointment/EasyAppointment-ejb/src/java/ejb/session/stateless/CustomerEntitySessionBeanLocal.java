@@ -3,6 +3,7 @@ package ejb.session.stateless;
 import entity.CustomerEntity;
 import util.exception.CustomerExistException;
 import util.exception.CustomerNotFoundException;
+import util.exception.DeleteCustomerException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.UnknownPersistenceException;
 
@@ -14,4 +15,6 @@ public interface CustomerEntitySessionBeanLocal {
     public CustomerEntity retrieveCustomerEntityByEmail(String email) throws CustomerNotFoundException;
     
     public CustomerEntity customerLogin(String email, Integer password) throws InvalidLoginCredentialException;
+
+    public void deleteCustomerEntity(Long CustomerId) throws CustomerNotFoundException, DeleteCustomerException;
 }

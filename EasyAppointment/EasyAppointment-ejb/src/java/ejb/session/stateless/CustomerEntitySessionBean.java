@@ -11,6 +11,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import util.exception.CustomerExistException;
 import util.exception.CustomerNotFoundException;
+import util.exception.DeleteCustomerException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.UnknownPersistenceException;
 
@@ -84,6 +85,21 @@ public class CustomerEntitySessionBean implements CustomerEntitySessionBeanLocal
            
         } catch (CustomerNotFoundException ex) {
             throw new InvalidLoginCredentialException("Invalid Login: " + ex.getMessage());
+        }
+    }
+    
+    @Override
+    public void deleteCustomerEntity(Long CustomerId) throws CustomerNotFoundException, DeleteCustomerException
+    {
+        CustomerEntity CustomerEntityToRemove = retrieveCustomerEntityById(CustomerId);
+        
+        if(CustomerEntityToRemove.getAppointments().isEmpty())
+        {
+            em.remove(CustomerEntityToRemove);
+        }
+        else
+        {
+            throw new DeleteCustomerException("Customer ID " + CustomerId + " is associated with existing sale transaction(s) and cannot be deleted!");
         }
     }
 }
