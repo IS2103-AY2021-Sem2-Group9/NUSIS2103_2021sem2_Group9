@@ -1,6 +1,7 @@
 package easyappointmentclient;
 
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
+import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import entity.AdminEntity;
 
 import java.util.Scanner;
@@ -8,6 +9,7 @@ import util.exception.InvalidLoginCredentialException;
 
 public class AdminTerminal {
     private AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
+    private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
     
     private AdminEntity loggedInAdminEntity;
     private AdminModule adminModule;
@@ -16,8 +18,9 @@ public class AdminTerminal {
     {
     }
 
-    public AdminTerminal(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote) {
+    public AdminTerminal(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote) {
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
+        this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
     }
     
     public void runApp() 
@@ -44,7 +47,7 @@ public class AdminTerminal {
                         doLogin();
                         System.out.println("Login successful!\n");
                         
-                        adminModule = new AdminModule(adminEntitySessionBeanRemote, loggedInAdminEntity);
+                        adminModule = new AdminModule(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, loggedInAdminEntity);
                         adminModule.mainMenu();
                     }
                     catch (InvalidLoginCredentialException ex)

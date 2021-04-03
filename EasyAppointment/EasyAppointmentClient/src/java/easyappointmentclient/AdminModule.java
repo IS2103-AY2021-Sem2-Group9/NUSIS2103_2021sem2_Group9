@@ -4,8 +4,10 @@ import ejb.session.stateless.AdminEntitySessionBeanRemote;
 import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import entity.AdminEntity;
 import entity.BusinessCategoryEntity;
+import java.util.List;
 
 import java.util.Scanner;
+import util.exception.BusinessCategoryNotFoundException;
 
 public class AdminModule {
     private AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
@@ -16,8 +18,9 @@ public class AdminModule {
     {
     }
 
-    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, AdminEntity loggedInAdminEntity) {
+    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, AdminEntity loggedInAdminEntity) {
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
+        this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
         this.loggedInAdminEntity = loggedInAdminEntity;
     }
     
@@ -73,7 +76,7 @@ public class AdminModule {
                 }
                 else if (response == 7) 
                 {
-                    System.out.println("work in progress...\n");
+                    removeBusinessCategories();
                 }
                 else if (response == 8) 
                 {
@@ -104,11 +107,118 @@ public class AdminModule {
         
         BusinessCategoryEntity newBusinessCategory = new BusinessCategoryEntity();
         String category = "";
-        System.out.print("Enter a new business category> ");
-        category = scanner.nextLine();
-        newBusinessCategory.setCategoryName(category);
+        Integer zero = 1;
         
-        String addedCategory = businessCategorySessionBeanRemote.createBusinessCategoryEntity(newBusinessCategory);
-        System.out.println("The business category " + addedCategory + " is added.");
+        while (true)
+        {
+            System.out.println("Enter 0 to go back to the previous menu.");
+            System.out.print("Enter a new business category> ");
+            category = scanner.nextLine();
+            
+            if (category.length() > 1)
+            {
+                newBusinessCategory.setCategoryName(category);
+
+                String addedCategory = businessCategorySessionBeanRemote.createBusinessCategoryEntity(newBusinessCategory);
+                System.out.println("The business category " + addedCategory + " is added.\n");
+                break;
+            }
+            else if (category.length() == 1)
+            {
+                try
+                {
+                    zero = Integer.valueOf(category);
+                }
+                catch (NumberFormatException ex)
+                {
+                    newBusinessCategory.setCategoryName(category);
+
+                    String addedCategory = businessCategorySessionBeanRemote.createBusinessCategoryEntity(newBusinessCategory);
+                    System.out.println("The business category " + addedCategory + " is added.\n");
+                    break;
+                }
+                
+                if (zero == 0) 
+                {
+                    break;
+                } 
+                else 
+                {
+                    System.out.println("Please enter 0 if you would like to go back to the previous menu.");
+                    System.out.println("Single digits are not allowed to be category names.");
+                }
+            }
+            else
+            {
+                continue;
+            }
+        }
+    }
+    
+    private void removeBusinessCategories()
+    {
+        System.out.println("*** Admin Terminal :: Remove a Business Category ***\n");
+        Scanner scanner = new Scanner(System.in);
+        List<BusinessCategoryEntity> businessCategories = businessCategorySessionBeanRemote.retrieveAllBusinessCategories();
+        
+        System.out.printf("%11s%16s\n", "Category ID", "Category Name");
+        
+        for (BusinessCategoryEntity category : businessCategories)
+        {
+            System.out.printf("%11s%16s\n", category.getId(), category.getCategoryName());
+        }
+        
+        System.out.println();
+        
+        Integer zero = 1;
+        
+        while (true)
+        {
+            System.out.println("Enter 0 to go back to the previous menu.");
+            System.out.print("Enter the name of the category you want to remove> ");
+
+            String toBeRemoved = scanner.nextLine().trim();
+
+            try
+            {
+                if (toBeRemoved.length() > 1)
+                {
+                    String removedName = businessCategorySessionBeanRemote.deleteBusinessCategory(toBeRemoved);
+                    System.out.println("Business Category " + removedName + " has been removed.\n");
+                    break;
+                }
+                else if (toBeRemoved.length() == 1)
+                {
+                    try
+                    {
+                        zero = Integer.valueOf(toBeRemoved);
+                    }
+                    catch (NumberFormatException ex)
+                    {
+                        String removedName = businessCategorySessionBeanRemote.deleteBusinessCategory(toBeRemoved);
+                        System.out.println("Business Category " + removedName + " has been removed.\n");
+                        break;
+                    }
+                
+                    if (zero == 0) 
+                    {
+                        break;
+                    } 
+                    else 
+                    {
+                        System.out.println("Please enter 0 if you would like to go back to the previous menu.");
+                        System.out.println("Single digits are not allowed to be category names.");
+                    }
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            catch (BusinessCategoryNotFoundException ex)
+            {
+                System.out.println("Error removing Business Category: " + ex.getMessage() + "\n");
+            }
+        }
     }
 }

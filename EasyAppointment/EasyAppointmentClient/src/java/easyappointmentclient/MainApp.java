@@ -2,6 +2,7 @@ package easyappointmentclient;
 
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
+import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 
 import java.util.Scanner;
@@ -9,6 +10,7 @@ import java.util.Scanner;
 public class MainApp {
     private AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
     private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
+    private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
     private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
     private ServiceProviderTerminal spTerminal;
     private AdminTerminal adminTerminal;
@@ -18,10 +20,15 @@ public class MainApp {
     {
     }
 
-    public MainApp(ServiceProviderEntitySessionBeanRemote sericeProviderSessionBeanRemote, AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote) {
+    public MainApp(ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote) {
+        this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
+        this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
+        this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
+    public MainApp(ServiceProviderEntitySessionBeanRemote sericeProviderSessionBeanRemote, AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote) {
         this.serviceProviderSessionBeanRemote = sericeProviderSessionBeanRemote;
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
         this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
+        this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
     }
     
     public void runApp() {
@@ -47,7 +54,7 @@ public class MainApp {
                     spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote);
                     spTerminal.runApp();
                 } else if (response == 3) {
-                    adminTerminal = new AdminTerminal(adminEntitySessionBeanRemote);
+                    adminTerminal = new AdminTerminal(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote);
                     adminTerminal.runApp();
                 } else if (response == 4) {
                     break;
