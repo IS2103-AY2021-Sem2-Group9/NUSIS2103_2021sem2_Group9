@@ -3,9 +3,11 @@ package easyappointmentclient;
 import Enumeration.ServiceProviderStatus;
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
 import ejb.session.stateless.BusinessCategorySessionBeanRemote;
+import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.AdminEntity;
 import entity.BusinessCategoryEntity;
+import entity.CustomerEntity;
 import entity.ServiceProviderEntity;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -13,6 +15,8 @@ import java.util.List;
 
 import java.util.Scanner;
 import util.exception.BusinessCategoryNotFoundException;
+import util.exception.CustomerNotFoundException;
+import util.exception.DeleteCustomerException;
 import util.exception.ServiceProviderAlreadyApprovedException;
 import util.exception.ServiceProviderAlreadyBlockedException;
 import util.exception.ServiceProviderEntityNotFoundException;
@@ -20,6 +24,7 @@ import util.exception.ServiceProviderEntityNotFoundException;
 public class AdminModule {
     private AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
     private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
+    private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
     private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
     private AdminEntity loggedInAdminEntity;
     
@@ -27,9 +32,10 @@ public class AdminModule {
     {
     }
 
-    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntity loggedInAdminEntity) {
+    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntity loggedInAdminEntity) {
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
         this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
+        this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
         this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
         this.loggedInAdminEntity = loggedInAdminEntity;
     }
@@ -51,7 +57,8 @@ public class AdminModule {
             System.out.println("6: Add Business category");
             System.out.println("7: Remove Business category");
             System.out.println("8: Send reminder email");
-            System.out.println("9: Logout");
+            System.out.println("9: Delete customer");
+            System.out.println("10: Logout");
             
             response = 0;
             
@@ -94,6 +101,10 @@ public class AdminModule {
                 }
                 else if (response == 9) 
                 {
+                    deleteCustomer();
+                }
+                else if (response == 10) 
+                {
                     break;
                 }
                 else 
@@ -102,7 +113,7 @@ public class AdminModule {
                 }
             }
             
-            if (response == 9) 
+            if (response == 10) 
             {
                 System.out.println("Thank you! Logging out...\n");
                 break;
@@ -339,6 +350,55 @@ public class AdminModule {
             {
                 System.out.println("Error removing Business Category: " + ex.getMessage() + "\n");
             }
+        }
+    }
+    
+    private void deleteCustomer()
+    {
+        Scanner scanner = new Scanner(System.in);        
+        Long id;
+        String response;
+        CustomerEntity deletingCustomer;
+        
+        System.out.println("*** Admin Terminal :: Delete Customer's Account ***\n");
+        
+        while (true)
+        {
+            System.out.println("Enter 0 to go back.");
+            System.out.printf("Enter Customer ID to delete> ");
+            response = "";
+
+            try 
+            {
+                id = scanner.nextLong();
+                scanner.nextLine();
+                if (id == 0)
+                {
+                    break;
+                }
+                deletingCustomer = customerEntitySessionBeanRemote.retrieveCustomerEntityById(id);
+                System.out.printf("Confirm deletion of " + deletingCustomer.getFirstName() + " " + deletingCustomer.getLastName() + " (Enter 'Y' to delete)> ");
+                response = scanner.nextLine().trim().toUpperCase();
+                if (response.equals("Y"))
+                {
+                    customerEntitySessionBeanRemote.deleteCustomerEntity(id);
+                    System.out.println("Customer " + deletingCustomer.getFirstName() + " deleted successfully!\n");
+                }
+                else
+                {
+                    System.out.println("Customer " + deletingCustomer.getFirstName() + " not deleted!\n");
+                }
+            }
+            catch (CustomerNotFoundException | DeleteCustomerException ex)
+            {
+                System.err.println("Error while deleting customer: " + ex.getMessage() + "\n");
+            }
+            catch (InputMismatchException ex)
+            {
+                System.err.println("Please enter digits only for Customer ID!");
+                scanner.next();
+            }
+            
         }
     }
 }

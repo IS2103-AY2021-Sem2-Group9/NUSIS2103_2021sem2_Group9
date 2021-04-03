@@ -51,7 +51,7 @@ public class MainApp {
                     spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote);
                     spTerminal.runApp();
                 } else if (response == 3) {
-                    adminTerminal = new AdminTerminal(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, serviceProviderSessionBeanRemote);
+                    adminTerminal = new AdminTerminal(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote);
                     adminTerminal.runApp();
                 } else if (response == 4) {
                     break;

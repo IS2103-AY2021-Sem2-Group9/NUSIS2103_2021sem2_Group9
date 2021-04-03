@@ -2,6 +2,7 @@ package easyappointmentclient;
 
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
 import ejb.session.stateless.BusinessCategorySessionBeanRemote;
+import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.AdminEntity;
 
@@ -11,6 +12,7 @@ import util.exception.InvalidLoginCredentialException;
 public class AdminTerminal {
     private AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
     private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
+    private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
     private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
     
     private AdminEntity loggedInAdminEntity;
@@ -20,9 +22,10 @@ public class AdminTerminal {
     {
     }
 
-    public AdminTerminal(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote) {
+    public AdminTerminal(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote) {
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
         this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
+        this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
         this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
     }
     
@@ -50,7 +53,7 @@ public class AdminTerminal {
                         doLogin();
                         System.out.println("Login successful!\n");
                         
-                        adminModule = new AdminModule(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, serviceProviderSessionBeanRemote, loggedInAdminEntity);
+                        adminModule = new AdminModule(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, loggedInAdminEntity);
                         adminModule.mainMenu();
                     }
                     catch (InvalidLoginCredentialException ex)
