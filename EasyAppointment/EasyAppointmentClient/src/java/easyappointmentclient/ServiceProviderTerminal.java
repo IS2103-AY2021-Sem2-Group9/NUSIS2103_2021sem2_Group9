@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
+import util.exception.BusinessCategoryNotFoundException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.ServiceProviderEmailExistException;
 import util.exception.UnknownPersistenceException;
@@ -42,7 +43,6 @@ public class ServiceProviderTerminal {
                 if (response == 1) 
                 {
                     doRegister();
-                    System.out.println("You have registered successfully! \n"); 
                     System.out.println("Enter 0 to go back to the previous menu");
                     System.out.print("> ");
                     Integer regResponse = 0; 
@@ -122,11 +122,12 @@ public class ServiceProviderTerminal {
         spEntity.setStatus(ServiceProviderStatus.PENDING);
         
         try {
-            spEntity = serviceProviderEntitySessionBeanRemote.registerNewServiceProvider(spEntity);            
-        } catch(ServiceProviderEmailExistException ex ) {
-            System.out.println("Error registering " + ex.getMessage());
+            spEntity = serviceProviderEntitySessionBeanRemote.registerNewServiceProvider(spEntity);
+            System.out.println("You have registered Service Provider: " + spEntity.getName() + " successfully!\n"); 
+        } catch(ServiceProviderEmailExistException | BusinessCategoryNotFoundException ex ) {
+            System.out.println("Error registering! " + ex.getMessage());
         } catch(UnknownPersistenceException ex ) {
-            System.out.println("Error registering " + ex.getMessage());
+            System.out.println("Error registering! " + ex.getMessage());
         }
 
     }
