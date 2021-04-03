@@ -1,15 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ejb.session.stateless;
 
 import entity.ServiceProviderEntity;
 import util.exception.InvalidLoginCredentialException;
-import util.exception.ServiceProviderAddressExistException;
+import util.exception.ServiceProviderEmailExistException;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateServiceProviderException;
 
 public interface ServiceProviderEntitySessionBeanLocal {
 
@@ -17,6 +13,10 @@ public interface ServiceProviderEntitySessionBeanLocal {
 
     public ServiceProviderEntity retrieveServiceProviderByServiceProviderAddress(String email) throws ServiceProviderEntityNotFoundException;
 
-    public ServiceProviderEntity createServiceProviderEntity(ServiceProviderEntity newServiceProvider) throws ServiceProviderAddressExistException, UnknownPersistenceException;
+    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider) throws ServiceProviderEmailExistException, UnknownPersistenceException;
+
+    public ServiceProviderEntity retrieveServiceProviderByServiceProviderId(Long serviceProviderId) throws ServiceProviderEntityNotFoundException;
+
+    public void updateServiceProvider(ServiceProviderEntity serviceProviderEntity) throws ServiceProviderEntityNotFoundException, UpdateServiceProviderException;
     
 }

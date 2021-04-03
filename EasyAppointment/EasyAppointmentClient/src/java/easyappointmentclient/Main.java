@@ -2,12 +2,15 @@ package easyappointmentclient;
 
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
 import ejb.session.stateless.BusinessCategorySessionBeanRemote;
+import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import javax.ejb.EJB;
 import util.exception.AdminNotFoundException;
 
 public class Main {
-   
+
+    @EJB
+    private static CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
     @EJB
     private static ServiceProviderEntitySessionBeanRemote serviceProviderEntitySessionBeanRemote;   
     @EJB
@@ -15,8 +18,9 @@ public class Main {
     @EJB
     private static BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
     
+    
     public static void main(String[] args) throws AdminNotFoundException {
-        MainApp mainApp = new MainApp(serviceProviderEntitySessionBeanRemote, adminEntitySessionBeanRemote, businessCategorySessionBeanRemote);
+        MainApp mainApp = new MainApp(serviceProviderEntitySessionBeanRemote, adminEntitySessionBeanRemote, customerEntitySessionBeanRemote, businessCategorySessionBeanRemote);
         mainApp.runApp();
     }
     
