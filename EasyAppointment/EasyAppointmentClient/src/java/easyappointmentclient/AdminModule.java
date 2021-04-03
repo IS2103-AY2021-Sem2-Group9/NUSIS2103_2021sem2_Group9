@@ -1,26 +1,34 @@
 package easyappointmentclient;
 
+import Enumeration.ServiceProviderStatus;
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
 import ejb.session.stateless.BusinessCategorySessionBeanRemote;
+import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.AdminEntity;
 import entity.BusinessCategoryEntity;
+import entity.ServiceProviderEntity;
+import java.util.InputMismatchException;
 import java.util.List;
 
 import java.util.Scanner;
 import util.exception.BusinessCategoryNotFoundException;
+import util.exception.ServiceProviderAlreadyApprovedException;
+import util.exception.ServiceProviderEntityNotFoundException;
 
 public class AdminModule {
     private AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
     private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
+    private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
     private AdminEntity loggedInAdminEntity;
     
     public AdminModule() 
     {
     }
 
-    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, AdminEntity loggedInAdminEntity) {
+    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntity loggedInAdminEntity) {
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
         this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
+        this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
         this.loggedInAdminEntity = loggedInAdminEntity;
     }
     
@@ -60,11 +68,11 @@ public class AdminModule {
                 }
                 else if (response == 3) 
                 {
-                    System.out.println("work in progress...\n");
+                    viewServiceProviders();
                 }
                 else if (response == 4) 
                 {
-                    System.out.println("work in progress...\n");
+                    approveServiceProvider();
                 }
                 else if (response == 5) 
                 {
@@ -96,6 +104,65 @@ public class AdminModule {
             {
                 System.out.println("Thank you! Logging out...\n");
                 break;
+            }
+        }
+    }
+    
+    private void viewServiceProviders()
+    {
+        System.out.println("*** Admin Terminal :: View Service Providers ***\n");
+        Scanner scanner = new Scanner(System.in);
+        List<ServiceProviderEntity> serviceProviders = serviceProviderSessionBeanRemote.retrieveAllServiceProviders();
+        
+        System.out.printf("%-18s%-20s%-15s%-18s%-10s\n", "Name", "| Business Category", "| City", "| Overall Rating", "| Status");
+        
+        for (ServiceProviderEntity sp : serviceProviders)
+        {
+            System.out.printf("%-18s%-20s%-15s%-18s%-10s\n", sp.getName(), "| " + sp.getCategory(), "| " + sp.getCity(), "| " + "<rating>", "| " + sp.getStatus());
+        }
+        
+        System.out.println();
+    }
+    
+    private void approveServiceProvider()
+    {
+        System.out.println("*** Admin Terminal :: Approve Service Provider ***\n");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("List of service providers with pending approval: \n");
+        List<ServiceProviderEntity> serviceProviders = serviceProviderSessionBeanRemote.retrieveServiceProvidersByStatus(ServiceProviderStatus.PENDING);
+        
+        System.out.printf("%-3s%-18s%-20s%-22s%-15s%-15s%-15s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone");
+        
+        for (ServiceProviderEntity sp : serviceProviders)
+        {
+            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-15s%-15s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber());
+        }
+        
+        System.out.println();
+        
+        while (true)
+        {
+            System.out.println("Enter 0 to go back to the previous menu.");
+            System.out.print("Enter Service Provider ID> ");
+            Long id = scanner.nextLong();
+            scanner.nextLine();
+            if (id == 0)
+            {
+                break;
+            }
+            try
+            {
+                String approvedSp = serviceProviderSessionBeanRemote.approveServiceProviderById(id);
+                System.out.println(approvedSp + "'s registration is approved.\n");
+                break;
+            }
+            catch (ServiceProviderEntityNotFoundException | ServiceProviderAlreadyApprovedException ex)
+            {
+                System.err.println("Error occured while approving Service Provider: " + ex.getMessage());
+            }
+            catch (InputMismatchException ex)
+            {
+                System.err.println("Please only enter digits!");
             }
         }
     }

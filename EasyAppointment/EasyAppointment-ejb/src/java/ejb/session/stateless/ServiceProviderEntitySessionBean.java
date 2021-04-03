@@ -3,6 +3,7 @@ package ejb.session.stateless;
 import Enumeration.ServiceProviderStatus;
 import entity.BusinessCategoryEntity;
 import entity.ServiceProviderEntity;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.Local;
@@ -14,6 +15,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.ServiceProviderAlreadyApprovedException;
 import util.exception.ServiceProviderEmailExistException;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -131,4 +133,36 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         }   
     }
     
+    @Override
+    public List<ServiceProviderEntity> retrieveAllServiceProviders()
+    {
+        Query query = em.createQuery("SELECT s FROM ServiceProviderEntity s");
+        
+        return query.getResultList();
+    }
+    
+    @Override
+    public List<ServiceProviderEntity> retrieveServiceProvidersByStatus(ServiceProviderStatus status)
+    {
+        Query query = em.createQuery("SELECT s FROM ServiceProviderEntity s WHERE s.status = :currStatus");
+        query.setParameter("currStatus", status);
+        
+        return query.getResultList();
+    }
+    
+    @Override
+    public String approveServiceProviderById(Long id) throws ServiceProviderEntityNotFoundException, ServiceProviderAlreadyApprovedException
+    {
+        ServiceProviderEntity sp = retrieveServiceProviderByServiceProviderId(id);
+        if (sp.getStatus() == ServiceProviderStatus.APPROVED) 
+        {
+            throw new ServiceProviderAlreadyApprovedException("Service Provider has already been approved!");
+        } 
+        else
+        {
+            sp.setStatus(ServiceProviderStatus.APPROVED);
+        }
+        
+        return sp.getName();
+    }
 }
