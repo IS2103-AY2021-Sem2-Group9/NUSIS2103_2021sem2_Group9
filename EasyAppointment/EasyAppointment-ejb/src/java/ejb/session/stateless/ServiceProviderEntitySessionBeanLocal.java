@@ -6,6 +6,7 @@ import java.util.List;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.ServiceProviderAlreadyApprovedException;
+import util.exception.ServiceProviderAlreadyBlockedException;
 import util.exception.ServiceProviderEmailExistException;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -28,5 +29,7 @@ public interface ServiceProviderEntitySessionBeanLocal {
     public List<ServiceProviderEntity> retrieveServiceProvidersByStatus(ServiceProviderStatus status);
 
     public String approveServiceProviderById(Long id) throws ServiceProviderEntityNotFoundException, ServiceProviderAlreadyApprovedException;
+
+    public String blockServiceProviderById(Long id) throws ServiceProviderEntityNotFoundException, ServiceProviderAlreadyBlockedException;
     
 }

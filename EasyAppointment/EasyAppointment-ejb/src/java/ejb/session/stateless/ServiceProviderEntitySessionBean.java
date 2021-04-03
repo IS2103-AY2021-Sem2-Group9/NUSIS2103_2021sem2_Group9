@@ -16,6 +16,7 @@ import javax.persistence.Query;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.ServiceProviderAlreadyApprovedException;
+import util.exception.ServiceProviderAlreadyBlockedException;
 import util.exception.ServiceProviderEmailExistException;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -161,6 +162,22 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         else
         {
             sp.setStatus(ServiceProviderStatus.APPROVED);
+        }
+        
+        return sp.getName();
+    }
+    
+    @Override
+    public String blockServiceProviderById(Long id) throws ServiceProviderEntityNotFoundException, ServiceProviderAlreadyBlockedException
+    {
+        ServiceProviderEntity sp = retrieveServiceProviderByServiceProviderId(id);
+        if (sp.getStatus() == ServiceProviderStatus.BLOCKED) 
+        {
+            throw new ServiceProviderAlreadyBlockedException("Service Provider has already been blocked!");
+        } 
+        else
+        {
+            sp.setStatus(ServiceProviderStatus.BLOCKED);
         }
         
         return sp.getName();

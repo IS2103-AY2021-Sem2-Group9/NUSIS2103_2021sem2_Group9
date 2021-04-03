@@ -7,12 +7,14 @@ import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.AdminEntity;
 import entity.BusinessCategoryEntity;
 import entity.ServiceProviderEntity;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 
 import java.util.Scanner;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.ServiceProviderAlreadyApprovedException;
+import util.exception.ServiceProviderAlreadyBlockedException;
 import util.exception.ServiceProviderEntityNotFoundException;
 
 public class AdminModule {
@@ -76,7 +78,7 @@ public class AdminModule {
                 }
                 else if (response == 5) 
                 {
-                    System.out.println("work in progress...\n");
+                    blockServiceProvider();
                 }
                 else if (response == 6) 
                 {
@@ -131,11 +133,11 @@ public class AdminModule {
         System.out.println("List of service providers with pending approval: \n");
         List<ServiceProviderEntity> serviceProviders = serviceProviderSessionBeanRemote.retrieveServiceProvidersByStatus(ServiceProviderStatus.PENDING);
         
-        System.out.printf("%-3s%-18s%-20s%-22s%-15s%-15s%-15s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone");
+        System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone");
         
         for (ServiceProviderEntity sp : serviceProviders)
         {
-            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-15s%-15s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber());
+            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber());
         }
         
         System.out.println();
@@ -144,14 +146,15 @@ public class AdminModule {
         {
             System.out.println("Enter 0 to go back to the previous menu.");
             System.out.print("Enter Service Provider ID> ");
-            Long id = scanner.nextLong();
-            scanner.nextLine();
-            if (id == 0)
-            {
-                break;
-            }
+            
             try
             {
+                Long id = scanner.nextLong();
+                scanner.nextLine();
+                if (id == 0)
+                {
+                   break;
+                }
                 String approvedSp = serviceProviderSessionBeanRemote.approveServiceProviderById(id);
                 System.out.println(approvedSp + "'s registration is approved.\n");
                 break;
@@ -163,6 +166,56 @@ public class AdminModule {
             catch (InputMismatchException ex)
             {
                 System.err.println("Please only enter digits!");
+                scanner.next();
+            }
+        }
+    }
+    
+        private void blockServiceProvider()
+    {
+        System.out.println("*** Admin Terminal :: Block Service Provider ***\n");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("List of service providers: \n");
+        List<ServiceProviderEntity> approvedServiceProviders = serviceProviderSessionBeanRemote.retrieveServiceProvidersByStatus(ServiceProviderStatus.APPROVED);
+        List<ServiceProviderEntity> pendingServiceProviders = serviceProviderSessionBeanRemote.retrieveServiceProvidersByStatus(ServiceProviderStatus.PENDING);
+        List<ServiceProviderEntity> totalServiceProviders = new ArrayList<>();
+        totalServiceProviders.addAll(approvedServiceProviders);
+        totalServiceProviders.addAll(pendingServiceProviders);
+        
+        System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone", "| Status");
+        
+        for (ServiceProviderEntity sp : totalServiceProviders)
+        {
+            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber(), "| " + sp.getStatus());
+        }
+        
+        System.out.println();
+        
+        while (true)
+        {
+            System.out.println("Enter 0 to go back to the previous menu.");
+            System.out.print("Enter Service Provider ID> ");
+
+            try
+            {
+                Long id = scanner.nextLong();
+                scanner.nextLine();
+                if (id == 0)
+                {
+                   break;
+                }
+                String blockedSp = serviceProviderSessionBeanRemote.blockServiceProviderById(id);
+                System.out.println("Service Provider: " + blockedSp + " has been blocked.\n");
+                break;
+            }
+            catch (ServiceProviderEntityNotFoundException | ServiceProviderAlreadyBlockedException ex)
+            {
+                System.err.println("Error occured while blocking Service Provider: " + ex.getMessage());
+            }
+            catch (InputMismatchException ex)
+            {
+                System.err.println("Please only enter digits!");
+                scanner.next();
             }
         }
     }
