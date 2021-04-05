@@ -2,6 +2,7 @@ package ejb.session.singleton;
 
 import Enumeration.ServiceProviderStatus;
 import ejb.session.stateless.AdminEntitySessionBeanLocal;
+import ejb.session.stateless.AppointmentEntitySessionBeanLocal;
 import ejb.session.stateless.BusinessCategorySessionBeanLocal;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanLocal;
 import entity.AdminEntity;
@@ -60,7 +61,7 @@ public class DataInitializationSessionBean {
             businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Fashion"));
             businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Education"));
             
-            serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(new ServiceProviderEntity("Kevin Paterson", "1111001111", "Clementi", "93718799", "13, Clementi Road", "kevin@nuh.com.sg", 113322, availability, ServiceProviderStatus.APPROVED), 1);
+            serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(new ServiceProviderEntity("Kevin Paterson", "1111001111", "Clementi", "93718799", "13, Clementi Road", "kevin@nuh.com.sg", 113322, ServiceProviderStatus.APPROVED), 1);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

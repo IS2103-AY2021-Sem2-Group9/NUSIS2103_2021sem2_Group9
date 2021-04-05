@@ -9,8 +9,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import Enumeration.ServiceProviderStatus;
+import java.util.ArrayList;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 
 @Entity
@@ -37,16 +39,16 @@ public class ServiceProviderEntity implements Serializable {
     private String email; 
     @Column(nullable = false, length = 64)
     private Integer password; 
-    @Column(nullable = false)
-    private List<Boolean> availability;
-    
     @Column (nullable = false)
     private ServiceProviderStatus status;
+    @OneToMany(mappedBy = "serviceProviderEntity")
+    private List<AppointmentEntity> appointmentEntities; 
 
     public ServiceProviderEntity() {
+        this.appointmentEntities = new ArrayList<>();
     }
 
-    public ServiceProviderEntity(String name, BusinessCategoryEntity category, String uen, String city, String phoneNumber, String address, String email, Integer password, List<Boolean> availability, ServiceProviderStatus status) {
+    public ServiceProviderEntity(String name, BusinessCategoryEntity category, String uen, String city, String phoneNumber, String address, String email, Integer password, ServiceProviderStatus status) {
         this.name = name;
         this.category = category;
         this.uen = uen;
@@ -55,11 +57,10 @@ public class ServiceProviderEntity implements Serializable {
         this.address = address;
         this.email = email;
         this.password = password;
-        this.availability = availability;
         this.status = status;
     }
     
-    public ServiceProviderEntity(String name, String uen, String city, String phoneNumber, String address, String email, Integer password, List<Boolean> availability, ServiceProviderStatus status) {
+    public ServiceProviderEntity(String name, String uen, String city, String phoneNumber, String address, String email, Integer password, ServiceProviderStatus status) {
         this.name = name;
         this.uen = uen;
         this.city = city;
@@ -67,10 +68,17 @@ public class ServiceProviderEntity implements Serializable {
         this.address = address;
         this.email = email;
         this.password = password;
-        this.availability = availability;
         this.status = status;
     }
 
+    public List<AppointmentEntity> getAppointmentEntities() {
+        return appointmentEntities;
+    }
+
+    public void setAppointmentEntities(List<AppointmentEntity> appointmentEntities) {
+        this.appointmentEntities = appointmentEntities;
+    }
+    
     public ServiceProviderStatus getStatus() {
         return status;
     }
@@ -143,16 +151,6 @@ public class ServiceProviderEntity implements Serializable {
     public void setPassword(int password) {
         this.password = password;
     }
-
-    public List<Boolean> getAvailability() {
-        return availability;
-    }
-
-    public void setAvailability(List<Boolean> availability) {
-        this.availability = availability;
-    }
-    
-    
 
     public Long getServiceProviderId() {
         return serviceProviderId;

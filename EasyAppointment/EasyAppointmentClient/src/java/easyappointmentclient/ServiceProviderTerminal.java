@@ -40,20 +40,20 @@ public class ServiceProviderTerminal {
             System.out.println("3: Exit");
             response = 0;
                 
-            while (response < 1 || response > 4) {
+            while (response < 1 || response > 3) {
                 System.out.print("> ");
                 response = scanner.nextInt(); 
+                
                 if (response == 1) 
                 {
                     doRegister();
                     System.out.println("Enter 0 to go back to the previous menu");
                     System.out.print("> ");
+                    
                     Integer regResponse = 0; 
                     regResponse = scanner.nextInt();
                     if(regResponse == 0) {
                         break;
-                    } else {
-                        continue;
                     }
                 } 
                 else if (response == 2) 
@@ -64,7 +64,6 @@ public class ServiceProviderTerminal {
                         System.out.println("Login successful!\n");
                         serviceProviderModule = new ServiceProviderModule(serviceProviderEntitySessionBeanRemote, currentServiceProviderEntity, businessCategorySessionBeanRemote);
                         serviceProviderModule.menuServiceProvider();
-                        break;
                     }
                     catch (InvalidLoginCredentialException ex)
                     {
@@ -124,12 +123,6 @@ public class ServiceProviderTerminal {
         spEntity.setEmail(scanner.nextLine().trim());
         System.out.print("Enter Password> ");
         spEntity.setPassword(scanner.nextInt());
-        
-        //dummy data for availability, will replace with list of appointments instead
-        List<Boolean> availability =new ArrayList<Boolean>(Arrays.asList(new Boolean[10]));
-        Collections.fill(availability, Boolean.TRUE);
-        spEntity.setAvailability(availability);
-        
         spEntity.setStatus(ServiceProviderStatus.PENDING);
         
         try {

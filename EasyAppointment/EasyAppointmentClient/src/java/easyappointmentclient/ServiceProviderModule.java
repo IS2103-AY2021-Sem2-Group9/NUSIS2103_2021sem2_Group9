@@ -117,8 +117,7 @@ public class ServiceProviderModule {
                 System.err.println("Please input a password consisting of numbers only!");
                 }            
             }
-        }
-        
+        }        
         System.out.print("Enter Business Registration Number (blank if no change)> ");
         input = scanner.nextLine().trim();
         if(input.length() > 0) {
