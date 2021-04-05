@@ -1,19 +1,24 @@
 package easyappointmentclient;
 
+import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
+import entity.BusinessCategoryEntity;
 import entity.ServiceProviderEntity;
 import java.util.Scanner;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UpdateServiceProviderException;
+import java.util.List;
 
 public class ServiceProviderModule {
     
     private ServiceProviderEntitySessionBeanRemote serviceProviderEntitySessionBeanRemote;
     private ServiceProviderEntity currentServiceProviderEntity; 
+    private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote; 
 
-    public ServiceProviderModule(ServiceProviderEntitySessionBeanRemote serviceProviderEntitySessionBeanRemote, ServiceProviderEntity currentServiceProviderEntity) {
+    public ServiceProviderModule(ServiceProviderEntitySessionBeanRemote serviceProviderEntitySessionBeanRemote, ServiceProviderEntity currentServiceProviderEntity, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote) {
         this.serviceProviderEntitySessionBeanRemote = serviceProviderEntitySessionBeanRemote;
         this.currentServiceProviderEntity = currentServiceProviderEntity;
+        this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
     }
     
     public void menuServiceProvider() {
@@ -70,7 +75,7 @@ public class ServiceProviderModule {
         System.out.println("*** Service Provider Terminal :: View Profile ***");
         
         System.out.println("Name: " + currentServiceProviderEntity.getName());
-        System.out.println("Category: " + currentServiceProviderEntity.getCategory());
+        System.out.println("Category: " + currentServiceProviderEntity.getCategory().getCategoryName());
         System.out.println("Business Registration Number: " + currentServiceProviderEntity.getUen());
         System.out.println("City: " + currentServiceProviderEntity.getCity());
         System.out.println("Phone: " + currentServiceProviderEntity.getPhoneNumber());
@@ -91,10 +96,27 @@ public class ServiceProviderModule {
             currentServiceProviderEntity.setName(input);
         }
         
+        System.out.printf("%11s%16s\n", "Category ID", "Category Name");
+
+        List<BusinessCategoryEntity> businessCategories = businessCategorySessionBeanRemote.retrieveAllBusinessCategories();  
+        for (BusinessCategoryEntity category : businessCategories)
+        {
+            System.out.printf("%11s%16s\n", category.getId(), category.getCategoryName());
+        }
         System.out.print("Enter Business Category (blank if no change)> ");
         input = scanner.nextLine().trim();
         if(input.length() > 0) {
-            currentServiceProviderEntity.setCategory(input);
+            for (BusinessCategoryEntity category : businessCategories) {  
+                try {
+                    long matchEntry = Long.valueOf(input);
+                    if(category.getId() == matchEntry) {
+                        currentServiceProviderEntity.setCategory(category);
+                        break; 
+                    }
+                } catch (NumberFormatException ex) {
+                System.err.println("Please input a password consisting of numbers only!");
+                }            
+            }
         }
         
         System.out.print("Enter Business Registration Number (blank if no change)> ");
@@ -128,7 +150,7 @@ public class ServiceProviderModule {
                 Integer newPassword = Integer.valueOf(input);
                 currentServiceProviderEntity.setPassword(newPassword);
             } catch (NumberFormatException ex) {
-                System.out.println("Please input a password consisting of numebers only!");
+                System.err.println("Please input a password consisting of numbers only!");
             }
         }
      

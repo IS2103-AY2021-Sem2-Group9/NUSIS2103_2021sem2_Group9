@@ -34,12 +34,20 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     private BusinessCategorySessionBeanLocal businessCategorySessionBeanLocal;
     
     @Override
-    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException 
+    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, int category) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException 
     {
         try 
         {
-            String currBusinessCategory = newServiceProvider.getCategory();
-            BusinessCategoryEntity businessCategory = businessCategorySessionBeanLocal.retrieveBusinessCategoryByName(currBusinessCategory);
+            List<BusinessCategoryEntity> categoryList = businessCategorySessionBeanLocal.retrieveAllBusinessCategories();
+            for (BusinessCategoryEntity categoryEntity : categoryList) {
+                long matchEntry = Long.valueOf(category);
+                if(categoryEntity.getId() == matchEntry) {
+                    newServiceProvider.setCategory(categoryEntity);
+                    break; 
+                } else {
+                    throw new BusinessCategoryNotFoundException("Business Category Not Found");
+                }
+            }
             em.persist(newServiceProvider);
             em.flush();
             return newServiceProvider;
@@ -61,10 +69,6 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
             {
                 throw new UnknownPersistenceException(ex.getMessage());
             }
-        }
-        catch(BusinessCategoryNotFoundException ex)
-        {
-            throw new BusinessCategoryNotFoundException(ex.getMessage());
         }
         
     }

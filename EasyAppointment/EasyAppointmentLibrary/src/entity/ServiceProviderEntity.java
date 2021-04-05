@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import Enumeration.ServiceProviderStatus;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 
 @Entity
@@ -20,13 +22,14 @@ public class ServiceProviderEntity implements Serializable {
     private Long serviceProviderId;
     @Column(nullable = false, length = 32)
     private String name; 
-    @Column(nullable = false, length = 32)
-    private String category; 
-    @Column(nullable = false, length = 32)
+    @ManyToOne (optional = false)
+    @JoinColumn(nullable = false)
+    private BusinessCategoryEntity category; 
+    @Column(nullable = false, length = 32, unique = true)
     private String uen;
     @Column(nullable = false, length = 32)
     private String city;
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false, length = 32, unique = true)
     private String phoneNumber; 
     @Column(nullable = false, length = 128)
     private String address; 
@@ -43,9 +46,21 @@ public class ServiceProviderEntity implements Serializable {
     public ServiceProviderEntity() {
     }
 
-    public ServiceProviderEntity(String name, String category, String uen, String city, String phoneNumber, String address, String email, Integer password, List<Boolean> availability, ServiceProviderStatus status) {
+    public ServiceProviderEntity(String name, BusinessCategoryEntity category, String uen, String city, String phoneNumber, String address, String email, Integer password, List<Boolean> availability, ServiceProviderStatus status) {
         this.name = name;
         this.category = category;
+        this.uen = uen;
+        this.city = city;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.email = email;
+        this.password = password;
+        this.availability = availability;
+        this.status = status;
+    }
+    
+    public ServiceProviderEntity(String name, String uen, String city, String phoneNumber, String address, String email, Integer password, List<Boolean> availability, ServiceProviderStatus status) {
+        this.name = name;
         this.uen = uen;
         this.city = city;
         this.phoneNumber = phoneNumber;
@@ -81,11 +96,11 @@ public class ServiceProviderEntity implements Serializable {
         this.name = name;
     }
 
-    public String getCategory() {
+    public BusinessCategoryEntity getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(BusinessCategoryEntity category) {
         this.category = category;
     }
 

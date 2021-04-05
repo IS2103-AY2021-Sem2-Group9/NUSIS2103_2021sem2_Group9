@@ -48,7 +48,7 @@ public class MainApp {
                     customerTerminal = new CustomerTerminal(customerEntitySessionBeanRemote);
                     customerTerminal.runApp();
                 } else if(response == 2) {
-                    spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote);
+                    spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote, businessCategorySessionBeanRemote);
                     spTerminal.runApp();
                 } else if (response == 3) {
                     adminTerminal = new AdminTerminal(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote);

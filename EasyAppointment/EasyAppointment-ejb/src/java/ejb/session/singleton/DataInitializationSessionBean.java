@@ -56,8 +56,11 @@ public class DataInitializationSessionBean {
             Collections.fill(availability, Boolean.TRUE);
             adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("terry@easyadmin.com", "password", "Terry", "Tan"));
             adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("1", "1", "Test", "Test"));
-            businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Food"));
-            serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(new ServiceProviderEntity("Kevin Paterson", "Food", "1111001111", "Clementi", "93718799", "13, Clementi Road", "kevin@nuh.com.sg", 113322, availability, ServiceProviderStatus.APPROVED));
+            businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Health"));
+            businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Fashion"));
+            businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Education"));
+            
+            serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(new ServiceProviderEntity("Kevin Paterson", "1111001111", "Clementi", "93718799", "13, Clementi Road", "kevin@nuh.com.sg", 113322, availability, ServiceProviderStatus.APPROVED), 1);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
