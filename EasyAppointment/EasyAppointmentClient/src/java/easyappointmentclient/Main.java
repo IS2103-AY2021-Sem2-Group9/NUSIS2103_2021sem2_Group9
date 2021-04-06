@@ -5,7 +5,10 @@ import ejb.session.stateless.AppointmentEntitySessionBeanRemote;
 import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
+import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.jms.ConnectionFactory;
+import javax.jms.Queue;
 import util.exception.AdminNotFoundException;
 
 public class Main {
@@ -20,9 +23,14 @@ public class Main {
     private static BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
     @EJB
     private static AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote;
+
+    @Resource(mappedName = "jms/queueAppointmentNotification")
+    private static Queue queueCheckoutNotification;
+    @Resource(mappedName = "jms/queueAppointmentNotificationFactory")
+    private static ConnectionFactory queueCheckoutNotificationFactory;
     
     public static void main(String[] args) throws AdminNotFoundException {
-        MainApp mainApp = new MainApp(serviceProviderEntitySessionBeanRemote, adminEntitySessionBeanRemote, customerEntitySessionBeanRemote, businessCategorySessionBeanRemote, appointmentEntitySessionBeanRemote);
+        MainApp mainApp = new MainApp(serviceProviderEntitySessionBeanRemote, adminEntitySessionBeanRemote, customerEntitySessionBeanRemote, businessCategorySessionBeanRemote, appointmentEntitySessionBeanRemote, queueCheckoutNotification, queueCheckoutNotificationFactory);
         mainApp.runApp();
     }
     

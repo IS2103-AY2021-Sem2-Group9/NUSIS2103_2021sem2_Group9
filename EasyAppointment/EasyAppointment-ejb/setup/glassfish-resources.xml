@@ -12,4 +12,9 @@
     <property name="useSSL" value="false"/>
     <property name="allowPublicKeyRetrieval" value="true"/>
   </jdbc-connection-pool>
+  <admin-object-resource enabled="true" jndi-name="jms/queueAppointmentNotification" res-type="javax.jms.Queue" res-adapter="jmsra">
+    <property name="Name" value="PhysicalQueue"/>
+  </admin-object-resource>
+  <connector-connection-pool name="jms/queueAppointmentNotificationFactoryPool" connection-definition-name="javax.jms.QueueConnectionFactory" resource-adapter-name="jmsra"/>
+  <connector-resource enabled="true" jndi-name="jms/queueAppointmentNotificationFactory" pool-name="jms/queueAppointmentNotificationFactoryPool"  />
 </resources>

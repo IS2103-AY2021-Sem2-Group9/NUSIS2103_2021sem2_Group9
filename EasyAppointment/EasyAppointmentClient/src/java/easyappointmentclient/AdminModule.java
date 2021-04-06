@@ -14,6 +14,16 @@ import java.util.InputMismatchException;
 import java.util.List;
 
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.naming.NamingException;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.CustomerNotFoundException;
 import util.exception.DeleteCustomerException;
@@ -27,17 +37,23 @@ public class AdminModule {
     private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
     private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
     private AdminEntity loggedInAdminEntity;
+    private Queue queueCheckoutNotification;
+    private ConnectionFactory queueCheckoutNotificationFactory;
+    
+    
     
     public AdminModule() 
     {
     }
 
-    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntity loggedInAdminEntity) {
+    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntity loggedInAdminEntity, Queue queueCheckoutNotification, ConnectionFactory queueCheckoutNotificationFactory) {
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
         this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
         this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
         this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
         this.loggedInAdminEntity = loggedInAdminEntity;
+        this.queueCheckoutNotification = queueCheckoutNotification;
+        this.queueCheckoutNotificationFactory = queueCheckoutNotificationFactory;
     }
     
     public void mainMenu()
@@ -97,7 +113,7 @@ public class AdminModule {
                 }
                 else if (response == 8) 
                 {
-                    System.out.println("work in progress...\n");
+                    sendReminderEmail();
                 }
                 else if (response == 9) 
                 {
@@ -353,6 +369,27 @@ public class AdminModule {
         }
     }
     
+    private void sendReminderEmail()
+    {
+        System.out.println("*** Admin Terminal :: Send Reminder Email ***\n");
+        
+        Scanner sc = new Scanner(System.in);
+        Long customerId;
+        
+        try
+        {
+            customerId = sc.nextLong();
+            sc.nextLine();
+            CustomerEntity customerEntity = customerEntitySessionBeanRemote.retrieveCustomerEntityById(customerId);
+            sendJMSMessageToQueueAppointmentNotification(customerId, "EasyAppointment_Group9");
+            System.out.println("Email sent successfully!");
+        }
+        catch (Exception ex)
+        {
+            System.err.println("An error occured while trying to send email: " + ex.getMessage());
+        }
+    }
+    
     private void deleteCustomer()
     {
         Scanner scanner = new Scanner(System.in);        
@@ -401,4 +438,35 @@ public class AdminModule {
             
         }
     }
+
+    private void sendJMSMessageToQueueAppointmentNotification(Long customerEntityId, String fromEmailAddress) throws JMSException, NamingException 
+    {
+        Connection conn = null;
+        Session s = null;
+        try {
+            conn = queueCheckoutNotificationFactory.createConnection();
+            s = conn.createSession(false, s.AUTO_ACKNOWLEDGE);
+            MessageProducer mp = s.createProducer(queueCheckoutNotification);
+            
+            MapMessage mapMessage = s.createMapMessage();
+            mapMessage.setString("fromEmailAddress", fromEmailAddress);
+            //mapMessage.setString("toEmailAddress", toEmailAddress);            
+            mapMessage.setLong("customerEntityId", customerEntityId);
+            
+            mp.send(mapMessage);
+        } finally {
+            if (s != null) {
+                try {
+                    s.close();
+                } catch (JMSException e) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Cannot close session", e);
+                }
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+    }
+
+
 }
