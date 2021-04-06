@@ -3,6 +3,11 @@ package ejb.session.stateless;
 import Enumeration.ServiceProviderStatus;
 import entity.BusinessCategoryEntity;
 import entity.ServiceProviderEntity;
+import entity.AppointmentEntity;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -29,17 +34,25 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
 
     @PersistenceContext(unitName = "EasyAppointment-ejbPU")
     private EntityManager em;
-    
+            
     @EJB
     private BusinessCategorySessionBeanLocal businessCategorySessionBeanLocal;
     
     @Override
-    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException 
+    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, int category) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException 
     {
         try 
         {
-            String currBusinessCategory = newServiceProvider.getCategory();
-            BusinessCategoryEntity businessCategory = businessCategorySessionBeanLocal.retrieveBusinessCategoryByName(currBusinessCategory);
+            List<BusinessCategoryEntity> categoryList = businessCategorySessionBeanLocal.retrieveAllBusinessCategories();
+            for (BusinessCategoryEntity categoryEntity : categoryList) {
+                long matchEntry = Long.valueOf(category);
+                if(categoryEntity.getId() == matchEntry) {
+                    newServiceProvider.setCategory(categoryEntity);
+                    break; 
+                } else {
+                    throw new BusinessCategoryNotFoundException("Business Category Not Found");
+                }
+            }
             em.persist(newServiceProvider);
             em.flush();
             return newServiceProvider;
@@ -50,7 +63,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
             {
                 if(ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException"))
                 {
-                    throw new ServiceProviderEmailExistException("Try again, service provider email address exists");
+                    throw new BusinessCategoryNotFoundException("Error! Businesss category cannot be found!");
                 }
                 else
                 {
@@ -61,10 +74,6 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
             {
                 throw new UnknownPersistenceException(ex.getMessage());
             }
-        }
-        catch(BusinessCategoryNotFoundException ex)
-        {
-            throw new BusinessCategoryNotFoundException(ex.getMessage());
         }
         
     }
@@ -97,7 +106,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
                 throw new InvalidLoginCredentialException("Email address does not exist or invalid password.");
             }
         } catch (ServiceProviderEntityNotFoundException ex) {
-            throw new InvalidLoginCredentialException("Email address does not exist or invalid password");
+            throw new InvalidLoginCredentialException("Invalid Login : " + ex.getMessage());
         }
     }
 
@@ -182,4 +191,48 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         
         return sp.getName();
     }
+    
+    @Override
+    public List<ServiceProviderEntity> retrieveAllAvailableServiceProvidersForTheDay(LocalDate appointmentDate, Long category, String city) throws BusinessCategoryNotFoundException {
+        BusinessCategoryEntity bcEntity = businessCategorySessionBeanLocal.retrieveBusinessCategoryById(category); 
+        Query query = em.createQuery("SELECT sp FROM ServiceProviderEntity sp WHERE sp.category = :bcEntity AND sp.city = :city");
+        query.setParameter("bcEntity", bcEntity); 
+        query.setParameter("city", city);
+
+        List<ServiceProviderEntity> results = query.getResultList(); 
+        List<ServiceProviderEntity> availableServiceProviders = new ArrayList<>(); 
+
+        for(ServiceProviderEntity serviceProvider : results) {
+            List<LocalTime> serviceProviderAvailability = retrieveServiceProviderAvailabilityForTheDay(serviceProvider, appointmentDate);
+
+            if (!serviceProviderAvailability.isEmpty()) {
+                availableServiceProviders.add(serviceProvider);
+            }
+        }
+        return availableServiceProviders;
+    }
+    
+    @Override
+    public List<LocalTime> retrieveServiceProviderAvailabilityForTheDay(ServiceProviderEntity spEntity, LocalDate appointmentDate) {
+        
+        LocalTime[] timeSlots = {LocalTime.of(8, 30, 00), LocalTime.of(9, 30, 00), LocalTime.of(10, 30, 00), LocalTime.of(11, 30, 00), LocalTime.of(12, 30, 00),
+                                 LocalTime.of(13, 30, 00), LocalTime.of(14, 30, 00), LocalTime.of(15, 30, 00), LocalTime.of(16, 30, 00), LocalTime.of(17, 30, 00)};
+        
+        List<LocalTime> workingTimeSlots = Arrays.asList(timeSlots);
+        List<LocalTime> availableTimeSlots = new ArrayList<>();
+        
+        List<AppointmentEntity> apptEntities = spEntity.getAppointmentEntities();
+        
+        for(AppointmentEntity appointment : apptEntities) {
+            if (appointment.getAppointmentDate().equals(appointmentDate)) {
+                for(LocalTime time : workingTimeSlots) {
+                    if (!time.equals(appointment.getAppointmentTime())) {
+                        availableTimeSlots.add(time);
+                    }
+                }
+            }
+        }
+        return availableTimeSlots;        
+    }
+ 
 }

@@ -2,6 +2,7 @@ package easyappointmentclient;
 
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
+import ejb.session.stateless.AppointmentEntitySessionBeanRemote;
 import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 
@@ -15,6 +16,7 @@ public class MainApp {
     private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
     private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
     private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
+    private AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote;
     private ServiceProviderTerminal spTerminal;
     private AdminTerminal adminTerminal;
     private CustomerTerminal customerTerminal;
@@ -25,12 +27,13 @@ public class MainApp {
     {
     }
 
-    public MainApp(ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, Queue queueCheckoutNotification, ConnectionFactory queueCheckoutNotificationFactory) 
+    public MainApp(ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote, Queue queueCheckoutNotification, ConnectionFactory queueCheckoutNotificationFactory) 
     {
         this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
         this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
         this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
+        this.appointmentEntitySessionBeanRemote = appointmentEntitySessionBeanRemote;
         this.queueCheckoutNotification = queueCheckoutNotification;
         this.queueCheckoutNotificationFactory = queueCheckoutNotificationFactory;
     }
@@ -54,7 +57,7 @@ public class MainApp {
                     customerTerminal = new CustomerTerminal(customerEntitySessionBeanRemote);
                     customerTerminal.runApp();
                 } else if(response == 2) {
-                    spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote);
+                    spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote, businessCategorySessionBeanRemote, appointmentEntitySessionBeanRemote);
                     spTerminal.runApp();
                 } else if (response == 3) {
                     adminTerminal = new AdminTerminal(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, queueCheckoutNotification, queueCheckoutNotificationFactory);

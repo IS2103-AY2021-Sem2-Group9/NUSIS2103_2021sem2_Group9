@@ -60,4 +60,18 @@ public class BusinessCategorySessionBean implements BusinessCategorySessionBeanR
         
         return businessCategoryEntity.getCategoryName();
     }
+    
+    public BusinessCategoryEntity retrieveBusinessCategoryById(Long category) throws BusinessCategoryNotFoundException {
+        Query query = em.createQuery("SELECT b from BusinessCategoryEntity b WHERE b.id = :category");
+        query.setParameter("category", category);
+        
+        try
+        {
+            return (BusinessCategoryEntity)query.getSingleResult();
+        }
+        catch(NoResultException | NonUniqueResultException ex)
+        {
+            throw new BusinessCategoryNotFoundException("Business Category " + category + " does not exist!");
+        }
+    }
 }
