@@ -27,6 +27,8 @@ public class AppointmentEntity implements Serializable {
     private LocalTime appointmentTime;
     @Column(nullable = false)
     private AppointmentStatusEnum appointmentStatusEnum;
+    @Column (nullable = false)
+    private Integer rating; 
     
     @ManyToOne
     private CustomerEntity customerEntity;
@@ -34,6 +36,7 @@ public class AppointmentEntity implements Serializable {
     private ServiceProviderEntity serviceProviderEntity;
 
     public AppointmentEntity() {
+        this.rating = 0; 
     }
 
     public AppointmentEntity(String appointmentNum, LocalDate appointmentDate, LocalTime appointmentTime, AppointmentStatusEnum appointmentStatusEnum, CustomerEntity customerEntity, ServiceProviderEntity serviceProviderEntity) {
@@ -44,6 +47,16 @@ public class AppointmentEntity implements Serializable {
         this.customerEntity = customerEntity;
         this.serviceProviderEntity = serviceProviderEntity;
     }  
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
+    }
+    
+    
     
     public Long getId() {
         return id;
