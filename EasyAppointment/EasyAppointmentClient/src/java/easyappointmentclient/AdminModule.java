@@ -14,6 +14,22 @@ import java.util.InputMismatchException;
 import java.util.List;
 
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Resource;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
+import javax.jms.Message;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.CustomerNotFoundException;
 import util.exception.DeleteCustomerException;
@@ -27,6 +43,11 @@ public class AdminModule {
     private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
     private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
     private AdminEntity loggedInAdminEntity;
+    
+    @Resource(mappedName = "jms/queueAppointmentNotification")
+    private Queue queueCheckoutNotification;
+    @Resource(mappedName = "jms/queueAppointmentNotificationFactory")
+    private ConnectionFactory queueCheckoutNotificationFactory;
     
     public AdminModule() 
     {
@@ -47,6 +68,8 @@ public class AdminModule {
         
         while (true)
         {
+            System.out.println(queueCheckoutNotification);
+            System.out.println(queueCheckoutNotificationFactory);
             System.out.println("*** Admin Terminal :: Main ***\n");
             System.out.println("You are now logged in as " + loggedInAdminEntity.getFirstName() + " " + loggedInAdminEntity.getLastName() + "\n");
             System.out.println("1: View Appointments for Customers");
@@ -97,7 +120,7 @@ public class AdminModule {
                 }
                 else if (response == 8) 
                 {
-                    System.out.println("work in progress...\n");
+                    sendReminderEmail();
                 }
                 else if (response == 9) 
                 {
@@ -353,6 +376,18 @@ public class AdminModule {
         }
     }
     
+    private void sendReminderEmail()
+    {
+        try
+        {
+            sendJMSMessageToQueueAppointmentNotification(Long.valueOf(1), "EasyAppointment_Group9", "lawson.tkw@gmail.com");
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+    
     private void deleteCustomer()
     {
         Scanner scanner = new Scanner(System.in);        
@@ -401,4 +436,37 @@ public class AdminModule {
             
         }
     }
+
+    private void sendJMSMessageToQueueAppointmentNotification(Long serviceProviderEntityId, String fromEmailAddress, String toEmailAddress) throws JMSException, NamingException 
+    {
+        //ConnectionFactory cf = (ConnectionFactory) c.lookup("java:comp/env/jms/queueAppointmentNotificationFactory");
+        Connection conn = null;
+        Session s = null;
+        try {
+            conn = queueCheckoutNotificationFactory.createConnection();
+            s = conn.createSession(false, s.AUTO_ACKNOWLEDGE);
+            //Destination destination = (Destination) c.lookup("java:comp/env/jms/queueAppointmentNotification");
+            MessageProducer mp = s.createProducer(queueCheckoutNotification);
+            
+            MapMessage mapMessage = s.createMapMessage();
+            mapMessage.setString("fromEmailAddress", fromEmailAddress);
+            mapMessage.setString("toEmailAddress", toEmailAddress);            
+            mapMessage.setLong("serviceProviderEntityId", serviceProviderEntityId);
+            
+            mp.send(mapMessage);
+        } finally {
+            if (s != null) {
+                try {
+                    s.close();
+                } catch (JMSException e) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Cannot close session", e);
+                }
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+    }
+
+
 }
