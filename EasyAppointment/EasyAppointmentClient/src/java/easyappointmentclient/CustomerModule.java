@@ -1,18 +1,21 @@
 package easyappointmentclient;
 
+import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.AppointmentEntity;
+import entity.BusinessCategoryEntity;
 import entity.CustomerEntity;
 import entity.ServiceProviderEntity;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Scanner;
 
 public class CustomerModule {
     private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
     private ServiceProviderEntitySessionBeanRemote serviceProviderEntitySessionBeanRemote;
+    private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
     private CustomerEntity loggedInCustomerEntity;
 
     public CustomerModule() {
@@ -90,7 +93,15 @@ public class CustomerModule {
         
         System.out.println("*** Customer Terminal :: Search Operation ***\n");
         
-        // Print out all the biz category here
+        // Get all the biz categories and print them
+        List<BusinessCategoryEntity> businessCategories = this.businessCategorySessionBeanRemote.retrieveAllBusinessCategories();
+        for (int i = 0; i < businessCategories.size(); i++) { 
+            System.out.print(i + 1);
+            System.out.println(" ");
+            System.out.println(businessCategories.get(i).getCategoryName());
+            System.out.println(" | ");
+        }
+        
         
         System.out.print("Enter business category> ");
         Integer category = sc.nextInt(); 
@@ -102,12 +113,27 @@ public class CustomerModule {
         String dateStr = sc.nextLine();
         LocalDate date = LocalDate.parse(dateStr); // e.g. yyyy-MM-dd
         
-        System.out.println("Retrieve and print out all available service provider for the day here.");
+        // Print headers
+        System.out.printf("%20s | %-15s | %-20s | %-15s | %-15s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
         
-//        this.serviceProviderEntitySessionBeanRemote.retrieveAllAvailableServiceProviderForTheDay(categoryName, city, date); 
+        // Unimplemented SP session bean method
+        List<ServiceProviderEntity> serviceProviders = this.serviceProviderEntitySessionBeanRemote.retrieveAllAvailableServiceProviderForTheDay(category, city, date);
+        
+        // Print record rows
+        for (int i = 0; i < serviceProviders.size(); i++) {
+            Long spId = serviceProviders.get(i).getServiceProviderId();
+            String name = serviceProviders.get(i).getName();
+            // Get avail time - firstAvai (String)
+            String address = serviceProviders.get(i).getAddress();
+            // Get rating value - rating (Integer)
+            
+            System.out.printf("%-20d | %-15s | %-20s | %-15s | %d", spId, "Name", firstAvai, "Address", rating);
+        }
+        
+         
 
         
-        return null; // Return list here
+        return serviceProviders; 
     }
     
     public void addAppointments() {
@@ -122,9 +148,25 @@ public class CustomerModule {
         }
         
         System.out.print("Service provider Id> ");
-        Integer id = sc.nextInt();
+        Integer spId = sc.nextInt();
+        System.out.println();
         
-        // TBC...
+        System.out.println("Available Appointment slots:");
+        // Print out all available appointment slots here e.g. 
+        // 11:30 | 12:30 | 1:30 | 2:30 | 4:30 | 5:30
+        
+        
+        System.out.println("Enter 0 to go back to previous menu");
+        if (sc.nextInt() == 0) {
+            return;
+        }
+        
+        System.out.print("Enter time> ");
+        String timeStr = sc.nextLine(); // e.g. 11:30
+        LocalTime time = LocalTime.parse(timeStr);
+        
+        System.out.println("The appointment with %s at %s on %s is confirmed.");
+        
     }
     
     public void viewAppointments() {

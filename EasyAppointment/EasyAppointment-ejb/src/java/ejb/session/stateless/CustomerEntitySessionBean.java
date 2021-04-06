@@ -26,11 +26,8 @@ public class CustomerEntitySessionBean implements CustomerEntitySessionBeanLocal
     @Override
     public CustomerEntity createCustomerEntity(CustomerEntity customerEntity) throws UnknownPersistenceException, CustomerExistException {
         try {
-            System.out.println("FIRSTLINE");
-            em.persist(customerEntity);
-            System.out.println("PERSISTED");
+            em.persist(customerEntity);            
             em.flush();
-            System.out.println("FLUSHED");
             return customerEntity;
             
         } catch (PersistenceException ex) {
