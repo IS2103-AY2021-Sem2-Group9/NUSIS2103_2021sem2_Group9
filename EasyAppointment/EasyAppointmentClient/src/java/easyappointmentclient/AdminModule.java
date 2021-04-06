@@ -16,19 +16,13 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Resource;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
-import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.CustomerNotFoundException;
@@ -377,13 +371,22 @@ public class AdminModule {
     
     private void sendReminderEmail()
     {
+        System.out.println("*** Admin Terminal :: Send Reminder Email ***\n");
+        
+        Scanner sc = new Scanner(System.in);
+        Long customerId;
+        
         try
         {
-            sendJMSMessageToQueueAppointmentNotification(Long.valueOf(1), "EasyAppointment_Group9", "lawson.tkw@gmail.com");
+            customerId = sc.nextLong();
+            sc.nextLine();
+            CustomerEntity customerEntity = customerEntitySessionBeanRemote.retrieveCustomerEntityById(customerId);
+            sendJMSMessageToQueueAppointmentNotification(customerEntity.getId(), "EasyAppointment_Group9", customerEntity.getEmail());
+            System.out.println("Email sent successfully!");
         }
         catch (Exception ex)
         {
-            ex.printStackTrace();
+            System.err.println("An error occured while trying to send email: " + ex.getMessage());
         }
     }
     
@@ -436,21 +439,19 @@ public class AdminModule {
         }
     }
 
-    private void sendJMSMessageToQueueAppointmentNotification(Long serviceProviderEntityId, String fromEmailAddress, String toEmailAddress) throws JMSException, NamingException 
+    private void sendJMSMessageToQueueAppointmentNotification(Long customerEntityId, String fromEmailAddress, String toEmailAddress) throws JMSException, NamingException 
     {
-        //ConnectionFactory cf = (ConnectionFactory) c.lookup("java:comp/env/jms/queueAppointmentNotificationFactory");
         Connection conn = null;
         Session s = null;
         try {
             conn = queueCheckoutNotificationFactory.createConnection();
             s = conn.createSession(false, s.AUTO_ACKNOWLEDGE);
-            //Destination destination = (Destination) c.lookup("java:comp/env/jms/queueAppointmentNotification");
             MessageProducer mp = s.createProducer(queueCheckoutNotification);
             
             MapMessage mapMessage = s.createMapMessage();
             mapMessage.setString("fromEmailAddress", fromEmailAddress);
             mapMessage.setString("toEmailAddress", toEmailAddress);            
-            mapMessage.setLong("serviceProviderEntityId", serviceProviderEntityId);
+            mapMessage.setLong("customerEntityId", customerEntityId);
             
             mp.send(mapMessage);
         } finally {

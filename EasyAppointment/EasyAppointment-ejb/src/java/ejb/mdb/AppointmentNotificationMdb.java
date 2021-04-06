@@ -1,8 +1,8 @@
 package ejb.mdb;
 
+import ejb.session.stateless.CustomerEntitySessionBeanLocal;
 import ejb.session.stateless.EmailSessionBeanLocal;
-import ejb.session.stateless.ServiceProviderEntitySessionBeanLocal;
-import entity.ServiceProviderEntity;
+import entity.CustomerEntity;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
@@ -10,12 +10,8 @@ import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import util.exception.ServiceProviderEntityNotFoundException;
+import util.exception.CustomerNotFoundException;
 
-/**
- *
- * @author Lawson
- */
 @MessageDriven(activationConfig = {
     @ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = "jms/queueAppointmentNotification"),
     @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue")
@@ -26,7 +22,7 @@ public class AppointmentNotificationMdb implements MessageListener
     @EJB
     private EmailSessionBeanLocal emailSessionBeanLocal;
     @EJB
-    private ServiceProviderEntitySessionBeanLocal serviceProviderEntitySessionBeanLocal;
+    private CustomerEntitySessionBeanLocal customerEntitySessionBeanLocal;
     
     public AppointmentNotificationMdb() 
     {
@@ -42,13 +38,13 @@ public class AppointmentNotificationMdb implements MessageListener
                 MapMessage mapMessage = (MapMessage)message;
                 String toEmailAddress = mapMessage.getString("toEmailAddress");
                 String fromEmailAddress = mapMessage.getString("fromEmailAddress");
-                Long serviceProviderEntityId = (Long)mapMessage.getLong("serviceProviderEntityId");
-                ServiceProviderEntity serviceProviderEntity = serviceProviderEntitySessionBeanLocal.retrieveServiceProviderByServiceProviderId(serviceProviderEntityId);
+                Long customerEntityId = (Long)mapMessage.getLong("customerEntityId");
+                CustomerEntity customerEntity = customerEntitySessionBeanLocal.retrieveCustomerEntityById(customerEntityId);
                 
-                emailSessionBeanLocal.emailCheckoutNotificationSync(serviceProviderEntity, fromEmailAddress, toEmailAddress);
+                emailSessionBeanLocal.emailCheckoutNotificationSync(customerEntity, fromEmailAddress, toEmailAddress);
             }
         }
-        catch(ServiceProviderEntityNotFoundException | JMSException ex)
+        catch(CustomerNotFoundException | JMSException ex)
         {
             System.err.println("Error sending Email: " + ex.getMessage());
         }

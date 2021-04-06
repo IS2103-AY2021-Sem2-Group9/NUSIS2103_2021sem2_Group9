@@ -1,5 +1,6 @@
 package util.email;
 
+import entity.CustomerEntity;
 import entity.ServiceProviderEntity;
 import java.text.NumberFormat;
 import java.util.Date;
@@ -35,16 +36,16 @@ public class EmailManager
     
     
     
-    public Boolean emailAppointmentNotification(ServiceProviderEntity serviceProviderEntity, String fromEmailAddress, String toEmailAddress)
+    public Boolean emailAppointmentNotification(CustomerEntity customerEntity, String fromEmailAddress, String toEmailAddress)
     {
         String emailBody = "";
         
         emailBody += "This is a reminder!\n You have an upcoming appointment: "  +  "\n\n";
         emailBody += "S/N     Service Provider's Name     Appointment Date     Appointment Time     Address\n\n";
         
-        emailBody += serviceProviderEntity.getServiceProviderId().toString()
-                + "     " + serviceProviderEntity.getName()
-                + "     " + serviceProviderEntity.getAddress();
+        emailBody += customerEntity.getId()
+                + "     " + customerEntity.getFirstName()
+                + "     " + customerEntity.getAddress();
             
 //        for(SaleTransactionLineItemEntity saleTransactionLineItemEntity:saleTransactionEntity.getSaleTransactionLineItemEntities())
 //        {
