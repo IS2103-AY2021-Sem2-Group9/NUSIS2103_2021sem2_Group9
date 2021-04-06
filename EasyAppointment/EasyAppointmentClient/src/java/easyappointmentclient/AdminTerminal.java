@@ -7,6 +7,8 @@ import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.AdminEntity;
 
 import java.util.Scanner;
+import javax.jms.ConnectionFactory;
+import javax.jms.Queue;
 import util.exception.InvalidLoginCredentialException;
 
 public class AdminTerminal {
@@ -14,6 +16,8 @@ public class AdminTerminal {
     private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
     private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
     private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
+    private Queue queueCheckoutNotification;
+    private ConnectionFactory queueCheckoutNotificationFactory;
     
     private AdminEntity loggedInAdminEntity;
     private AdminModule adminModule;
@@ -22,11 +26,13 @@ public class AdminTerminal {
     {
     }
 
-    public AdminTerminal(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote) {
+    public AdminTerminal(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, Queue queueCheckoutNotification, ConnectionFactory queueCheckoutNotificationFactory) {
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
         this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
         this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
         this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
+        this.queueCheckoutNotification = queueCheckoutNotification;
+        this.queueCheckoutNotificationFactory = queueCheckoutNotificationFactory;
     }
     
     public void runApp() 
@@ -53,7 +59,7 @@ public class AdminTerminal {
                         doLogin();
                         System.out.println("Login successful!\n");
                         
-                        adminModule = new AdminModule(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, loggedInAdminEntity);
+                        adminModule = new AdminModule(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, loggedInAdminEntity, queueCheckoutNotification, queueCheckoutNotificationFactory);
                         adminModule.mainMenu();
                     }
                     catch (InvalidLoginCredentialException ex)

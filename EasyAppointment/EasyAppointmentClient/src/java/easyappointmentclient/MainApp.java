@@ -6,6 +6,9 @@ import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 
 import java.util.Scanner;
+import javax.annotation.Resource;
+import javax.jms.ConnectionFactory;
+import javax.jms.Queue;
 
 public class MainApp {
     private AdminEntitySessionBeanRemote adminEntitySessionBeanRemote;
@@ -15,23 +18,26 @@ public class MainApp {
     private ServiceProviderTerminal spTerminal;
     private AdminTerminal adminTerminal;
     private CustomerTerminal customerTerminal;
+    private Queue queueCheckoutNotification;
+    private ConnectionFactory queueCheckoutNotificationFactory;
     
     public MainApp() 
     {
     }
 
-    public MainApp(ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote) 
+    public MainApp(ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, Queue queueCheckoutNotification, ConnectionFactory queueCheckoutNotificationFactory) 
     {
         this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
         this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
         this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
+        this.queueCheckoutNotification = queueCheckoutNotification;
+        this.queueCheckoutNotificationFactory = queueCheckoutNotificationFactory;
     }
     
     public void runApp() {
         Scanner scanner = new Scanner(System.in); 
         Integer response = 0; 
-        
         while(true) {
             System.out.println("*** Welcome to EasyAppoinment ***\n"); 
             System.out.println("1: Customer Terminal");
@@ -51,7 +57,7 @@ public class MainApp {
                     spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote);
                     spTerminal.runApp();
                 } else if (response == 3) {
-                    adminTerminal = new AdminTerminal(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote);
+                    adminTerminal = new AdminTerminal(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, queueCheckoutNotification, queueCheckoutNotificationFactory);
                     adminTerminal.runApp();
                 } else if (response == 4) {
                     break;

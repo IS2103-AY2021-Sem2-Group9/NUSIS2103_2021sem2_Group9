@@ -43,22 +43,23 @@ public class AdminModule {
     private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
     private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
     private AdminEntity loggedInAdminEntity;
-    
-    @Resource(mappedName = "jms/queueAppointmentNotification")
     private Queue queueCheckoutNotification;
-    @Resource(mappedName = "jms/queueAppointmentNotificationFactory")
     private ConnectionFactory queueCheckoutNotificationFactory;
+    
+    
     
     public AdminModule() 
     {
     }
 
-    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntity loggedInAdminEntity) {
+    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntity loggedInAdminEntity, Queue queueCheckoutNotification, ConnectionFactory queueCheckoutNotificationFactory) {
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
         this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
         this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
         this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
         this.loggedInAdminEntity = loggedInAdminEntity;
+        this.queueCheckoutNotification = queueCheckoutNotification;
+        this.queueCheckoutNotificationFactory = queueCheckoutNotificationFactory;
     }
     
     public void mainMenu()
@@ -68,8 +69,6 @@ public class AdminModule {
         
         while (true)
         {
-            System.out.println(queueCheckoutNotification);
-            System.out.println(queueCheckoutNotificationFactory);
             System.out.println("*** Admin Terminal :: Main ***\n");
             System.out.println("You are now logged in as " + loggedInAdminEntity.getFirstName() + " " + loggedInAdminEntity.getLastName() + "\n");
             System.out.println("1: View Appointments for Customers");
