@@ -1,19 +1,29 @@
 package easyappointmentclient;
 
+import ejb.session.stateless.AppointmentEntitySessionBeanRemote;
+import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
+import entity.AppointmentEntity;
+import entity.BusinessCategoryEntity;
 import entity.ServiceProviderEntity;
 import java.util.Scanner;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UpdateServiceProviderException;
+import java.util.List;
+import util.exception.AppointmentNotFoundException;
 
 public class ServiceProviderModule {
     
     private ServiceProviderEntitySessionBeanRemote serviceProviderEntitySessionBeanRemote;
     private ServiceProviderEntity currentServiceProviderEntity; 
+    private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote; 
+    private AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote;
 
-    public ServiceProviderModule(ServiceProviderEntitySessionBeanRemote serviceProviderEntitySessionBeanRemote, ServiceProviderEntity currentServiceProviderEntity) {
+    public ServiceProviderModule(ServiceProviderEntitySessionBeanRemote serviceProviderEntitySessionBeanRemote, ServiceProviderEntity currentServiceProviderEntity, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote) {
         this.serviceProviderEntitySessionBeanRemote = serviceProviderEntitySessionBeanRemote;
         this.currentServiceProviderEntity = currentServiceProviderEntity;
+        this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
+        this.appointmentEntitySessionBeanRemote = appointmentEntitySessionBeanRemote;
     }
     
     public void menuServiceProvider() {
@@ -50,9 +60,16 @@ public class ServiceProviderModule {
                     doEditProfile(currentServiceProviderEntity);
                     System.out.println("Profile successfully updated!");
                 } else if (response == 3) {
-                    
+                    System.out.println("*** Service provider terminal :: View Appointments ***\n");
+                    doViewAllAppointments(currentServiceProviderEntity);
+                    System.out.println("Enter 0 to go back to the previous menu");
+                    System.out.print("> ");
+                    Integer viewResponse = 0; 
+                    if (viewResponse == 0) {
+                        break;
+                    }
                 } else if (response == 4) {
-                    
+                    doCancelAppointment(currentServiceProviderEntity);
                 } else if(response == 5) {
                     break;
                 } else {
@@ -70,7 +87,7 @@ public class ServiceProviderModule {
         System.out.println("*** Service Provider Terminal :: View Profile ***");
         
         System.out.println("Name: " + currentServiceProviderEntity.getName());
-        System.out.println("Category: " + currentServiceProviderEntity.getCategory());
+        System.out.println("Category: " + currentServiceProviderEntity.getCategory().getCategoryName());
         System.out.println("Business Registration Number: " + currentServiceProviderEntity.getUen());
         System.out.println("City: " + currentServiceProviderEntity.getCity());
         System.out.println("Phone: " + currentServiceProviderEntity.getPhoneNumber());
@@ -91,12 +108,28 @@ public class ServiceProviderModule {
             currentServiceProviderEntity.setName(input);
         }
         
+        System.out.printf("%11s%16s\n", "Category ID", "Category Name");
+
+        List<BusinessCategoryEntity> businessCategories = businessCategorySessionBeanRemote.retrieveAllBusinessCategories();  
+        for (BusinessCategoryEntity category : businessCategories)
+        {
+            System.out.printf("%11s%16s\n", category.getId(), category.getCategoryName());
+        }
         System.out.print("Enter Business Category (blank if no change)> ");
         input = scanner.nextLine().trim();
         if(input.length() > 0) {
-            currentServiceProviderEntity.setCategory(input);
-        }
-        
+            for (BusinessCategoryEntity category : businessCategories) {  
+                try {
+                    long matchEntry = Long.valueOf(input);
+                    if(category.getId() == matchEntry) {
+                        currentServiceProviderEntity.setCategory(category);
+                        break; 
+                    }
+                } catch (NumberFormatException ex) {
+                System.err.println("Please input a password consisting of numbers only!");
+                }            
+            }
+        }        
         System.out.print("Enter Business Registration Number (blank if no change)> ");
         input = scanner.nextLine().trim();
         if(input.length() > 0) {
@@ -128,7 +161,7 @@ public class ServiceProviderModule {
                 Integer newPassword = Integer.valueOf(input);
                 currentServiceProviderEntity.setPassword(newPassword);
             } catch (NumberFormatException ex) {
-                System.out.println("Please input a password consisting of numebers only!");
+                System.err.println("Please input a password consisting of numbers only!");
             }
         }
      
@@ -141,4 +174,31 @@ public class ServiceProviderModule {
         }
    }
     
+   public void doViewAllAppointments(ServiceProviderEntity currentServiceProviderEntity) {
+       System.out.println("Appointments: ");
+       
+       System.out.printf("%-22s%-20s%-20s%-15s\n", "Name", " | Date", " | Time", " | Appointment No.");
+       List<AppointmentEntity> appointments = appointmentEntitySessionBeanRemote.retrieveAllAppointmentsForServiceProvider(currentServiceProviderEntity);
+       for (AppointmentEntity appointment : appointments) {
+           System.out.printf("%-22s%-20s%-20s%-15s\n", appointment.getCustomerEntity().getFirstName() + " " + appointment.getCustomerEntity().getLastName(), " | " + appointment.getAppointmentDate().toString(), " | " + appointment.getAppointmentTime().toString(), " | " + appointment.getAppointmentNum());
+       }
+       System.out.println(); 
+       
+   } 
+   
+   public void doCancelAppointment(ServiceProviderEntity currentProviderEntity) {
+       Scanner sc = new Scanner(System.in);
+       String appointmentNum; 
+       System.out.println("*** Service provider terminal :: Cancel Appointment ***\n");
+       doViewAllAppointments(currentProviderEntity);
+       System.out.print("Enter Appointment ID> ");
+       appointmentNum = sc.nextLine().trim(); 
+       try {
+        appointmentEntitySessionBeanRemote.cancelAppointment(appointmentNum);
+        System.out.println("Appointment " + appointmentNum + " has been cancelled successfully.");
+       } catch (AppointmentNotFoundException ex) {
+           System.out.println("An error has occured cancelling the appointment: " + ex.getMessage());
+       }
+   }
+   
 }

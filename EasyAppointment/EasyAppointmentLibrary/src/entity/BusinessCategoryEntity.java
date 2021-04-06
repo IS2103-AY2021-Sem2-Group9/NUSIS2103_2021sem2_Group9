@@ -1,10 +1,12 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class BusinessCategoryEntity implements Serializable {
@@ -14,6 +16,8 @@ public class BusinessCategoryEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String categoryName;
+    @OneToMany(mappedBy = "category")
+    private List<ServiceProviderEntity> serviceProviderEntities;
 
     public BusinessCategoryEntity() {
     }

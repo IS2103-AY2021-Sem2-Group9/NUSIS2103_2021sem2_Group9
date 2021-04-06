@@ -2,6 +2,8 @@ package ejb.session.stateless;
 
 import Enumeration.ServiceProviderStatus;
 import entity.ServiceProviderEntity;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.InvalidLoginCredentialException;
@@ -18,7 +20,7 @@ public interface ServiceProviderEntitySessionBeanLocal {
 
     public ServiceProviderEntity retrieveServiceProviderByServiceProviderAddress(String email) throws ServiceProviderEntityNotFoundException;
 
-    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException;
+    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, int category) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException;
 
     public ServiceProviderEntity retrieveServiceProviderByServiceProviderId(Long serviceProviderId) throws ServiceProviderEntityNotFoundException;
 
@@ -31,5 +33,9 @@ public interface ServiceProviderEntitySessionBeanLocal {
     public String approveServiceProviderById(Long id) throws ServiceProviderEntityNotFoundException, ServiceProviderAlreadyApprovedException;
 
     public String blockServiceProviderById(Long id) throws ServiceProviderEntityNotFoundException, ServiceProviderAlreadyBlockedException;
+
+    public List<ServiceProviderEntity> retrieveAllAvailableServiceProvidersForTheDay(LocalDate appointmentDate, Long category, String city) throws BusinessCategoryNotFoundException;
+
+    public List<LocalTime> retrieveServiceProviderAvailabilityForTheDay(ServiceProviderEntity spEntity, LocalDate appointmentDate);
     
 }

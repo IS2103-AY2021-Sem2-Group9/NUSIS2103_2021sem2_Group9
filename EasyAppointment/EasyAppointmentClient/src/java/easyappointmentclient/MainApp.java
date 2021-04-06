@@ -2,6 +2,7 @@ package easyappointmentclient;
 
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
+import ejb.session.stateless.AppointmentEntitySessionBeanRemote;
 import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 
@@ -12,6 +13,7 @@ public class MainApp {
     private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
     private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
     private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
+    private AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote;
     private ServiceProviderTerminal spTerminal;
     private AdminTerminal adminTerminal;
     private CustomerTerminal customerTerminal;
@@ -20,12 +22,13 @@ public class MainApp {
     {
     }
 
-    public MainApp(ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote) 
+    public MainApp(ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote) 
     {
         this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
         this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
         this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
+        this.appointmentEntitySessionBeanRemote = appointmentEntitySessionBeanRemote;
     }
     
     public void runApp() {
@@ -48,7 +51,7 @@ public class MainApp {
                     customerTerminal = new CustomerTerminal(customerEntitySessionBeanRemote);
                     customerTerminal.runApp();
                 } else if(response == 2) {
-                    spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote);
+                    spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote, businessCategorySessionBeanRemote, appointmentEntitySessionBeanRemote);
                     spTerminal.runApp();
                 } else if (response == 3) {
                     adminTerminal = new AdminTerminal(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote);

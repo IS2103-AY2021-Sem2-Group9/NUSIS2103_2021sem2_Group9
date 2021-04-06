@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -21,30 +22,83 @@ public class AppointmentEntity implements Serializable {
     
     @Column(nullable = false)
     private String appointmentNum;
-    @Column(nullable = false)    
+    @Column(nullable = false, columnDefinition = "DATE")
     private LocalDate appointmentDate;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TIME")
     private LocalTime appointmentTime;
     @Column(nullable = false)
     private AppointmentStatusEnum appointmentStatusEnum;
+    @Column (nullable = false)
+    private Integer rating; 
     
     @ManyToOne
     private CustomerEntity customerEntity;
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private ServiceProviderEntity serviceProviderEntity;
 
     public AppointmentEntity() {
+        this.rating = 0; 
     }
 
-    public AppointmentEntity(String appointmentNum, LocalDate appointmentDate, LocalTime appointmentTime, AppointmentStatusEnum appointmentStatusEnum, CustomerEntity customerEntity, ServiceProviderEntity serviceProviderEntity) {
-        this.appointmentNum = appointmentNum;
+    public AppointmentEntity(LocalDate appointmentDate, LocalTime appointmentTime, AppointmentStatusEnum appointmentStatusEnum, CustomerEntity customerEntity, ServiceProviderEntity serviceProviderEntity) {
         this.appointmentDate = appointmentDate;
         this.appointmentTime = appointmentTime;
         this.appointmentStatusEnum = appointmentStatusEnum;
         this.customerEntity = customerEntity;
         this.serviceProviderEntity = serviceProviderEntity;
+        Long uid = serviceProviderEntity.getServiceProviderId();
+        String sMonth = "";
+        int month = appointmentDate.getMonthValue();
+        if (month < 10) {
+            sMonth = "0" + String.valueOf(month);
+        } else {
+            sMonth = String.valueOf(month);
+        }
+        String sDate = "";
+        int date = appointmentDate.getDayOfMonth();
+        if (date < 10) {
+            sDate = "0" + String.valueOf(date);
+        } else {
+            sDate = String.valueOf(date);
+        }
+        this.appointmentNum = String.valueOf(uid) + sMonth + sDate + String.valueOf(appointmentTime.getHour()) + String.valueOf(appointmentTime.getMinute());
+      
     }  
+
+    public AppointmentEntity(LocalDate appointmentDate, LocalTime appointmentTime, AppointmentStatusEnum appointmentStatusEnum, Integer rating, CustomerEntity customerEntity, ServiceProviderEntity serviceProviderEntity) {
+        this.appointmentDate = appointmentDate;
+        this.appointmentTime = appointmentTime;
+        this.appointmentStatusEnum = appointmentStatusEnum;
+        this.rating = rating;
+        this.customerEntity = customerEntity;
+        this.serviceProviderEntity = serviceProviderEntity;
+        Long uid = serviceProviderEntity.getServiceProviderId();
+        String sMonth = "";
+        int month = appointmentDate.getMonthValue();
+        if (month < 10) {
+            sMonth = "0" + String.valueOf(month);
+        } else {
+            sMonth = String.valueOf(month);
+        }
+        String sDate = "";
+        int date = appointmentDate.getDayOfMonth();
+        if (date < 10) {
+            sDate = "0" + String.valueOf(date);
+        } else {
+            sDate = String.valueOf(date);
+        }
+        this.appointmentNum = String.valueOf(uid) + sMonth + sDate + String.valueOf(appointmentTime.getHour()) + String.valueOf(appointmentTime.getMinute());
+    }
     
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
+    }
+      
     public Long getId() {
         return id;
     }
