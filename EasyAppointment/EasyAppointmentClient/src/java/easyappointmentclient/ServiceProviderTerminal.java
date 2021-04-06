@@ -1,6 +1,7 @@
 package easyappointmentclient;
 
 import Enumeration.ServiceProviderStatus;
+import ejb.session.stateless.AppointmentEntitySessionBeanRemote;
 import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.BusinessCategoryEntity;
@@ -21,13 +22,15 @@ public class ServiceProviderTerminal {
     private ServiceProviderModule serviceProviderModule;
     private ServiceProviderEntity currentServiceProviderEntity;
     private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
-
+    private AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote;
+    
     public ServiceProviderTerminal() {
     }
     
-    public ServiceProviderTerminal(ServiceProviderEntitySessionBeanRemote serviceProviderEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote) {
+    public ServiceProviderTerminal(ServiceProviderEntitySessionBeanRemote serviceProviderEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote) {
         this.serviceProviderEntitySessionBeanRemote = serviceProviderEntitySessionBeanRemote;
         this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
+        this.appointmentEntitySessionBeanRemote = appointmentEntitySessionBeanRemote;
     }
     public void runApp() {
         Scanner scanner = new Scanner(System.in); 
@@ -62,19 +65,20 @@ public class ServiceProviderTerminal {
                     {
                         doLogin();
                         System.out.println("Login successful!\n");
-                        serviceProviderModule = new ServiceProviderModule(serviceProviderEntitySessionBeanRemote, currentServiceProviderEntity, businessCategorySessionBeanRemote);
+                        
+                        serviceProviderModule = new ServiceProviderModule(serviceProviderEntitySessionBeanRemote, currentServiceProviderEntity, businessCategorySessionBeanRemote, appointmentEntitySessionBeanRemote);
                         serviceProviderModule.menuServiceProvider();
                     }
                     catch (InvalidLoginCredentialException ex)
                     {
-                        System.err.println("An error occured while logging in: " + ex.getMessage());
+                        System.out.println("An error occured while logging in: " + ex.getMessage());
                     }
                 } else if (response == 3) 
                 { 
                     break;
                 } else 
                 {
-                    System.err.println("Invalid option, please try again");
+                    System.out.println("Invalid option, please try again");
                 }
             }
             if (response == 3) 
@@ -128,9 +132,7 @@ public class ServiceProviderTerminal {
         try {
             spEntity = serviceProviderEntitySessionBeanRemote.registerNewServiceProvider(spEntity, category);
             System.out.println("You have registered Service Provider: " + spEntity.getName() + " successfully!\n"); 
-        } catch(ServiceProviderEmailExistException | BusinessCategoryNotFoundException ex ) {
-            System.out.println("Error registering! " + ex.getMessage());
-        } catch(UnknownPersistenceException ex ) {
+        } catch(ServiceProviderEmailExistException | BusinessCategoryNotFoundException | UnknownPersistenceException ex ) {
             System.out.println("Error registering! " + ex.getMessage());
         }
 
@@ -147,6 +149,7 @@ public class ServiceProviderTerminal {
         email = scanner.nextLine().trim(); 
         System.out.print("Enter password> "); 
         password = scanner.nextInt(); 
+        scanner.nextLine(); 
         
         if(email.length() > 0 && password.toString().length() > 0) {
             currentServiceProviderEntity = serviceProviderEntitySessionBeanRemote.serviceProviderLogin(email, password);

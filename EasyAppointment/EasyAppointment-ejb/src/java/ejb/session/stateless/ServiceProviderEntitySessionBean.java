@@ -234,5 +234,5 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         }
         return availableTimeSlots;        
     }
-    
+ 
 }
