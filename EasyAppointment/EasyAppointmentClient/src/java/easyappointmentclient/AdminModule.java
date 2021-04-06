@@ -381,7 +381,7 @@ public class AdminModule {
             customerId = sc.nextLong();
             sc.nextLine();
             CustomerEntity customerEntity = customerEntitySessionBeanRemote.retrieveCustomerEntityById(customerId);
-            sendJMSMessageToQueueAppointmentNotification(customerEntity.getId(), "EasyAppointment_Group9", customerEntity.getEmail());
+            sendJMSMessageToQueueAppointmentNotification(customerId, "EasyAppointment_Group9");
             System.out.println("Email sent successfully!");
         }
         catch (Exception ex)
@@ -439,7 +439,7 @@ public class AdminModule {
         }
     }
 
-    private void sendJMSMessageToQueueAppointmentNotification(Long customerEntityId, String fromEmailAddress, String toEmailAddress) throws JMSException, NamingException 
+    private void sendJMSMessageToQueueAppointmentNotification(Long customerEntityId, String fromEmailAddress) throws JMSException, NamingException 
     {
         Connection conn = null;
         Session s = null;
@@ -450,7 +450,7 @@ public class AdminModule {
             
             MapMessage mapMessage = s.createMapMessage();
             mapMessage.setString("fromEmailAddress", fromEmailAddress);
-            mapMessage.setString("toEmailAddress", toEmailAddress);            
+            //mapMessage.setString("toEmailAddress", toEmailAddress);            
             mapMessage.setLong("customerEntityId", customerEntityId);
             
             mp.send(mapMessage);
