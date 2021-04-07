@@ -203,7 +203,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         List<ServiceProviderEntity> availableServiceProviders = new ArrayList<>(); 
 
         for(ServiceProviderEntity serviceProvider : results) {
-            List<LocalTime> serviceProviderAvailability = retrieveServiceProviderAvailabilityForTheDay(serviceProvider, appointmentDate);
+            List<LocalTime> serviceProviderAvailability = retrieveServiceProviderAvailabilityForTheDay(serviceProvider, appointmentDate); 
 
             if (!serviceProviderAvailability.isEmpty()) {
                 availableServiceProviders.add(serviceProvider);
@@ -224,7 +224,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         List<AppointmentEntity> apptEntities = spEntity.getAppointmentEntities();
         
         for(AppointmentEntity appointment : apptEntities) {
-            if (appointment.getAppointmentDate().equals(appointmentDate)) {
+            if (appointment.getAppointmentDate().equals(appointmentDate)) { 
                 for(LocalTime time : workingTimeSlots) {
                     if (!time.equals(appointment.getAppointmentTime())) {
                         availableTimeSlots.add(time);

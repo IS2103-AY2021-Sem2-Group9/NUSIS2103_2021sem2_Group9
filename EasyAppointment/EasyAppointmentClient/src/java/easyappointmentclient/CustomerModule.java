@@ -32,8 +32,11 @@ public class CustomerModule {
     public CustomerModule() {
     }
 
-    public CustomerModule(CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, CustomerEntity loggedInCustomerEntity) {
+    public CustomerModule(AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, CustomerEntity loggedInCustomerEntity) {
+        this.appointmentEntitySessionBeanRemote = appointmentEntitySessionBeanRemote;
         this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
+        this.serviceProviderEntitySessionBeanRemote = serviceProviderEntitySessionBeanRemote;
+        this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
         this.loggedInCustomerEntity = loggedInCustomerEntity;
     }
 
@@ -89,10 +92,17 @@ public class CustomerModule {
         // Get all the biz categories and print them
         List<BusinessCategoryEntity> businessCategories = this.businessCategorySessionBeanRemote.retrieveAllBusinessCategories();
         for (int i = 0; i < businessCategories.size(); i++) {
-            System.out.print(i + 1);
-            System.out.print(" ");
-            System.out.print(businessCategories.get(i).getCategoryName());
-            System.out.println(" | ");
+            if (i == businessCategories.size() - 1) {
+                System.out.print(i + 1);
+                System.out.print(" ");
+                System.out.println(businessCategories.get(i).getCategoryName());
+            } else {
+                System.out.print(i + 1);
+                System.out.print(" ");
+                System.out.print(businessCategories.get(i).getCategoryName());
+                System.out.print(" | ");
+            }
+
         }
 
         System.out.print("Enter business category> ");
@@ -102,16 +112,18 @@ public class CustomerModule {
         String city = sc.nextLine();
 
         System.out.print("Enter date> ");
-        String dateStr = sc.nextLine();
-        LocalDate date = LocalDate.parse(dateStr); // e.g. yyyy-MM-dd
+        String dateStr = sc.nextLine(); // e.g. yyyy-MM-dd
+        LocalDate date = LocalDate.parse(dateStr); 
 
         // Print headers
         System.out.printf("%20s | %-15s | %-20s | %-15s | %-15s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
+        System.out.println();
 
         try {
             // Unimplemented SP session bean method
             List<ServiceProviderEntity> serviceProviders = this.serviceProviderEntitySessionBeanRemote.retrieveAllAvailableServiceProvidersForTheDay(date, category, city);
 
+            System.out.println(serviceProviders); // Debug
             // Print record rows
             for (int i = 0; i < serviceProviders.size(); i++) {
                 Long spId = serviceProviders.get(i).getServiceProviderId();
@@ -121,7 +133,7 @@ public class CustomerModule {
                 String address = serviceProviders.get(i).getAddress();
 //                Double rating = 0.0; // Stub
 
-                System.out.printf("%-20d | %-15s | %-20s | %-15s", spId, "Name", firstAvaiTime, "Address");
+                System.out.printf("%-20d | %-15s | %-20s | %-15s", spId, name, firstAvaiTime, address);
 //                System.out.printf("%-20d | %-15s | %-20s | %-15s | %d", spId, "Name", firstAvaiTime, "Address", rating);
             }
 
@@ -136,10 +148,10 @@ public class CustomerModule {
     public void addAppointments() {
         Scanner sc = new Scanner(System.in);
 
+        LocalDate date = this.searchOperation(); // A list of Service Providers available for that day
+
         System.out.println("*** Customer Terminal :: Add Appointments ***\n");
 
-        LocalDate date = this.searchOperation(); // A list of Service Providers available for that day
-        
         try {
             System.out.println("Enter 0 to go back to the previous menu.");
             if (sc.nextInt() == 0) {
@@ -151,17 +163,17 @@ public class CustomerModule {
             System.out.println();
 
             System.out.println("Available Appointment slots:");
-            
+
             // Print out all available appointment slots here e.g. 
             ServiceProviderEntity spEntity = this.serviceProviderEntitySessionBeanRemote.retrieveServiceProviderByServiceProviderId(spId);
             List<LocalTime> availableTimeSlots = this.serviceProviderEntitySessionBeanRemote.retrieveServiceProviderAvailabilityForTheDay(spEntity, date);
-            
+
             for (int i = 0; i < availableTimeSlots.size(); i++) {
                 LocalTime time = availableTimeSlots.get(i);
                 if (i == availableTimeSlots.size() - 1) {
                     System.out.print(time);
                 }
-                
+
                 System.out.printf("%s | ", time.toString());
             }
 
@@ -184,22 +196,21 @@ public class CustomerModule {
             apptEntity.setAppointmentNum(apptNum);
             apptEntity.setCustomerEntity(loggedInCustomerEntity);
             apptEntity.setServiceProviderEntity(spEntity);
-            
+
             try {
-            
+
                 this.appointmentEntitySessionBeanRemote.createAppointmentEntity(apptEntity);
             } catch (UnknownPersistenceException | AppointmentExistException ex) {
                 System.err.println("Error occured when creating appointment: " + ex.getMessage());
-            }   
-            
+            }
+
             System.out.printf("The appointment with %s %s at %s on %s is confirmed.", this.loggedInCustomerEntity.getFirstName(), this.loggedInCustomerEntity.getLastName(), timeStr, dateStr);
-            
+
         } catch (DateTimeException ex) {
             System.out.println("Error occurred when reading date: " + ex.getMessage() + "\n");
         } catch (ServiceProviderEntityNotFoundException ex) {
             System.out.println("Error occurred when retrieving Service Provider: " + ex.getMessage() + "\n");
         }
-        
 
         System.out.println("Enter 0 to go back to previous menu");
         Integer response = -1;
