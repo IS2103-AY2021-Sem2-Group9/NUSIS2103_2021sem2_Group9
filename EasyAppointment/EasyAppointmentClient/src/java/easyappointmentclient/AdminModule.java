@@ -6,6 +6,7 @@ import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.AdminEntity;
+import entity.AppointmentEntity;
 import entity.BusinessCategoryEntity;
 import entity.CustomerEntity;
 import entity.ServiceProviderEntity;
@@ -85,7 +86,7 @@ public class AdminModule {
                 
                 if (response == 1) 
                 {
-                    System.out.println("work in progress...\n");
+                    viewCustomerAppointments();
                 } 
                 else if (response == 2) 
                 {
@@ -137,6 +138,62 @@ public class AdminModule {
         }
     }
     
+    private void viewCustomerAppointments() 
+    {
+        System.out.println("*** Admin Terminal :: View Appointments for customers ***\n");
+        Scanner scanner = new Scanner(System.in);
+        Long customerId;
+         
+        while (true)
+        {
+            System.out.println("Enter 0 to go back to the previous menu.\n");
+            System.out.print("Enter customer ID> ");
+            try
+            {
+                customerId = scanner.nextLong();
+                System.out.println();
+                
+                if (customerId == 0)
+                {
+                    System.out.println("Heading back to main menu...\n");
+                    break;
+                }
+                else 
+                {
+                    CustomerEntity customerEntity = customerEntitySessionBeanRemote.retrieveCustomerEntityById(customerId);
+                    List<AppointmentEntity> customerAppointments = customerEntitySessionBeanRemote.retrieveCustomerEntityAppointments(customerId);
+                    
+                    if (!customerAppointments.isEmpty())
+                    {
+                        System.out.println(customerEntity.getFirstName() + "'s Appointments: \n");
+
+                        System.out.printf("%-15s%-20s%-15s%-10s%-18s\n", "Name", "| Business Category", "| Date", "| Time", "| Appointment No.");
+
+                        for (AppointmentEntity appointment : customerAppointments)
+                        {
+                            ServiceProviderEntity apptServiceProvider = appointment.getServiceProviderEntity();
+                            System.out.printf("%-15s%-20s%-15s%-10s%-18s\n", apptServiceProvider.getName(), "| " + apptServiceProvider.getCategory().getCategoryName(), "| " + appointment.getAppointmentDate().toString(), "| " + appointment.getAppointmentTime().toString(), "| " + appointment.getAppointmentNum());
+                        }
+                    }
+                    else
+                    {
+                        System.out.println(customerEntity.getFirstName() + " does not have any upcoming appointments!\n");
+                    }
+                }
+                
+            }
+            catch(InputMismatchException ex)
+            {
+                System.err.println("Please input digits only.");
+                scanner.next();
+            }
+            catch(CustomerNotFoundException ex)
+            {
+                System.err.println("Error while retrieving customer's appointments: " + ex.getMessage());
+            }
+        }
+    }
+    
     private void viewServiceProviders()
     {
         System.out.println("*** Admin Terminal :: View Service Providers ***\n");
@@ -147,7 +204,7 @@ public class AdminModule {
         
         for (ServiceProviderEntity sp : serviceProviders)
         {
-            System.out.printf("%-18s%-20s%-15s%-18s%-10s\n", sp.getName(), "| " + sp.getCategory(), "| " + sp.getCity(), "| " + "<rating>", "| " + sp.getStatus());
+            System.out.printf("%-18s%-20s%-15s%-18s%-10s\n", sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getCity(), "| " + "<rating>", "| " + sp.getStatus());
         }
         
         System.out.println();

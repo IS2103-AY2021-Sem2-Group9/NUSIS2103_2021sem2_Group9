@@ -1,6 +1,10 @@
 package ejb.session.stateless;
 
+import entity.AppointmentEntity;
 import entity.CustomerEntity;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -101,5 +105,15 @@ public class CustomerEntitySessionBean implements CustomerEntitySessionBeanLocal
         {
             throw new DeleteCustomerException("Customer ID " + CustomerId + " is associated with existing sale transaction(s) and cannot be deleted!");
         }
+    }
+    
+    
+    @Override
+    public List<AppointmentEntity> retrieveCustomerEntityAppointments(Long customerId) throws CustomerNotFoundException
+    {
+            CustomerEntity customerEntity = retrieveCustomerEntityById(customerId);
+            List<AppointmentEntity> appointments = customerEntity.getAppointments();
+            appointments.size();
+            return appointments;
     }
 }

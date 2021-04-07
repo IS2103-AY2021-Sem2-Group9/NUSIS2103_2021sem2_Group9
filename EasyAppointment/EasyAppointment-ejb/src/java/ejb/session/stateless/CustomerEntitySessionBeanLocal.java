@@ -1,6 +1,8 @@
 package ejb.session.stateless;
 
+import entity.AppointmentEntity;
 import entity.CustomerEntity;
+import java.util.List;
 import util.exception.CustomerExistException;
 import util.exception.CustomerNotFoundException;
 import util.exception.DeleteCustomerException;
@@ -17,4 +19,6 @@ public interface CustomerEntitySessionBeanLocal {
     public CustomerEntity customerLogin(String email, Integer password) throws InvalidLoginCredentialException;
 
     public void deleteCustomerEntity(Long CustomerId) throws CustomerNotFoundException, DeleteCustomerException;
+
+    public List<AppointmentEntity> retrieveCustomerEntityAppointments(Long customerId) throws CustomerNotFoundException;
 }
