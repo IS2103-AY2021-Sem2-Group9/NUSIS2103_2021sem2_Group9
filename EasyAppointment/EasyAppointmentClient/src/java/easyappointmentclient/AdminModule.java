@@ -6,6 +6,7 @@ import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.AdminEntity;
+import entity.AppointmentEntity;
 import entity.BusinessCategoryEntity;
 import entity.CustomerEntity;
 import entity.ServiceProviderEntity;
@@ -81,11 +82,19 @@ public class AdminModule {
             while (response < 1 || response > 9)
             {
                 System.out.print("> ");
-                response = scanner.nextInt();
+                try
+                {
+                    response = scanner.nextInt();
+                }
+                catch (InputMismatchException ex)
+                {
+                    System.err.println("Please only input digits!");
+                    scanner.next();
+                }
                 
                 if (response == 1) 
                 {
-                    System.out.println("work in progress...\n");
+                    viewCustomerAppointments();
                 } 
                 else if (response == 2) 
                 {
@@ -125,7 +134,7 @@ public class AdminModule {
                 }
                 else 
                 {
-                    System.out.println("Please key in 1 ~ 9 only.");
+                    System.out.println("Please key in 1 ~ 10 only.");
                 }
             }
             
@@ -133,6 +142,62 @@ public class AdminModule {
             {
                 System.out.println("Thank you! Logging out...\n");
                 break;
+            }
+        }
+    }
+    
+    private void viewCustomerAppointments() 
+    {
+        System.out.println("*** Admin Terminal :: View Appointments for customers ***\n");
+        Scanner scanner = new Scanner(System.in);
+        Long customerId;
+         
+        while (true)
+        {
+            System.out.println("Enter 0 to go back to the previous menu.\n");
+            System.out.print("Enter customer ID> ");
+            try
+            {
+                customerId = scanner.nextLong();
+                System.out.println();
+                
+                if (customerId == 0)
+                {
+                    System.out.println("Heading back to main menu...\n");
+                    break;
+                }
+                else 
+                {
+                    CustomerEntity customerEntity = customerEntitySessionBeanRemote.retrieveCustomerEntityById(customerId);
+                    List<AppointmentEntity> customerAppointments = customerEntitySessionBeanRemote.retrieveCustomerEntityAppointments(customerId);
+                    
+                    if (!customerAppointments.isEmpty())
+                    {
+                        System.out.println(customerEntity.getFirstName() + "'s Appointments: \n");
+
+                        System.out.printf("%-15s%-20s%-15s%-10s%-18s\n", "Name", "| Business Category", "| Date", "| Time", "| Appointment No.");
+
+                        for (AppointmentEntity appointment : customerAppointments)
+                        {
+                            ServiceProviderEntity apptServiceProvider = appointment.getServiceProviderEntity();
+                            System.out.printf("%-15s%-20s%-15s%-10s%-18s\n", apptServiceProvider.getName(), "| " + apptServiceProvider.getCategory().getCategoryName(), "| " + appointment.getAppointmentDate().toString(), "| " + appointment.getAppointmentTime().toString(), "| " + appointment.getAppointmentNum());
+                        }
+                    }
+                    else
+                    {
+                        System.out.println(customerEntity.getFirstName() + " does not have any upcoming appointments!\n");
+                    }
+                }
+                
+            }
+            catch(InputMismatchException ex)
+            {
+                System.err.println("Please input digits only.");
+                scanner.next();
+            }
+            catch(CustomerNotFoundException ex)
+            {
+                System.err.println("Error while retrieving customer's appointments: " + ex.getMessage());
             }
         }
     }
@@ -147,7 +212,7 @@ public class AdminModule {
         
         for (ServiceProviderEntity sp : serviceProviders)
         {
-            System.out.printf("%-18s%-20s%-15s%-18s%-10s\n", sp.getName(), "| " + sp.getCategory(), "| " + sp.getCity(), "| " + "<rating>", "| " + sp.getStatus());
+            System.out.printf("%-18s%-20s%-15s%-18s%-10s\n", sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getCity(), "| " + "<rating>", "| " + sp.getStatus());
         }
         
         System.out.println();
@@ -378,11 +443,32 @@ public class AdminModule {
         
         try
         {
+            System.out.print("Enter customer ID> ");
             customerId = sc.nextLong();
             sc.nextLine();
             CustomerEntity customerEntity = customerEntitySessionBeanRemote.retrieveCustomerEntityById(customerId);
-            sendJMSMessageToQueueAppointmentNotification(customerId, "EasyAppointment_Group9");
-            System.out.println("Email sent successfully!");
+            List<AppointmentEntity> customerAppointments = customerEntitySessionBeanRemote.retrieveCustomerEntityAppointments(customerId);
+                    
+            if (!customerAppointments.isEmpty())
+            {
+                System.out.println(customerEntity.getFirstName() + "'s upcoming appointment: \n");
+                System.out.printf("%-15s%-20s%-15s%-10s%-18s\n", "Name", "| Business Category", "| Date", "| Time", "| Appointment No.");
+                
+                AppointmentEntity appointment = customerAppointments.get(0);
+                ServiceProviderEntity apptServiceProvider = appointment.getServiceProviderEntity();
+                System.out.printf("%-15s%-20s%-15s%-10s%-18s\n", apptServiceProvider.getName(), "| " + apptServiceProvider.getCategory().getCategoryName(), "| " + appointment.getAppointmentDate().toString(), "| " + appointment.getAppointmentTime().toString(), "| " + appointment.getAppointmentNum());
+                sendJMSMessageToQueueAppointmentNotification(customerEntity.getId(), "EasyAppointment_Group9");
+                System.out.println("Email sent successfully!\n");
+            }
+            else
+            {
+                System.out.println("Unable to send email as " + customerEntity.getFirstName() + " does not have any upcoming appointments!\n");
+            }
+        }
+        catch(InputMismatchException ex)
+        {
+            System.err.println("Please enter digits only.\n");
+            sc.next();
         }
         catch (Exception ex)
         {
@@ -449,8 +535,7 @@ public class AdminModule {
             MessageProducer mp = s.createProducer(queueCheckoutNotification);
             
             MapMessage mapMessage = s.createMapMessage();
-            mapMessage.setString("fromEmailAddress", fromEmailAddress);
-            //mapMessage.setString("toEmailAddress", toEmailAddress);            
+            mapMessage.setString("fromEmailAddress", fromEmailAddress);            
             mapMessage.setLong("customerEntityId", customerEntityId);
             
             mp.send(mapMessage);

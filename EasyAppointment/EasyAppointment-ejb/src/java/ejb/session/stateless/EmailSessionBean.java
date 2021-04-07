@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.AppointmentEntity;
 import entity.CustomerEntity;
 import entity.ServiceProviderEntity;
 import java.util.concurrent.Future;
@@ -26,10 +27,10 @@ public class EmailSessionBean implements EmailSessionBeanRemote, EmailSessionBea
     
     
     @Override
-    public Boolean emailCheckoutNotificationSync(CustomerEntity customerEntity, String fromEmailAddress, String toEmailAddress)
+    public Boolean emailCheckoutNotificationSync(CustomerEntity customerEntity, AppointmentEntity appointmentEntity, String fromEmailAddress, String toEmailAddress)
     {
         EmailManager emailManager = new EmailManager(GMAIL_USERNAME, GMAIL_PASSWORD);
-        Boolean result = emailManager.emailAppointmentNotification(customerEntity, fromEmailAddress, toEmailAddress);
+        Boolean result = emailManager.emailAppointmentNotification(customerEntity, appointmentEntity, fromEmailAddress, toEmailAddress);
         
         return result;
     } 
@@ -38,10 +39,10 @@ public class EmailSessionBean implements EmailSessionBeanRemote, EmailSessionBea
     
     @Asynchronous
     @Override
-    public Future<Boolean> emailCheckoutNotificationAsync(CustomerEntity customerEntity, String fromEmailAddress, String toEmailAddress) throws InterruptedException
+    public Future<Boolean> emailCheckoutNotificationAsync(CustomerEntity customerEntity, AppointmentEntity appointmentEntity, String fromEmailAddress, String toEmailAddress) throws InterruptedException
     {        
         EmailManager emailManager = new EmailManager(GMAIL_USERNAME, GMAIL_PASSWORD);
-        Boolean result = emailManager.emailAppointmentNotification(customerEntity, fromEmailAddress, toEmailAddress);
+        Boolean result = emailManager.emailAppointmentNotification(customerEntity, appointmentEntity, fromEmailAddress, toEmailAddress);
         
         return new AsyncResult<>(result);
     }

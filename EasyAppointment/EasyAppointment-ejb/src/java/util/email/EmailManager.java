@@ -1,5 +1,6 @@
 package util.email;
 
+import entity.AppointmentEntity;
 import entity.CustomerEntity;
 import entity.ServiceProviderEntity;
 import java.text.NumberFormat;
@@ -11,8 +12,6 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-
-
 public class EmailManager 
 {
     private final String emailServerName = "smtp.gmail.com";
@@ -20,13 +19,9 @@ public class EmailManager
     private String smtpAuthUser;
     private String smtpAuthPassword;
     
-    
-    
     public EmailManager()
     {
-    }
-
-    
+    }   
     
     public EmailManager(String smtpAuthUser, String smtpAuthPassword)
     {
@@ -34,33 +29,30 @@ public class EmailManager
         this.smtpAuthPassword = smtpAuthPassword;
     }
     
-    
-    
-    public Boolean emailAppointmentNotification(CustomerEntity customerEntity, String fromEmailAddress, String toEmailAddress)
+    public Boolean emailAppointmentNotification(CustomerEntity customerEntity, AppointmentEntity appointmentEntity, String fromEmailAddress, String toEmailAddress)
     {
+        ServiceProviderEntity serviceProvider = appointmentEntity.getServiceProviderEntity();
+        
         String emailBody = "";
         
-        emailBody += "This is a reminder!\n You have an upcoming appointment: "  +  "\n\n";
-        emailBody += "S/N     Service Provider's Name     Appointment Date     Appointment Time     Address\n\n";
+        emailBody += "Dear " + customerEntity.getFirstName() + ", \n\n";
+        emailBody += "This is a reminder!\nYou have an upcoming appointment: "  +  "\n\n";
+               
+        String apptNum = String.format("%s: " + appointmentEntity.getAppointmentNum() + "\n", "Appointment Number");
+        String serviceProviderName = String.format("%s: " + serviceProvider.getName() + "\n", "Service Provider's Name"); 
+        String apptDate = String.format("%s: " + appointmentEntity.getAppointmentDate() + "\n", "Appointment Date"); 
+        String apptTime = String.format("%s: " + appointmentEntity.getAppointmentTime() + "\n", "Appointment Time"); 
+        String address = String.format("%s: " + serviceProvider.getAddress() + "\n", "Address"); 
         
-        emailBody += customerEntity.getId()
-                + "     " + customerEntity.getFirstName()
-                + "     " + customerEntity.getAddress();
-            
-//        for(SaleTransactionLineItemEntity saleTransactionLineItemEntity:saleTransactionEntity.getSaleTransactionLineItemEntities())
-//        {
-//            emailBody += saleTransactionLineItemEntity.getSerialNumber()
-//                + "     " + saleTransactionLineItemEntity.getProductEntity().getSkuCode()
-//                + "     " + saleTransactionLineItemEntity.getProductEntity().getName()
-//                + "     " + saleTransactionLineItemEntity.getQuantity()
-//                + "     " + NumberFormat.getCurrencyInstance().format(saleTransactionLineItemEntity.getUnitPrice())
-//                + "     " + NumberFormat.getCurrencyInstance().format(saleTransactionLineItemEntity.getSubTotal()) + "\n";
-//        }
-//            
-//        emailBody += "\nTotal Line Item: " + saleTransactionEntity.getTotalLineItem() + ", Total Quantity: " + saleTransactionEntity.getTotalQuantity() + ", Total Amount: " + NumberFormat.getCurrencyInstance().format(saleTransactionEntity.getTotalAmount()) + "\n";
+        emailBody += apptNum;
+        emailBody += serviceProviderName;
+        emailBody += apptDate;
+        emailBody += apptTime;
+        emailBody += address;
         
-        
-        
+        emailBody += "\n\n\n";
+        emailBody += "Thank you for using EasyAppointment!";
+                 
         try 
         {
             Properties props = new Properties();
@@ -79,7 +71,7 @@ public class EmailManager
             {
                 msg.setFrom(InternetAddress.parse(fromEmailAddress, false)[0]);
                 msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmailAddress, false));
-                msg.setSubject("Checkout Completed Successfully!");
+                msg.setSubject("Reminder for your Appointment!");
                 msg.setText(emailBody);
                 msg.setHeader("X-Mailer", mailer);
                 
