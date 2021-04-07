@@ -9,6 +9,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.Local;
@@ -220,19 +222,40 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         
         List<LocalTime> workingTimeSlots = Arrays.asList(timeSlots);
         List<LocalTime> availableTimeSlots = new ArrayList<>();
+        List<AppointmentEntity> apptEntities = new ArrayList<>();
         
-        List<AppointmentEntity> apptEntities = spEntity.getAppointmentEntities();
-        
-        for(AppointmentEntity appointment : apptEntities) {
-            if (appointment.getAppointmentDate().equals(appointmentDate)) { 
-                for(LocalTime time : workingTimeSlots) {
-                    if (!time.equals(appointment.getAppointmentTime())) {
-                        availableTimeSlots.add(time);
+        try {
+            spEntity = retrieveServiceProviderByServiceProviderId(spEntity.getServiceProviderId());
+            apptEntities = spEntity.getAppointmentEntities();
+            apptEntities.size();
+        } catch (ServiceProviderEntityNotFoundException ex) {
+            ex.printStackTrace();
+        }
+
+        Boolean anyApptOnDate = false;
+        if (!apptEntities.isEmpty())
+        {
+            for(AppointmentEntity appointment : apptEntities) 
+            {
+                if (appointment.getAppointmentDate().equals(appointmentDate)) {
+                    anyApptOnDate = true;
+                    for(LocalTime time : workingTimeSlots) {
+                        if (!time.equals(appointment.getAppointmentTime())) {
+                            availableTimeSlots.add(time);
+                        }
                     }
                 }
             }
         }
-        return availableTimeSlots;        
+        
+        if (anyApptOnDate)
+        {
+            return availableTimeSlots;
+        } 
+        else
+        {
+            return workingTimeSlots;
+        }
     }
  
     @Override
