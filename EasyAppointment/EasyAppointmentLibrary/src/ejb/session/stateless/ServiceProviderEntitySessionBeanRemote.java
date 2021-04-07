@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import Enumeration.ServiceProviderStatus;
+import entity.AppointmentEntity;
 import entity.ServiceProviderEntity;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -42,4 +43,7 @@ public interface ServiceProviderEntitySessionBeanRemote {
     public List<ServiceProviderEntity> retrieveAllAvailableServiceProvidersForTheDay(LocalDate appointmentDate, Long category, String city) throws BusinessCategoryNotFoundException;
 
     public List<LocalTime> retrieveServiceProviderAvailabilityForTheDay(ServiceProviderEntity spEntity, LocalDate appointmentDate);
+    
+    public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity);
+
 }

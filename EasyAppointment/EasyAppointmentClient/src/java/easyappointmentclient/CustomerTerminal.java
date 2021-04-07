@@ -1,6 +1,9 @@
 package easyappointmentclient;
 
+import ejb.session.stateless.AppointmentEntitySessionBeanRemote;
+import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
+import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.CustomerEntity;
 import java.util.Scanner;
 import util.exception.CustomerExistException;
@@ -10,6 +13,9 @@ import util.exception.UnknownPersistenceException;
 public class CustomerTerminal {
 
     private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
+    private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
+    private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
+    private AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote;
 
     private CustomerEntity loggedInCustomerEntity;
     private CustomerModule customerModule;
@@ -17,8 +23,11 @@ public class CustomerTerminal {
     public CustomerTerminal() {
     }
 
-    public CustomerTerminal(CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote) {
+    public CustomerTerminal(CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote) {
         this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
+        this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
+        this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
+        this.appointmentEntitySessionBeanRemote = appointmentEntitySessionBeanRemote;
     }
 
     public void runApp() {
@@ -42,7 +51,7 @@ public class CustomerTerminal {
                         doRegistration();
                         System.out.println("Registration successful!\n");
                         
-                        customerModule = new CustomerModule(customerEntitySessionBeanRemote, loggedInCustomerEntity);
+                        customerModule = new CustomerModule(appointmentEntitySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, businessCategorySessionBeanRemote, loggedInCustomerEntity);
                         customerModule.mainMenu();
                     } catch (InvalidLoginCredentialException | CustomerExistException | UnknownPersistenceException ex) {
                         System.out.println(ex.getMessage());
@@ -55,7 +64,7 @@ public class CustomerTerminal {
                         doLogin();
                         System.out.println("Login successful!\n");
 
-                        customerModule = new CustomerModule(customerEntitySessionBeanRemote, loggedInCustomerEntity);
+                        customerModule = new CustomerModule(appointmentEntitySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, businessCategorySessionBeanRemote, loggedInCustomerEntity);
                         customerModule.mainMenu();
                     } catch (InvalidLoginCredentialException ex) {
                         System.out.println("An error has occurred while logging in: " + ex.getMessage() + "\n");
@@ -121,7 +130,7 @@ public class CustomerTerminal {
         String email = "";
         Integer password;
 
-        System.out.println("*** Service provider terminal :: Login ***\n");
+        System.out.println("*** Customer terminal :: Login ***\n");
         System.out.print("Enter Email Address> ");
         email = scanner.nextLine().trim();
         System.out.print("Enter password> ");

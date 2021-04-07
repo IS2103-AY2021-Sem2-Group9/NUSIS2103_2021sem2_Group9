@@ -80,7 +80,7 @@ public class DataInitializationSessionBean {
             serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(new ServiceProviderEntity("Kevin Paterson", "1111001111", "Clementi", "93718799", "13, Clementi Road", "kevin@nuh.com.sg", 113322, ServiceProviderStatus.APPROVED), 1);
             AppointmentEntity testAppointment = new AppointmentEntity(testDate, testTime, AppointmentStatusEnum.UPCOMING, 0, testCustomer, testSP);
             appointmentEntitySessionBeanLocal.createAppointmentEntity(testAppointment);
-            
+            serviceProviderEntitySessionBeanLocal.addAppointment(testAppointment, testSP);
             
         } catch (Exception ex) {
             ex.printStackTrace();
