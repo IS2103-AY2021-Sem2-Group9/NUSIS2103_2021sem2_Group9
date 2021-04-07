@@ -435,11 +435,32 @@ public class AdminModule {
         
         try
         {
+            System.out.print("Enter customer ID> ");
             customerId = sc.nextLong();
             sc.nextLine();
             CustomerEntity customerEntity = customerEntitySessionBeanRemote.retrieveCustomerEntityById(customerId);
-            sendJMSMessageToQueueAppointmentNotification(customerId, "EasyAppointment_Group9");
-            System.out.println("Email sent successfully!");
+            List<AppointmentEntity> customerAppointments = customerEntitySessionBeanRemote.retrieveCustomerEntityAppointments(customerId);
+                    
+            if (!customerAppointments.isEmpty())
+            {
+                System.out.println(customerEntity.getFirstName() + "'s upcoming appointment: \n");
+                System.out.printf("%-15s%-20s%-15s%-10s%-18s\n", "Name", "| Business Category", "| Date", "| Time", "| Appointment No.");
+                
+                AppointmentEntity appointment = customerAppointments.get(0);
+                ServiceProviderEntity apptServiceProvider = appointment.getServiceProviderEntity();
+                System.out.printf("%-15s%-20s%-15s%-10s%-18s\n", apptServiceProvider.getName(), "| " + apptServiceProvider.getCategory().getCategoryName(), "| " + appointment.getAppointmentDate().toString(), "| " + appointment.getAppointmentTime().toString(), "| " + appointment.getAppointmentNum());
+                sendJMSMessageToQueueAppointmentNotification(customerEntity.getId(), "EasyAppointment_Group9");
+                System.out.println("Email sent successfully!\n");
+            }
+            else
+            {
+                System.out.println("Unable to send email as " + customerEntity.getFirstName() + " does not have any upcoming appointments!\n");
+            }
+        }
+        catch(InputMismatchException ex)
+        {
+            System.err.println("Please enter digits only.\n");
+            sc.next();
         }
         catch (Exception ex)
         {
@@ -506,8 +527,7 @@ public class AdminModule {
             MessageProducer mp = s.createProducer(queueCheckoutNotification);
             
             MapMessage mapMessage = s.createMapMessage();
-            mapMessage.setString("fromEmailAddress", fromEmailAddress);
-            //mapMessage.setString("toEmailAddress", toEmailAddress);            
+            mapMessage.setString("fromEmailAddress", fromEmailAddress);            
             mapMessage.setLong("customerEntityId", customerEntityId);
             
             mp.send(mapMessage);

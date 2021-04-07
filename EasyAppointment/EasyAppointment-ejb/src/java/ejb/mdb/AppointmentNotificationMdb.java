@@ -2,7 +2,9 @@ package ejb.mdb;
 
 import ejb.session.stateless.CustomerEntitySessionBeanLocal;
 import ejb.session.stateless.EmailSessionBeanLocal;
+import entity.AppointmentEntity;
 import entity.CustomerEntity;
+import java.util.List;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
@@ -35,15 +37,17 @@ public class AppointmentNotificationMdb implements MessageListener
         {
             if (message instanceof MapMessage)
             {
-                MapMessage mapMessage = (MapMessage)message;
-                //String toEmailAddress = mapMessage.getString("toEmailAddress");
+                MapMessage mapMessage = (MapMessage)message;                //String toEmailAddress = mapMessage.getString("toEmailAddress");
                 String fromEmailAddress = mapMessage.getString("fromEmailAddress");
                 Long customerEntityId = (Long)mapMessage.getLong("customerEntityId");
                 
                 CustomerEntity customerEntity = customerEntitySessionBeanLocal.retrieveCustomerEntityById(customerEntityId);
-                String toEmailAddress = customerEntity.getEmail();
+                List<AppointmentEntity> appointments = customerEntitySessionBeanLocal.retrieveCustomerEntityAppointments(customerEntityId);
+                AppointmentEntity appointment = appointments.get(0);
+                // String toEmailAddress = customerEntity.getEmail();
+                String toEmailAddress = "lawson.tkw@gmail.com";
                 
-                emailSessionBeanLocal.emailCheckoutNotificationSync(customerEntity, fromEmailAddress, toEmailAddress);
+                emailSessionBeanLocal.emailCheckoutNotificationSync(customerEntity, appointment, fromEmailAddress, toEmailAddress);
             }
         }
         catch(CustomerNotFoundException | JMSException ex)

@@ -1,5 +1,6 @@
 package util.email;
 
+import entity.AppointmentEntity;
 import entity.CustomerEntity;
 import entity.ServiceProviderEntity;
 import java.text.NumberFormat;
@@ -36,16 +37,32 @@ public class EmailManager
     
     
     
-    public Boolean emailAppointmentNotification(CustomerEntity customerEntity, String fromEmailAddress, String toEmailAddress)
+    public Boolean emailAppointmentNotification(CustomerEntity customerEntity, AppointmentEntity appointmentEntity, String fromEmailAddress, String toEmailAddress)
     {
+        ServiceProviderEntity serviceProvider = appointmentEntity.getServiceProviderEntity();
+        
         String emailBody = "";
         
-        emailBody += "This is a reminder!\n You have an upcoming appointment: "  +  "\n\n";
-        emailBody += "S/N     Service Provider's Name     Appointment Date     Appointment Time     Address\n\n";
+        emailBody += "Dear " + customerEntity.getFirstName() + ", \n\n";
+        emailBody += "This is a reminder!\nYou have an upcoming appointment: "  +  "\n\n";
         
-        emailBody += customerEntity.getId()
-                + "     " + customerEntity.getFirstName()
-                + "     " + customerEntity.getAddress();
+        //String header = String.format("%-20s | %-25s | %-18s | %-18s | %-28s", "Appointment No.", "Service Provider's Name", "Appointment Date", "Appointment Time", "Address");
+        //String information = String.format("%-20s | %-25s | %-18s | %-18s | %-28s", appointmentEntity.getAppointmentNum(), serviceProvider.getName(), appointmentEntity.getAppointmentDate(), appointmentEntity.getAppointmentTime(), serviceProvider.getAddress());
+        
+        String apptNum = String.format("%s: " + appointmentEntity.getAppointmentNum() + "\n", "Appointment Number");
+        String serviceProviderName = String.format("%s: " + serviceProvider.getName() + "\n", "Service Provider's Name"); 
+        String apptDate = String.format("%s: " + appointmentEntity.getAppointmentDate() + "\n", "Appointment Date"); 
+        String apptTime = String.format("%s: " + appointmentEntity.getAppointmentTime() + "\n", "Appointment Time"); 
+        String address = String.format("%s: " + serviceProvider.getAddress() + "\n", "Address"); 
+        
+        emailBody += apptNum;
+        emailBody += serviceProviderName;
+        emailBody += apptDate;
+        emailBody += apptTime;
+        emailBody += address;
+        
+        emailBody += "\n\n\n";
+        emailBody += "Thank you for using EasyAppointment!";
             
 //        for(SaleTransactionLineItemEntity saleTransactionLineItemEntity:saleTransactionEntity.getSaleTransactionLineItemEntities())
 //        {
