@@ -111,7 +111,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
             return serviceProviderEntity;
         }
         else {
-            throw new ServiceProviderEntityNotFoundException("Service Provier ID " + serviceProviderId + " does not exist");
+            throw new ServiceProviderEntityNotFoundException("Service Provider ID " + serviceProviderId + " does not exist");
         }
     }
     
@@ -254,5 +254,14 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity) {
         spEntity.getAppointmentEntities().add(appt);
         em.merge(spEntity);
+    }
+    
+    @Override
+    public List<AppointmentEntity> retrieveAppointmentsOfServiceProviderById(Long serviceProviderId) throws ServiceProviderEntityNotFoundException
+    {
+        ServiceProviderEntity serviceProviderEntity = retrieveServiceProviderByServiceProviderId(serviceProviderId);
+        List<AppointmentEntity> apptEntities = serviceProviderEntity.getAppointmentEntities();
+        apptEntities.size();
+        return apptEntities;
     }
 }
