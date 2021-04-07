@@ -62,9 +62,9 @@ public class BusinessCategorySessionBean implements BusinessCategorySessionBeanR
         return businessCategoryEntity.getCategoryName();
     }
     
-    public BusinessCategoryEntity retrieveBusinessCategoryById(Long category) throws BusinessCategoryNotFoundException {
-        Query query = em.createQuery("SELECT b from BusinessCategoryEntity b WHERE b.id = :category");
-        query.setParameter("category", category);
+    public BusinessCategoryEntity retrieveBusinessCategoryById(Long categoryId) throws BusinessCategoryNotFoundException {
+        Query query = em.createQuery("SELECT b from BusinessCategoryEntity b WHERE b.id = :categoryId");
+        query.setParameter("categoryId", categoryId);
         
         try
         {
@@ -72,7 +72,7 @@ public class BusinessCategorySessionBean implements BusinessCategorySessionBeanR
         }
         catch(NoResultException | NonUniqueResultException ex)
         {
-            throw new BusinessCategoryNotFoundException("Business Category " + category + " does not exist!");
+            throw new BusinessCategoryNotFoundException("Business Category " + categoryId + " does not exist!");
         }
     }
 }

@@ -94,7 +94,7 @@ public class ServiceProviderTerminal {
         Scanner scanner = new Scanner(System.in);
         ServiceProviderEntity spEntity = new ServiceProviderEntity(); 
         String name = ""; 
-        int category = 0; 
+        Long category; 
         String uen = ""; 
         String city = ""; 
         String phone = "";
@@ -113,7 +113,7 @@ public class ServiceProviderTerminal {
             System.out.printf("%11s%16s\n", categoryEntity.getId(), categoryEntity.getCategoryName());
         }
         System.out.print("Enter Business Category> ");
-        category = scanner.nextInt(); 
+        category = scanner.nextLong(); 
         scanner.nextLine();
         System.out.print("Enter Business Registration Number>");
         spEntity.setUen(scanner.nextLine().trim());

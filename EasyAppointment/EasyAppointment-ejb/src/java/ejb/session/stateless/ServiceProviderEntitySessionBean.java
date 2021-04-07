@@ -33,26 +33,18 @@ import util.exception.UpdateServiceProviderException;
 public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySessionBeanRemote, ServiceProviderEntitySessionBeanLocal {
 
     @PersistenceContext(unitName = "EasyAppointment-ejbPU")
-    private EntityManager em;
-            
+    private EntityManager em;    
+    
     @EJB
     private BusinessCategorySessionBeanLocal businessCategorySessionBeanLocal;
     
     @Override
-    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, int category) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException 
+    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, Long categoryId) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException 
     {
         try 
         {
-            List<BusinessCategoryEntity> categoryList = businessCategorySessionBeanLocal.retrieveAllBusinessCategories();
-            for (BusinessCategoryEntity categoryEntity : categoryList) {
-                long matchEntry = Long.valueOf(category);
-                if(categoryEntity.getId() == matchEntry) {
-                    newServiceProvider.setCategory(categoryEntity);
-                    break; 
-                } else {
-                    throw new BusinessCategoryNotFoundException("Business Category Not Found");
-                }
-            }
+            BusinessCategoryEntity categoryEntity = businessCategorySessionBeanLocal.retrieveBusinessCategoryById(categoryId);
+            newServiceProvider.setCategory(categoryEntity);          
             em.persist(newServiceProvider);
             em.flush();
             return newServiceProvider;
