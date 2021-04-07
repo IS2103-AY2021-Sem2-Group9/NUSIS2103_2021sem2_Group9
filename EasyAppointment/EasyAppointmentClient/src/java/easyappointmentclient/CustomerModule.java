@@ -198,8 +198,8 @@ public class CustomerModule {
             apptEntity.setServiceProviderEntity(spEntity);
 
             try {
-
                 this.appointmentEntitySessionBeanRemote.createAppointmentEntity(apptEntity);
+                this.serviceProviderEntitySessionBeanRemote.addAppointment(apptEntity, spEntity);
             } catch (UnknownPersistenceException | AppointmentExistException ex) {
                 System.err.println("Error occured when creating appointment: " + ex.getMessage());
             }

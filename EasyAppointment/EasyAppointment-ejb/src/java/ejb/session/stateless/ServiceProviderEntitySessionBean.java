@@ -235,4 +235,9 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         return availableTimeSlots;        
     }
  
+    @Override
+    public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity) {
+        spEntity.getAppointmentEntities().add(appt);
+        em.merge(spEntity);
+    }
 }
