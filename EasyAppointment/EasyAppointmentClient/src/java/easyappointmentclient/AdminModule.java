@@ -82,7 +82,15 @@ public class AdminModule {
             while (response < 1 || response > 9)
             {
                 System.out.print("> ");
-                response = scanner.nextInt();
+                try
+                {
+                    response = scanner.nextInt();
+                }
+                catch (InputMismatchException ex)
+                {
+                    System.err.println("Please only input digits!");
+                    scanner.next();
+                }
                 
                 if (response == 1) 
                 {
@@ -126,7 +134,7 @@ public class AdminModule {
                 }
                 else 
                 {
-                    System.out.println("Please key in 1 ~ 9 only.");
+                    System.out.println("Please key in 1 ~ 10 only.");
                 }
             }
             
