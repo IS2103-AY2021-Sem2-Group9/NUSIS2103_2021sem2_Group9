@@ -8,7 +8,7 @@ import util.exception.AppointmentNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 public interface AppointmentEntitySessionBeanLocal {
-
+    
     public List<AppointmentEntity> retrieveAllAppointments();
 
     public void cancelAppointment(String appointmentNum) throws AppointmentNotFoundException;

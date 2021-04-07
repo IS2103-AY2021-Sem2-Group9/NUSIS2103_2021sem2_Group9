@@ -27,7 +27,7 @@ public class AppointmentEntity implements Serializable {
     @Column(nullable = false, columnDefinition = "TIME")
     private LocalTime appointmentTime;
     @Column(nullable = false)
-    private AppointmentStatusEnum appointmentStatusEnum;
+    private AppointmentStatusEnum appointmentStatusEnum; // UPCOMING, ONGOING, COMPLETED
     @Column (nullable = false)
     private Integer rating; 
     
