@@ -71,10 +71,18 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
     }
     
     @Override
-    public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
+    public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
         Query query = em.createQuery("SELECT a FROM AppointmentEntity a WHERE a.serviceProviderEntity.serviceProviderId = :serviceProviderEntityId AND a.appointmentStatusEnum = :status");
         query.setParameter("serviceProviderEntityId", serviceProviderEntity.getServiceProviderId());
         query.setParameter("status", AppointmentStatusEnum.UPCOMING);
+        List<AppointmentEntity> result = query.getResultList();
+        return result;     
+    }
+    
+    @Override
+    public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
+        Query query = em.createQuery("SELECT a FROM AppointmentEntity a WHERE a.serviceProviderEntity.serviceProviderId = :serviceProviderEntityId");
+        query.setParameter("serviceProviderEntityId", serviceProviderEntity.getServiceProviderId());
         List<AppointmentEntity> result = query.getResultList();
         return result;     
     }

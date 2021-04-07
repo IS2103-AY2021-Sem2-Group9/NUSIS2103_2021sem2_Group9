@@ -39,6 +39,8 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     
     @EJB
     private BusinessCategorySessionBeanLocal businessCategorySessionBeanLocal;
+    @EJB
+    private AppointmentEntitySessionBeanLocal appointmentEntitySessionBeanLocal;
     
     @Override
     public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, Long categoryId) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException 
@@ -254,5 +256,23 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity) {
         spEntity.getAppointmentEntities().add(appt);
         em.merge(spEntity);
+    }
+    
+    @Override
+    public double generateOverallRating(ServiceProviderEntity spEntity) {
+        List<AppointmentEntity> appointments = appointmentEntitySessionBeanLocal.retrieveAllAppointmentsForServiceProvider(spEntity);
+        List<Integer> listOfRatings = new ArrayList<>();
+        for(AppointmentEntity appt : appointments) {
+            if(appt.getRating() > 0) {
+                listOfRatings.add(appt.getRating());
+            }
+        }
+        double totalRating = 0;
+        double overallRating;
+        for (Integer rating : listOfRatings) {
+            totalRating += (double) rating;
+        }
+        overallRating = totalRating/listOfRatings.size();
+        return overallRating;
     }
 }
