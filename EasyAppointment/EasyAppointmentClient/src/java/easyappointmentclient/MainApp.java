@@ -54,7 +54,7 @@ public class MainApp {
                 response = scanner.nextInt();
                 
                 if(response == 1) {
-                    customerTerminal = new CustomerTerminal(customerEntitySessionBeanRemote);
+                    customerTerminal = new CustomerTerminal(customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, businessCategorySessionBeanRemote, appointmentEntitySessionBeanRemote);
                     customerTerminal.runApp();
                 } else if(response == 2) {
                     spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote, businessCategorySessionBeanRemote, appointmentEntitySessionBeanRemote);
