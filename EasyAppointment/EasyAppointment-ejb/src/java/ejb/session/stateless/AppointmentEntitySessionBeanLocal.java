@@ -5,6 +5,8 @@ import java.util.List;
 import util.exception.AppointmentNumberNotFoundException;
 
 public interface AppointmentEntitySessionBeanLocal {
+    
+    public AppointmentEntity createAppointmentEntity(AppointmentEntity appointmentEntity);
 
     public List<AppointmentEntity> retrieveAllAppointments();
 

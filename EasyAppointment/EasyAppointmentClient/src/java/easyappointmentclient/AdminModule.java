@@ -172,7 +172,7 @@ public class AdminModule {
             }
             catch (ServiceProviderEntityNotFoundException | ServiceProviderAlreadyApprovedException ex)
             {
-                System.err.println("Error occured while approving Service Provider: " + ex.getMessage());
+                System.err.println("Error occurred while approving Service Provider: " + ex.getMessage());
             }
             catch (InputMismatchException ex)
             {

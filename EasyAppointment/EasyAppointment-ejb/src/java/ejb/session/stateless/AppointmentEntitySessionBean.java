@@ -20,6 +20,11 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
     @PersistenceContext(unitName = "EasyAppointment-ejbPU")
     private EntityManager em;
 
+    public AppointmentEntity createAppointmentEntity(AppointmentEntity appointmentEntity) {
+            em.persist(appointmentEntity);
+            em.flush();
+            return appointmentEntity;
+    }
     
     @Override
     public List<AppointmentEntity> retrieveAllAppointments() {
