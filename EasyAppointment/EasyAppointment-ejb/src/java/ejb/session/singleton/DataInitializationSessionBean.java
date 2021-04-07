@@ -76,11 +76,13 @@ public class DataInitializationSessionBean {
             LocalDate testDate = LocalDate.of(2021,04,06);
             LocalTime testTime = LocalTime.of(10, 30);
             ServiceProviderEntity testSP = new ServiceProviderEntity("1", "1", "1", "1", "1", "1", 1, ServiceProviderStatus.APPROVED);
-            serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(testSP, 1);
-            serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(new ServiceProviderEntity("Kevin Paterson", "1111001111", "Clementi", "93718799", "13, Clementi Road", "kevin@nuh.com.sg", 113322, ServiceProviderStatus.APPROVED), 1);
+            Long categoryId = 1L;
+            serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(testSP, categoryId);
+            serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(new ServiceProviderEntity("Kevin Paterson", "1111001111", "Clementi", "93718799", "13, Clementi Road", "kevin@nuh.com.sg", 113322, ServiceProviderStatus.APPROVED), categoryId);
             AppointmentEntity testAppointment = new AppointmentEntity(testDate, testTime, AppointmentStatusEnum.UPCOMING, 0, testCustomer, testSP);
             appointmentEntitySessionBeanLocal.createAppointmentEntity(testAppointment);
             serviceProviderEntitySessionBeanLocal.addAppointment(testAppointment, testSP);
+            
             
         } catch (Exception ex) {
             ex.printStackTrace();
