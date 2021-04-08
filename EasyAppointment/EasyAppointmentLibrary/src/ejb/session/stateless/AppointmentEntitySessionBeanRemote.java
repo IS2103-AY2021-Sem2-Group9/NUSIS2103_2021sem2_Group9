@@ -17,7 +17,7 @@ public interface AppointmentEntitySessionBeanRemote {
     
     public AppointmentEntity createAppointmentEntity(AppointmentEntity apptEntity) throws UnknownPersistenceException, AppointmentExistException;
     
-    public AppointmentEntity updateAppointmentEntity(AppointmentEntity apptEntity);
+    public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
     
     public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
 }

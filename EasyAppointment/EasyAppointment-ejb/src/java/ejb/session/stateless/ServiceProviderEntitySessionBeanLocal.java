@@ -40,5 +40,7 @@ public interface ServiceProviderEntitySessionBeanLocal {
     public List<LocalTime> retrieveServiceProviderAvailabilityForTheDay(ServiceProviderEntity spEntity, LocalDate appointmentDate);
 
     public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity);
+
+    public double generateOverallRating(ServiceProviderEntity spEntity);
     
 }

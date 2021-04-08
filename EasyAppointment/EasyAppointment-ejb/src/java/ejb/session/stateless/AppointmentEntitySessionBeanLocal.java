@@ -19,5 +19,7 @@ public interface AppointmentEntitySessionBeanLocal {
     
     public AppointmentEntity updateAppointmentEntity(AppointmentEntity apptEntity);
 
+    public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
+
     public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
 }

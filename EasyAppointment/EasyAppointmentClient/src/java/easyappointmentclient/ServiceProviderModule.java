@@ -178,7 +178,7 @@ public class ServiceProviderModule {
        System.out.println("Appointments: ");
        
        System.out.printf("%-22s%-20s%-20s%-15s\n", "Name", " | Date", " | Time", " | Appointment No.");
-       List<AppointmentEntity> appointments = appointmentEntitySessionBeanRemote.retrieveAllAppointmentsForServiceProvider(currentServiceProviderEntity);
+       List<AppointmentEntity> appointments = appointmentEntitySessionBeanRemote.retrieveUpcomingAppointmentsForServiceProvider(currentServiceProviderEntity);
        for (AppointmentEntity appointment : appointments) {
            System.out.printf("%-22s%-20s%-20s%-15s\n", appointment.getCustomerEntity().getFirstName() + " " + appointment.getCustomerEntity().getLastName(), " | " + appointment.getAppointmentDate().toString(), " | " + appointment.getAppointmentTime().toString(), " | " + appointment.getAppointmentNum());
        }
