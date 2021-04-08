@@ -1,15 +1,9 @@
 package easyappointmentcustomerclient;
 
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import ws.client.CustomerEntity;
-import ws.client.CustomerExistException;
 import ws.client.CustomerExistException_Exception;
-import ws.client.CustomerNotFoundException_Exception;
-import ws.client.InvalidLoginCredentialException;
 import ws.client.InvalidLoginCredentialException_Exception;
-import ws.client.UnknownPersistenceException;
 import ws.client.UnknownPersistenceException_Exception;
 
 public class CustomerTerminal 
@@ -38,43 +32,47 @@ public class CustomerTerminal
 
                 if (response == 1) {                  
                      
-                    try {
+                    try 
+                    {
                         doRegistration();
                         System.out.println("Registration successful!\n");
-                        System.out.println(loggedInCustomerEntity.getFirstName());
-                        //customerModule = new CustomerModule(appointmentEntitySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, businessCategorySessionBeanRemote, loggedInCustomerEntity);
-                        //customerModule.mainMenu();
-                    } catch (CustomerExistException_Exception | UnknownPersistenceException_Exception ex) {
+                        CustomerModule customerModule = new CustomerModule(loggedInCustomerEntity);
+                        customerModule.mainMenu();
+                    } 
+                    catch (CustomerExistException_Exception | UnknownPersistenceException_Exception ex) 
+                    {
                         System.out.println("An error occured while registering: " + ex.getMessage());
                         System.out.println();
                     }
                     
 
-                } else if (response == 2) {
-                    try {
+                } 
+                else if (response == 2) 
+                {
+                    try 
+                    {
                         doLogin();
                         System.out.println("Login successful!\n");
-                        System.out.println(loggedInCustomerEntity.getFirstName());
-                    } catch (InvalidLoginCredentialException_Exception ex) {
+                        CustomerModule customerModule = new CustomerModule(loggedInCustomerEntity);
+                        customerModule.mainMenu();
+                    } 
+                    catch (InvalidLoginCredentialException_Exception ex) 
+                    {
                         System.err.println("An error occured while logging in: " + ex.getMessage());
                     }
-//                    try {
-//                        doLogin();
-//                        System.out.println("Login successful!\n");
-//
-//                        customerModule = new CustomerModule(appointmentEntitySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, businessCategorySessionBeanRemote, loggedInCustomerEntity);
-//                        customerModule.mainMenu();
-//                    } catch (InvalidLoginCredentialException ex) {
-//                        System.out.println("An error has occurred while logging in: " + ex.getMessage() + "\n");
-//                    }
-                } else if (response == 3) {
+                } 
+                else if (response == 3) 
+                {
                     break;
-                } else {
+                } 
+                else 
+                {
                     System.out.println("Please key in 1 ~ 3 only.");
                 }
             }
 
-            if (response == 3) {
+            if (response == 3) 
+            {
                 System.out.println("Thank you!\n");
                 break;
             }
