@@ -253,4 +253,14 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         overallRating = totalRating / listOfRatings.size();
         return overallRating;
     }
+    
+    @Override
+    public List<AppointmentEntity> retrieveAppointmentsOfServiceProviderById(Long serviceProviderId) throws ServiceProviderEntityNotFoundException
+    {
+        ServiceProviderEntity serviceProviderEntity = retrieveServiceProviderByServiceProviderId(serviceProviderId);
+        List<AppointmentEntity> apptEntities = serviceProviderEntity.getAppointmentEntities();
+        apptEntities.size();
+        return apptEntities;
+    }
 }
+

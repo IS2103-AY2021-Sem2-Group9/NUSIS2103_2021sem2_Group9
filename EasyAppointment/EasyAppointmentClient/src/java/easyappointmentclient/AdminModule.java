@@ -98,7 +98,7 @@ public class AdminModule {
                 } 
                 else if (response == 2) 
                 {
-                    System.out.println("work in progress...\n");
+                    viewServiceProviderAppointments();
                 }
                 else if (response == 3) 
                 {
@@ -185,7 +185,7 @@ public class AdminModule {
                     }
                     else
                     {
-                        System.out.println(customerEntity.getFirstName() + " does not have any upcoming appointments!\n");
+                        System.out.println(customerEntity.getFirstName() + " does not have any appointments!\n");
                     }
                 }
                 
@@ -200,6 +200,60 @@ public class AdminModule {
                 System.err.println("Error while retrieving customer's appointments: " + ex.getMessage());
             }
         }
+    }
+    
+    private void viewServiceProviderAppointments()
+    {
+        System.out.println("*** Admin Terminal :: View Appointments for Service Providers ***\n");
+        Scanner scanner = new Scanner(System.in);
+        Long serviceProviderId;
+        
+        while (true)
+        {
+            System.out.println("Enter 0 to go back to the previous menu.\n");
+            System.out.print("Enter Service Provider ID> ");
+            
+            try
+            {
+                serviceProviderId = scanner.nextLong();
+                
+                if (serviceProviderId == 0)
+                {
+                    break;
+                }
+                else 
+                {
+                    List<AppointmentEntity> appointments = serviceProviderSessionBeanRemote.retrieveAppointmentsOfServiceProviderById(serviceProviderId);
+                    String serviceProviderName = serviceProviderSessionBeanRemote.retrieveServiceProviderByServiceProviderId(serviceProviderId).getName();
+                    
+                    if (!appointments.isEmpty())
+                    {
+                        System.out.println("Viewing Appointments for " + serviceProviderName + ":\n");
+                        System.out.printf("%-18s%-18s%-15s%-15s%-10s%-10s\n", "Appointment No.", "| Customer Name", "| Phone Number", "| Date", "| Time", "| Status", "| Rating");
+
+                        for(AppointmentEntity appointment : appointments)
+                        {
+                            CustomerEntity customer = appointment.getCustomerEntity();
+                            System.out.printf("%-18s%-18s%-15s%-15s%-10s%-10s\n", appointment.getAppointmentNum(), "| " + customer.getFirstName() + " " + customer.getLastName(), "| " + customer.getPhoneNumber(), "| " + appointment.getAppointmentDate(), "| " + appointment.getAppointmentTime(), "| " + "<status>", "| " + appointment.getRating());
+                        }
+                    }
+                    else
+                    {
+                        System.out.println(serviceProviderName + " does not have any appointments!");
+                    }
+                }
+            }
+            catch(InputMismatchException ex)
+            {
+                System.err.println("Please input a digit.\n");
+                scanner.next();
+            }
+            catch(ServiceProviderEntityNotFoundException ex)
+            {
+                System.err.println("Error while retrieving appointments: " + ex.getMessage());
+            }
+        }
+                
     }
     
     private void viewServiceProviders()

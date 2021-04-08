@@ -7,7 +7,6 @@ import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 
 import java.util.Scanner;
-import javax.annotation.Resource;
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 
