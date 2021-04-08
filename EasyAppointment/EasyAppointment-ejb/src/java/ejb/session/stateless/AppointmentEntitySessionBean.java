@@ -104,4 +104,10 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
         List<AppointmentEntity> result = query.getResultList();
         return result;     
     }
+    
+    @Override
+    public void rateAppointment(AppointmentEntity appointmentEntity) {
+        em.merge(appointmentEntity);
+        em.flush();
+    }
 }
