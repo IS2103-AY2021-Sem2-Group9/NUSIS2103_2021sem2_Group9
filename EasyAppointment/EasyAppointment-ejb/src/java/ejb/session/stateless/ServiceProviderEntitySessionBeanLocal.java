@@ -42,5 +42,7 @@ public interface ServiceProviderEntitySessionBeanLocal {
     public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity);
 
     public List<AppointmentEntity> retrieveAppointmentsOfServiceProviderById(Long serviceProviderId) throws ServiceProviderEntityNotFoundException;
+  
+    public double generateOverallRating(ServiceProviderEntity spEntity);
     
 }

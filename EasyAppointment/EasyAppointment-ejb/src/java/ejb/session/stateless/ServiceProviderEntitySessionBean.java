@@ -35,64 +35,54 @@ import util.exception.UpdateServiceProviderException;
 public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySessionBeanRemote, ServiceProviderEntitySessionBeanLocal {
 
     @PersistenceContext(unitName = "EasyAppointment-ejbPU")
-    private EntityManager em;    
-    
+    private EntityManager em;
+
     @EJB
     private BusinessCategorySessionBeanLocal businessCategorySessionBeanLocal;
-    
+    @EJB
+    private AppointmentEntitySessionBeanLocal appointmentEntitySessionBeanLocal;
+
     @Override
-    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, Long categoryId) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException 
-    {
-        try 
-        {
+    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, Long categoryId) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException {
+        try {
             BusinessCategoryEntity categoryEntity = businessCategorySessionBeanLocal.retrieveBusinessCategoryById(categoryId);
-            newServiceProvider.setCategory(categoryEntity);          
+            newServiceProvider.setCategory(categoryEntity);
             em.persist(newServiceProvider);
             em.flush();
             return newServiceProvider;
-        }
-        catch(PersistenceException ex)
-        {
-            if(ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException"))
-            {
-                if(ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException"))
-                {
+        } catch (PersistenceException ex) {
+            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
                     throw new BusinessCategoryNotFoundException("Error! Businesss category cannot be found!");
-                }
-                else
-                {
+                } else {
                     throw new UnknownPersistenceException(ex.getMessage());
                 }
-            }
-            else
-            {
+            } else {
                 throw new UnknownPersistenceException(ex.getMessage());
             }
         }
-        
+
     }
-            
-            
+
     @Override
     public ServiceProviderEntity retrieveServiceProviderByServiceProviderAddress(String email) throws ServiceProviderEntityNotFoundException {
         Query query = em.createQuery("SELECT s FROM ServiceProviderEntity s WHERE s.email = :inEmail");
         query.setParameter("inEmail", email);
         try {
-            return (ServiceProviderEntity)query.getSingleResult();
+            return (ServiceProviderEntity) query.getSingleResult();
         } catch (NoResultException ex) {
             throw new ServiceProviderEntityNotFoundException("Service Provider email " + email + " does not exist!");
         }
     }
-   
-   
+
     @Override
     public ServiceProviderEntity serviceProviderLogin(String email, Integer password) throws InvalidLoginCredentialException {
         try {
             ServiceProviderEntity currentServiceProviderEntity = retrieveServiceProviderByServiceProviderAddress(email);
-            if(currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.APPROVED) {
+            if (currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.APPROVED) {
                 return currentServiceProviderEntity;
 
-            }  else if (currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.PENDING) {
+            } else if (currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.PENDING) {
                 throw new InvalidLoginCredentialException("Your account is still pending administrator's approval. Please try again later!");
             } else if (currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.BLOCKED) {
                 throw new InvalidLoginCredentialException("Your account has been blocked by an administrator.");
@@ -107,20 +97,19 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     @Override
     public ServiceProviderEntity retrieveServiceProviderByServiceProviderId(Long serviceProviderId) throws ServiceProviderEntityNotFoundException {
         ServiceProviderEntity serviceProviderEntity = em.find(ServiceProviderEntity.class, serviceProviderId);
-        if(serviceProviderEntity != null) {
+        if (serviceProviderEntity != null) {
             return serviceProviderEntity;
-        }
-        else {
-            throw new ServiceProviderEntityNotFoundException("Service Provider ID " + serviceProviderId + " does not exist");
+        } else {
+            throw new ServiceProviderEntityNotFoundException("Service Provier ID " + serviceProviderId + " does not exist");
         }
     }
-    
+
     @Override
     public void updateServiceProvider(ServiceProviderEntity serviceProviderEntity) throws ServiceProviderEntityNotFoundException, UpdateServiceProviderException {
-        if(serviceProviderEntity.getServiceProviderId() != null) {
+        if (serviceProviderEntity.getServiceProviderId() != null) {
             ServiceProviderEntity serviceProviderEntityToUpdate = retrieveServiceProviderByServiceProviderId(serviceProviderEntity.getServiceProviderId());
-            
-            if(serviceProviderEntityToUpdate.getEmail().equals(serviceProviderEntity.getEmail())) {
+
+            if (serviceProviderEntityToUpdate.getEmail().equals(serviceProviderEntity.getEmail())) {
                 serviceProviderEntityToUpdate.setName(serviceProviderEntity.getName());
                 serviceProviderEntityToUpdate.setCategory(serviceProviderEntity.getCategory());
                 serviceProviderEntityToUpdate.setUen(serviceProviderEntity.getUen());
@@ -133,71 +122,60 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
                 throw new UpdateServiceProviderException("Username of service provider to be updated does not match the existing record");
             }
         } else {
-            throw new ServiceProviderEntityNotFoundException("Service Provider does not exist!");   
-        }   
+            throw new ServiceProviderEntityNotFoundException("Service Provider does not exist!");
+        }
     }
-    
+
     @Override
-    public List<ServiceProviderEntity> retrieveAllServiceProviders()
-    {
+    public List<ServiceProviderEntity> retrieveAllServiceProviders() {
         Query query = em.createQuery("SELECT s FROM ServiceProviderEntity s");
-        
+
         return query.getResultList();
     }
-    
+
     @Override
-    public List<ServiceProviderEntity> retrieveServiceProvidersByStatus(ServiceProviderStatus status)
-    {
+    public List<ServiceProviderEntity> retrieveServiceProvidersByStatus(ServiceProviderStatus status) {
         Query query = em.createQuery("SELECT s FROM ServiceProviderEntity s WHERE s.status = :currStatus");
         query.setParameter("currStatus", status);
-        
+
         return query.getResultList();
     }
-    
+
     @Override
-    public String approveServiceProviderById(Long id) throws ServiceProviderEntityNotFoundException, ServiceProviderAlreadyApprovedException
-    {
+    public String approveServiceProviderById(Long id) throws ServiceProviderEntityNotFoundException, ServiceProviderAlreadyApprovedException {
         ServiceProviderEntity sp = retrieveServiceProviderByServiceProviderId(id);
-        if (sp.getStatus() == ServiceProviderStatus.APPROVED) 
-        {
+        if (sp.getStatus() == ServiceProviderStatus.APPROVED) {
             throw new ServiceProviderAlreadyApprovedException("Service Provider has already been approved!");
-        } 
-        else
-        {
+        } else {
             sp.setStatus(ServiceProviderStatus.APPROVED);
         }
-        
+
         return sp.getName();
     }
-    
+
     @Override
-    public String blockServiceProviderById(Long id) throws ServiceProviderEntityNotFoundException, ServiceProviderAlreadyBlockedException
-    {
+    public String blockServiceProviderById(Long id) throws ServiceProviderEntityNotFoundException, ServiceProviderAlreadyBlockedException {
         ServiceProviderEntity sp = retrieveServiceProviderByServiceProviderId(id);
-        if (sp.getStatus() == ServiceProviderStatus.BLOCKED) 
-        {
+        if (sp.getStatus() == ServiceProviderStatus.BLOCKED) {
             throw new ServiceProviderAlreadyBlockedException("Service Provider has already been blocked!");
-        } 
-        else
-        {
+        } else {
             sp.setStatus(ServiceProviderStatus.BLOCKED);
         }
-        
+
         return sp.getName();
     }
-    
+
     @Override
     public List<ServiceProviderEntity> retrieveAllAvailableServiceProvidersForTheDay(LocalDate appointmentDate, Long category, String city) throws BusinessCategoryNotFoundException {
-        BusinessCategoryEntity bcEntity = businessCategorySessionBeanLocal.retrieveBusinessCategoryById(category); 
+        BusinessCategoryEntity bcEntity = businessCategorySessionBeanLocal.retrieveBusinessCategoryById(category);
         Query query = em.createQuery("SELECT sp FROM ServiceProviderEntity sp WHERE sp.category = :bcEntity AND sp.city = :city");
-        query.setParameter("bcEntity", bcEntity); 
+        query.setParameter("bcEntity", bcEntity);
         query.setParameter("city", city);
 
-        List<ServiceProviderEntity> results = query.getResultList(); 
-        List<ServiceProviderEntity> availableServiceProviders = new ArrayList<>(); 
-
-        for(ServiceProviderEntity serviceProvider : results) {
-            List<LocalTime> serviceProviderAvailability = retrieveServiceProviderAvailabilityForTheDay(serviceProvider, appointmentDate); 
+        List<ServiceProviderEntity> results = query.getResultList();
+        List<ServiceProviderEntity> availableServiceProviders = new ArrayList<>();
+        for (ServiceProviderEntity serviceProvider : results) {
+            List<LocalTime> serviceProviderAvailability = retrieveServiceProviderAvailabilityForTheDay(serviceProvider, appointmentDate);
 
             if (!serviceProviderAvailability.isEmpty()) {
                 availableServiceProviders.add(serviceProvider);
@@ -205,33 +183,31 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         }
         return availableServiceProviders;
     }
-    
+
     @Override
     public List<LocalTime> retrieveServiceProviderAvailabilityForTheDay(ServiceProviderEntity spEntity, LocalDate appointmentDate) {
-        
+
         LocalTime[] timeSlots = {LocalTime.of(8, 30, 00), LocalTime.of(9, 30, 00), LocalTime.of(10, 30, 00), LocalTime.of(11, 30, 00), LocalTime.of(12, 30, 00),
-                                 LocalTime.of(13, 30, 00), LocalTime.of(14, 30, 00), LocalTime.of(15, 30, 00), LocalTime.of(16, 30, 00), LocalTime.of(17, 30, 00)};
-        
+            LocalTime.of(13, 30, 00), LocalTime.of(14, 30, 00), LocalTime.of(15, 30, 00), LocalTime.of(16, 30, 00), LocalTime.of(17, 30, 00)};
+
         List<LocalTime> workingTimeSlots = Arrays.asList(timeSlots);
         List<LocalTime> availableTimeSlots = new ArrayList<>();
         List<AppointmentEntity> apptEntities = new ArrayList<>();
-        
+
         try {
             spEntity = retrieveServiceProviderByServiceProviderId(spEntity.getServiceProviderId());
             apptEntities = spEntity.getAppointmentEntities();
             apptEntities.size();
         } catch (ServiceProviderEntityNotFoundException ex) {
-            ex.printStackTrace();
+            System.err.println("Error occurred when retrieving service provider: " + ex.getMessage());
         }
 
         Boolean anyApptOnDate = false;
-        if (!apptEntities.isEmpty())
-        {
-            for(AppointmentEntity appointment : apptEntities) 
-            {
+        if (!apptEntities.isEmpty()) {
+            for (AppointmentEntity appointment : apptEntities) {
                 if (appointment.getAppointmentDate().equals(appointmentDate)) {
                     anyApptOnDate = true;
-                    for(LocalTime time : workingTimeSlots) {
+                    for (LocalTime time : workingTimeSlots) {
                         if (!time.equals(appointment.getAppointmentTime())) {
                             availableTimeSlots.add(time);
                         }
@@ -239,21 +215,43 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
                 }
             }
         }
-        
-        if (anyApptOnDate)
-        {
+
+        if (anyApptOnDate) {
             return availableTimeSlots;
-        } 
-        else
-        {
+        } else {
             return workingTimeSlots;
         }
     }
- 
+
     @Override
     public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity) {
-        spEntity.getAppointmentEntities().add(appt);
+        List<AppointmentEntity> appts = this.appointmentEntitySessionBeanLocal.retrieveAllAppointmentsForServiceProvider(spEntity);
+        appts.add(appt);
         em.merge(spEntity);
+        em.flush();
+    }
+
+    @Override
+    public double generateOverallRating(ServiceProviderEntity spEntity) {
+        List<AppointmentEntity> appointments = appointmentEntitySessionBeanLocal.retrieveAllAppointmentsForServiceProvider(spEntity);
+
+        List<Integer> listOfRatings = new ArrayList<>();
+        for (AppointmentEntity appt : appointments) {
+            System.out.println("appt.getRating()1:");
+            System.out.println(appt.getRating());
+            if (appt.getRating() > 0) {
+                listOfRatings.add(appt.getRating());
+                System.out.println("appt.getRating()2:");
+                System.out.println(appt.getRating());
+            }
+        }
+        double totalRating = 0;
+        double overallRating;
+        for (Integer rating : listOfRatings) {
+            totalRating += rating.doubleValue();
+        }
+        overallRating = totalRating / listOfRatings.size();
+        return overallRating;
     }
     
     @Override
@@ -265,3 +263,4 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         return apptEntities;
     }
 }
+

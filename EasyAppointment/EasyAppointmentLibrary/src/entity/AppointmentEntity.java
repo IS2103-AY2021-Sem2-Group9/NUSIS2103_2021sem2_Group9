@@ -27,8 +27,6 @@ public class AppointmentEntity implements Serializable {
     private LocalDate appointmentDate;
     @Column(nullable = false, columnDefinition = "TIME")
     private LocalTime appointmentTime;
-    @Column(nullable = false)
-    private AppointmentStatusEnum appointmentStatusEnum; // UPCOMING, ONGOING, COMPLETED
     @Column (nullable = false)
     private Integer rating; 
     
@@ -39,13 +37,12 @@ public class AppointmentEntity implements Serializable {
     private ServiceProviderEntity serviceProviderEntity;
 
     public AppointmentEntity() {
-        this.rating = 0; 
     }
 
-    public AppointmentEntity(LocalDate appointmentDate, LocalTime appointmentTime, AppointmentStatusEnum appointmentStatusEnum, CustomerEntity customerEntity, ServiceProviderEntity serviceProviderEntity) {
+    public AppointmentEntity(LocalDate appointmentDate, LocalTime appointmentTime, CustomerEntity customerEntity, ServiceProviderEntity serviceProviderEntity) {
+        this.rating = 0; 
         this.appointmentDate = appointmentDate;
         this.appointmentTime = appointmentTime;
-        this.appointmentStatusEnum = appointmentStatusEnum;
         this.customerEntity = customerEntity;
         this.serviceProviderEntity = serviceProviderEntity;
         Long uid = serviceProviderEntity.getServiceProviderId();
@@ -67,10 +64,9 @@ public class AppointmentEntity implements Serializable {
       
     }  
 
-    public AppointmentEntity(LocalDate appointmentDate, LocalTime appointmentTime, AppointmentStatusEnum appointmentStatusEnum, Integer rating, CustomerEntity customerEntity, ServiceProviderEntity serviceProviderEntity) {
+    public AppointmentEntity(LocalDate appointmentDate, LocalTime appointmentTime, Integer rating, CustomerEntity customerEntity, ServiceProviderEntity serviceProviderEntity) {
         this.appointmentDate = appointmentDate;
         this.appointmentTime = appointmentTime;
-        this.appointmentStatusEnum = appointmentStatusEnum;
         this.rating = rating;
         this.customerEntity = customerEntity;
         this.serviceProviderEntity = serviceProviderEntity;
@@ -183,20 +179,6 @@ public class AppointmentEntity implements Serializable {
      */
     public void setServiceProviderEntity(ServiceProviderEntity serviceProviderEntity) {
         this.serviceProviderEntity = serviceProviderEntity;
-    }
-    
-    /**
-     * @return the appointmentStatusEnum
-     */
-    public AppointmentStatusEnum getAppointmentStatusEnum() {
-        return appointmentStatusEnum;
-    }
-
-    /**
-     * @param appointmentStatusEnum the appointmentStatusEnum to set
-     */
-    public void setAppointmentStatusEnum(AppointmentStatusEnum appointmentStatusEnum) {
-        this.appointmentStatusEnum = appointmentStatusEnum;
     }
     
     @Override
