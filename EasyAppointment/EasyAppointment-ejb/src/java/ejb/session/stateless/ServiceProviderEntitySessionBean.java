@@ -197,7 +197,6 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
 
         List<ServiceProviderEntity> results = query.getResultList(); 
         List<ServiceProviderEntity> availableServiceProviders = new ArrayList<>(); 
-
         for(ServiceProviderEntity serviceProvider : results) {
             List<LocalTime> serviceProviderAvailability = retrieveServiceProviderAvailabilityForTheDay(serviceProvider, appointmentDate); 
 
@@ -223,7 +222,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
             apptEntities = spEntity.getAppointmentEntities();
             apptEntities.size();
         } catch (ServiceProviderEntityNotFoundException ex) {
-            ex.printStackTrace();
+            System.err.println("Error occurred when retrieving service provider: " + ex.getMessage());
         }
 
         Boolean anyApptOnDate = false;
@@ -254,8 +253,11 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
  
     @Override
     public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity) {
-        spEntity.getAppointmentEntities().add(appt);
+        List<AppointmentEntity> appts = spEntity.getAppointmentEntities();
+        appts.size();
+        appts.add(appt);
         em.merge(spEntity);
+        em.flush();
     }
     
     @Override
