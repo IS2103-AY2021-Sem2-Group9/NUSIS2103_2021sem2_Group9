@@ -42,5 +42,9 @@ public interface ServiceProviderEntitySessionBeanLocal {
     public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity);
 
     public double generateOverallRating(ServiceProviderEntity spEntity);
+
+    public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
+
+    public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
     
 }

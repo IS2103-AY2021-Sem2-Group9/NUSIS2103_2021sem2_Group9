@@ -6,6 +6,7 @@ import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.AppointmentEntity;
 import entity.BusinessCategoryEntity;
 import entity.ServiceProviderEntity;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UpdateServiceProviderException;
@@ -44,7 +45,14 @@ public class ServiceProviderModule {
             
             while (response < 1 || response > 6) {
                 System.out.print("> ");
+                
+                try {
                 response = sc.nextInt();
+                } 
+                catch (InputMismatchException ex) {
+                    System.err.println("Please only input digits 1-5");
+                    sc.next();
+                }
                 if (response == 1) {
                    doViewProfile();
                    System.out.println("Enter 0 to go back to the previous menu");
@@ -77,6 +85,7 @@ public class ServiceProviderModule {
                 }
             }
             if (response == 5) {
+                System.out.println("Thank you! Logging out... ");
                 break;
             }
         }
@@ -120,13 +129,13 @@ public class ServiceProviderModule {
         if(input.length() > 0) {
             for (BusinessCategoryEntity category : businessCategories) {  
                 try {
-                    long matchEntry = Long.valueOf(input);
-                    if(category.getId() == matchEntry) {
+                    Long matchEntry = Long.valueOf(input);
+                    if(category.getId().equals(matchEntry)) {
                         currentServiceProviderEntity.setCategory(category);
                         break; 
                     }
                 } catch (NumberFormatException ex) {
-                System.err.println("Please input a password consisting of numbers only!");
+                System.err.println("Please input a category number that matches the categories as displayed!");
                 }            
             }
         }        
@@ -178,7 +187,7 @@ public class ServiceProviderModule {
        System.out.println("Appointments: ");
        
        System.out.printf("%-22s%-20s%-20s%-15s\n", "Name", " | Date", " | Time", " | Appointment No.");
-       List<AppointmentEntity> appointments = appointmentEntitySessionBeanRemote.retrieveUpcomingAppointmentsForServiceProvider(currentServiceProviderEntity);
+       List<AppointmentEntity> appointments = serviceProviderEntitySessionBeanRemote.retrieveUpcomingAppointmentsForServiceProvider(currentServiceProviderEntity);
        for (AppointmentEntity appointment : appointments) {
            System.out.printf("%-22s%-20s%-20s%-15s\n", appointment.getCustomerEntity().getFirstName() + " " + appointment.getCustomerEntity().getLastName(), " | " + appointment.getAppointmentDate().toString(), " | " + appointment.getAppointmentTime().toString(), " | " + appointment.getAppointmentNum());
        }

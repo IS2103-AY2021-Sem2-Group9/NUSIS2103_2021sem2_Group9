@@ -39,8 +39,6 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     
     @EJB
     private BusinessCategorySessionBeanLocal businessCategorySessionBeanLocal;
-    @EJB
-    private AppointmentEntitySessionBeanLocal appointmentEntitySessionBeanLocal;
     
     @Override
     public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, Long categoryId) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException 
@@ -253,13 +251,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
  
     @Override
     public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity) {
-//        List<AppointmentEntity> appts = spEntity.getAppointmentEntities();
-//        appts.size();
-//        appts.add(appt);
-//        em.merge(spEntity);
-//        em.flush();
-        
-        List<AppointmentEntity> appts = this.appointmentEntitySessionBeanLocal.retrieveAllAppointmentsForServiceProvider(spEntity);
+        List<AppointmentEntity> appts = retrieveAllAppointmentsForServiceProvider(spEntity);
 //        appts.size();
         appts.add(appt);
         em.merge(spEntity);
@@ -269,7 +261,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     
     @Override
     public double generateOverallRating(ServiceProviderEntity spEntity) {
-        List<AppointmentEntity> appointments = appointmentEntitySessionBeanLocal.retrieveAllAppointmentsForServiceProvider(spEntity);
+        List<AppointmentEntity> appointments = retrieveAllAppointmentsForServiceProvider(spEntity);
         List<Integer> listOfRatings = new ArrayList<>();
         for(AppointmentEntity appt : appointments) {
             if(appt.getRating() > 0) {
@@ -279,9 +271,28 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         double totalRating = 0;
         double overallRating;
         for (Integer rating : listOfRatings) {
-            totalRating += (double) rating;
+            totalRating += rating.doubleValue();
         }
+        System.out.println(totalRating);
+        System.out.println(listOfRatings.size());
         overallRating = totalRating/listOfRatings.size();
         return overallRating;
+    }
+    
+    @Override
+    public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
+        Query query = em.createQuery("SELECT a FROM AppointmentEntity a WHERE a.serviceProviderEntity.serviceProviderId = :serviceProviderEntityId AND a.rating = :rating");
+        query.setParameter("serviceProviderEntityId", serviceProviderEntity.getServiceProviderId());
+        query.setParameter("rating", 0);
+        List<AppointmentEntity> result = query.getResultList();
+        return result;
+    }
+    
+    @Override
+    public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
+        Query query = em.createQuery("SELECT a FROM AppointmentEntity a WHERE a.serviceProviderEntity.serviceProviderId = :serviceProviderEntityId");
+        query.setParameter("serviceProviderEntityId", serviceProviderEntity.getServiceProviderId());
+        List<AppointmentEntity> result = query.getResultList();
+        return result;     
     }
 }

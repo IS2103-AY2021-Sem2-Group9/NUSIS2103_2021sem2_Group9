@@ -134,7 +134,7 @@ public class CustomerModule {
                 LocalTime temp = this.serviceProviderEntitySessionBeanRemote.retrieveServiceProviderAvailabilityForTheDay(serviceProviders.get(i), date).get(0);
                 String firstAvaiTime = temp.toString();
                 String address = serviceProviders.get(i).getAddress();
-                Double rating = 3.5; // Stub
+                Double rating = this.serviceProviderEntitySessionBeanRemote.generateOverallRating(serviceProviders.get(i)); // Stub
 
                 System.out.printf("%-20d | %-15s | %-20s | %-15s | %f", spId, name, firstAvaiTime, address, rating);
                 System.out.println("\n");
