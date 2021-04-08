@@ -97,7 +97,28 @@ public class CustomerTerminal
         System.out.print("Enter Last Name> ");
         String lastName = scanner.nextLine().trim();
         System.out.print("Enter Gender> ");
-        Character gender = scanner.next().charAt(0);
+        String gender;
+        while (true)
+        {
+            gender = scanner.nextLine().trim().toUpperCase();
+            if (gender.length() > 0)
+            {
+                if (gender.equals("M") || gender.equals("F"))
+                {
+                    break;
+                }
+                else
+                {
+                    System.err.println("Please enter 'M' or 'F' only.");
+                }
+            }
+            else 
+            {
+                System.err.println("Please enter 'M' or 'F'.");
+            }
+        }
+        
+        
         System.out.print("Enter Age> ");
         Integer age = scanner.nextInt();
         scanner.nextLine();
@@ -109,7 +130,7 @@ public class CustomerTerminal
         String city = scanner.nextLine().trim();
         
         if (iDNum.length() > 0 && email.length() > 0 && password.toString().length() > 0
-                && firstName.length() > 0 && lastName.length() > 0 && gender.toString().length() > 0
+                && firstName.length() > 0 && lastName.length() > 0 && gender.length() > 0
                 && age.toString().length() > 0 && phoneNum.length() > 0 && address.length() > 0
                 && city.length() > 0) 
         {
@@ -119,7 +140,7 @@ public class CustomerTerminal
             customerEntity.setPassword(password);
             customerEntity.setFirstName(firstName);
             customerEntity.setLastName(lastName);
-            customerEntity.setGender(0);
+            customerEntity.setGender(iDNum);
             customerEntity.setAge(age);
             customerEntity.setPhoneNumber(phoneNum);
             customerEntity.setAddress(address);

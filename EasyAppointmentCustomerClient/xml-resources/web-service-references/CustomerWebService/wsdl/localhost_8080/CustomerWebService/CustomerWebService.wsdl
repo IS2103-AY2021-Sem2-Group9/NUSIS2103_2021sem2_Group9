@@ -16,15 +16,6 @@
 <message name="CustomerExistException">
 <part name="fault" element="tns:CustomerExistException"/>
 </message>
-<message name="customerLogin">
-<part name="parameters" element="tns:customerLogin"/>
-</message>
-<message name="customerLoginResponse">
-<part name="parameters" element="tns:customerLoginResponse"/>
-</message>
-<message name="InvalidLoginCredentialException">
-<part name="fault" element="tns:InvalidLoginCredentialException"/>
-</message>
 <message name="retrieveCustomerEntityById">
 <part name="parameters" element="tns:retrieveCustomerEntityById"/>
 </message>
@@ -34,6 +25,15 @@
 <message name="CustomerNotFoundException">
 <part name="fault" element="tns:CustomerNotFoundException"/>
 </message>
+<message name="customerLogin">
+<part name="parameters" element="tns:customerLogin"/>
+</message>
+<message name="customerLoginResponse">
+<part name="parameters" element="tns:customerLoginResponse"/>
+</message>
+<message name="InvalidLoginCredentialException">
+<part name="fault" element="tns:InvalidLoginCredentialException"/>
+</message>
 <portType name="CustomerWebService">
 <operation name="createCustomerEntity">
 <input wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntityRequest" message="tns:createCustomerEntity"/>
@@ -41,15 +41,15 @@
 <fault message="tns:UnknownPersistenceException" name="UnknownPersistenceException" wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntity/Fault/UnknownPersistenceException"/>
 <fault message="tns:CustomerExistException" name="CustomerExistException" wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntity/Fault/CustomerExistException"/>
 </operation>
-<operation name="customerLogin">
-<input wsam:Action="http://ws.session.ejb/CustomerWebService/customerLoginRequest" message="tns:customerLogin"/>
-<output wsam:Action="http://ws.session.ejb/CustomerWebService/customerLoginResponse" message="tns:customerLoginResponse"/>
-<fault message="tns:InvalidLoginCredentialException" name="InvalidLoginCredentialException" wsam:Action="http://ws.session.ejb/CustomerWebService/customerLogin/Fault/InvalidLoginCredentialException"/>
-</operation>
 <operation name="retrieveCustomerEntityById">
 <input wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityByIdRequest" message="tns:retrieveCustomerEntityById"/>
 <output wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityByIdResponse" message="tns:retrieveCustomerEntityByIdResponse"/>
 <fault message="tns:CustomerNotFoundException" name="CustomerNotFoundException" wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityById/Fault/CustomerNotFoundException"/>
+</operation>
+<operation name="customerLogin">
+<input wsam:Action="http://ws.session.ejb/CustomerWebService/customerLoginRequest" message="tns:customerLogin"/>
+<output wsam:Action="http://ws.session.ejb/CustomerWebService/customerLoginResponse" message="tns:customerLoginResponse"/>
+<fault message="tns:InvalidLoginCredentialException" name="InvalidLoginCredentialException" wsam:Action="http://ws.session.ejb/CustomerWebService/customerLogin/Fault/InvalidLoginCredentialException"/>
 </operation>
 </portType>
 <binding name="CustomerWebServicePortBinding" type="tns:CustomerWebService">
@@ -69,18 +69,6 @@
 <soap:fault name="CustomerExistException" use="literal"/>
 </fault>
 </operation>
-<operation name="customerLogin">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="InvalidLoginCredentialException">
-<soap:fault name="InvalidLoginCredentialException" use="literal"/>
-</fault>
-</operation>
 <operation name="retrieveCustomerEntityById">
 <soap:operation soapAction=""/>
 <input>
@@ -91,6 +79,18 @@
 </output>
 <fault name="CustomerNotFoundException">
 <soap:fault name="CustomerNotFoundException" use="literal"/>
+</fault>
+</operation>
+<operation name="customerLogin">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="InvalidLoginCredentialException">
+<soap:fault name="InvalidLoginCredentialException" use="literal"/>
 </fault>
 </operation>
 </binding>
