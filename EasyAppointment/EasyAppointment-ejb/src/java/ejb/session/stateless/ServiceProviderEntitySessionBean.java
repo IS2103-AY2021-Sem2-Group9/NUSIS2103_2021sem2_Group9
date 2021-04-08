@@ -253,11 +253,18 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
  
     @Override
     public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity) {
-        List<AppointmentEntity> appts = spEntity.getAppointmentEntities();
-        appts.size();
+//        List<AppointmentEntity> appts = spEntity.getAppointmentEntities();
+//        appts.size();
+//        appts.add(appt);
+//        em.merge(spEntity);
+//        em.flush();
+        
+        List<AppointmentEntity> appts = this.appointmentEntitySessionBeanLocal.retrieveAllAppointmentsForServiceProvider(spEntity);
+//        appts.size();
         appts.add(appt);
         em.merge(spEntity);
         em.flush();
+        
     }
     
     @Override

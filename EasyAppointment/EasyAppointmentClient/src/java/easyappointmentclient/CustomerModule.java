@@ -193,13 +193,16 @@ public class CustomerModule {
             String timeStr = sc.nextLine(); // e.g. 11:30
             LocalTime time = LocalTime.parse(timeStr);
 
-            LocalDateTime currentDateTime = LocalDateTime.now();
+            LocalDateTime currentDateTime = LocalDateTime.now(); // Today's date and time
             String dateTimeStr = date.toString() + "T" + timeStr;
-            LocalDateTime selectedSlotDateTime =  LocalDateTime.parse(dateTimeStr);
-            Long hourDiff = ChronoUnit.HOURS.between(currentDateTime, selectedSlotDateTime);
+            LocalDateTime selectedSlotDateTime =  LocalDateTime.parse(dateTimeStr); // Selected date and time
+            Long hourDiff = ChronoUnit.HOURS.between(currentDateTime, selectedSlotDateTime); // 2021-03-01T11:30
+            System.out.println(hourDiff);
             
             // Appointment has to be made 2 hours in advance
-            while (Math.abs(hourDiff) < 2) {
+            while ((hourDiff > 0 && hourDiff < 2) || hourDiff < 0)  {
+                
+                
                 if (hourDiff > 0 && hourDiff < 2) {
                     System.out.println("Booking Error: You are required to book 2 hours in advance. Please select another option.");
                 } else if (hourDiff < 0) {
@@ -214,16 +217,11 @@ public class CustomerModule {
             try {
                 // Construct Appointment Entity
                 AppointmentEntity apptEntity = new AppointmentEntity(date, time, loggedInCustomerEntity, spEntity);
-                System.out.println("hi1");
-
                 this.appointmentEntitySessionBeanRemote.createAppointmentEntity(apptEntity);
-                System.out.println("hi2");
                 this.serviceProviderEntitySessionBeanRemote.addAppointment(apptEntity, spEntity);
-                System.out.println("hi3");
 
             } catch (UnknownPersistenceException | AppointmentExistException ex) {
-//                System.err.println("Error occured when creating appointment: " + ex.getMessage());
-                ex.printStackTrace();
+                System.err.println("Error occured when creating appointment: " + ex.getMessage());
             }
             
             System.out.printf("The appointment with %s %s at %s on %s is confirmed.", this.loggedInCustomerEntity.getFirstName(), this.loggedInCustomerEntity.getLastName(), timeStr, date);
