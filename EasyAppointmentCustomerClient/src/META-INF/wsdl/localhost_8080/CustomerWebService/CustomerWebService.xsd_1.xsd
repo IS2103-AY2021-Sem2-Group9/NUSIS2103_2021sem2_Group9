@@ -40,7 +40,7 @@
 <xs:element name="city" type="xs:string" minOccurs="0"/>
 <xs:element name="email" type="xs:string" minOccurs="0"/>
 <xs:element name="firstName" type="xs:string" minOccurs="0"/>
-<xs:element name="gender" type="xs:unsignedShort" minOccurs="0"/>
+<xs:element name="gender" type="xs:string" minOccurs="0"/>
 <xs:element name="id" type="xs:long" minOccurs="0"/>
 <xs:element name="identityNumber" type="xs:string" minOccurs="0"/>
 <xs:element name="lastName" type="xs:string" minOccurs="0"/>
@@ -53,7 +53,6 @@
 <xs:sequence>
 <xs:element name="appointmentDate" type="tns:localDate" minOccurs="0"/>
 <xs:element name="appointmentNum" type="xs:string" minOccurs="0"/>
-<xs:element name="appointmentStatusEnum" type="tns:appointmentStatusEnum" minOccurs="0"/>
 <xs:element name="appointmentTime" type="tns:localTime" minOccurs="0"/>
 <xs:element name="id" type="xs:long" minOccurs="0"/>
 <xs:element name="rating" type="xs:int" minOccurs="0"/>
@@ -116,12 +115,4 @@
 <xs:element name="message" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
-
-<xs:simpleType name="appointmentStatusEnum">
-<xs:restriction base="xs:string">
-<xs:enumeration value="UPCOMING"/>
-<xs:enumeration value="ONGOING"/>
-<xs:enumeration value="COMPLETED"/>
-</xs:restriction>
-</xs:simpleType>
 </xs:schema>

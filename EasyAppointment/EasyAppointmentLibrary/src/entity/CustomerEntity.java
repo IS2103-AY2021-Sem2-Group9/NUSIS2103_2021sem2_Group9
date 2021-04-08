@@ -27,8 +27,8 @@ public class CustomerEntity implements Serializable {
     private String firstName;
     @Column(nullable = false, length = 32)
     private String lastName;
-    @Column(nullable = false, length = 32)
-    private Character gender;
+    @Column(nullable = false, length = 1)
+    private String gender;
     @Column(nullable = false, length = 32)
     private Integer age;
     @Column(nullable = false, length = 32)
@@ -44,7 +44,7 @@ public class CustomerEntity implements Serializable {
         this.appointments = new ArrayList<>();
     }
 
-    public CustomerEntity(String identityNumber, String email, Integer password, String firstName, String lastName, Character gender, Integer age, String phoneNumber, String address, String city) {
+    public CustomerEntity(String identityNumber, String email, Integer password, String firstName, String lastName, String gender, Integer age, String phoneNumber, String address, String city) {
         this.identityNumber = identityNumber;
         this.email = email;
         this.password = password;
@@ -139,14 +139,14 @@ public class CustomerEntity implements Serializable {
     /**
      * @return the gender
      */
-    public Character getGender() {
+    public String getGender() {
         return gender;
     }
 
     /**
      * @param gender the gender to set
      */
-    public void setGender(Character gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
