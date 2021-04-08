@@ -39,3 +39,6 @@ EasyAppointment/*.class
 EasyAppointment/*.jar
 EasyAppointment/*.war
 EasyAppointment/*.ear
+/EasyAppointmentCustomerClient/nbproject/private/
+/EasyAppointmentCustomerClient/build/
+/EasyAppointmentCustomerClient/dist/
