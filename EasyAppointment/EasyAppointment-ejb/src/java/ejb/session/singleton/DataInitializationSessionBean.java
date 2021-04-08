@@ -79,7 +79,7 @@ public class DataInitializationSessionBean {
             Long categoryId = 1L;
             serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(testSP, categoryId);
             serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(new ServiceProviderEntity("Kevin Paterson", "1111001111", "Clementi", "93718799", "13, Clementi Road", "kevin@nuh.com.sg", 113322, ServiceProviderStatus.APPROVED), categoryId);
-            AppointmentEntity testAppointment = new AppointmentEntity(testDate, testTime, AppointmentStatusEnum.UPCOMING, 0, testCustomer, testSP);
+            AppointmentEntity testAppointment = new AppointmentEntity(testDate, testTime, testCustomer, testSP);
             appointmentEntitySessionBeanLocal.createAppointmentEntity(testAppointment);
             serviceProviderEntitySessionBeanLocal.addAppointment(testAppointment, testSP);
             
