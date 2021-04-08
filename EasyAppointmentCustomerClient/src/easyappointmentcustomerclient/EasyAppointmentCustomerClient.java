@@ -8,20 +8,22 @@ import ws.client.CustomerNotFoundException_Exception;
 public class EasyAppointmentCustomerClient {
 
     public static void main(String[] args) {
-        
         try {
-            CustomerEntity customer = retrieveCustomerEntityById(Long.valueOf(1));
-            System.out.println(customer.getFirstName() + " " + customer.getLastName() + " " + customer.getEmail());
+            CustomerEntity ce = retrieveCustomerEntityById(Long.valueOf(1));
+            System.out.println(ce.getEmail());
         } catch (CustomerNotFoundException_Exception ex) {
-            ex.printStackTrace();
+            Logger.getLogger(EasyAppointmentCustomerClient.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+        CustomerTerminal customerTerminal = new CustomerTerminal();
+        customerTerminal.runApp();
+    }    
 
-    private static CustomerEntity retrieveCustomerEntityById(java.lang.Long arg0) throws CustomerNotFoundException_Exception {
+    private static CustomerEntity retrieveCustomerEntityById(java.lang.Long customerId) throws CustomerNotFoundException_Exception {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
-        return port.retrieveCustomerEntityById(arg0);
+        return port.retrieveCustomerEntityById(customerId);
     }
     
     
+
 }
