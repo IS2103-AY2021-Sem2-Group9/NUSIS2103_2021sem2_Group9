@@ -11,7 +11,9 @@ import entity.CustomerEntity;
 import entity.ServiceProviderEntity;
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +21,9 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import util.exception.AppointmentExistException;
+import util.exception.AppointmentNotFoundException;
 import util.exception.BusinessCategoryNotFoundException;
+import util.exception.CustomerNotFoundException;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UnknownPersistenceException;
 
@@ -47,7 +51,7 @@ public class CustomerModule {
         Integer response = 0;
 
         while (true) {
-            System.out.println("*** Admin Terminal :: Main ***\n");
+            System.out.println("*** Customer Terminal :: Main ***\n");
             System.out.println("You are now logged in as " + loggedInCustomerEntity.getFirstName() + " " + loggedInCustomerEntity.getLastName() + "\n");
             System.out.println("1: Search Operation");
             System.out.println("2: Add Appointments");
@@ -115,28 +119,97 @@ public class CustomerModule {
 
         System.out.print("Enter date> ");
         String dateStr = sc.nextLine(); // e.g. yyyy-MM-dd
-        LocalDate date = LocalDate.parse(dateStr); 
+        LocalDate date = LocalDate.parse(dateStr);
 
         // Print headers
-        System.out.printf("%20s | %-15s | %-20s | %-15s | %-15s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
+        System.out.printf("%-20s | %-15s | %-20s | %-15s | %-15s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
         System.out.println();
 
         try {
             // Unimplemented SP session bean method
             List<ServiceProviderEntity> serviceProviders = this.serviceProviderEntitySessionBeanRemote.retrieveAllAvailableServiceProvidersForTheDay(date, category, city);
 
-            System.out.println(serviceProviders); // Debug
             // Print record rows
             for (int i = 0; i < serviceProviders.size(); i++) {
-                Long spId = serviceProviders.get(i).getServiceProviderId();
-                String name = serviceProviders.get(i).getName();
-                LocalTime temp = this.serviceProviderEntitySessionBeanRemote.retrieveServiceProviderAvailabilityForTheDay(serviceProviders.get(i), date).get(0);
+                ServiceProviderEntity currentSP = serviceProviders.get(i);
+                Long spId = currentSP.getServiceProviderId();
+                String name = currentSP.getName();
+                LocalTime temp = this.serviceProviderEntitySessionBeanRemote.retrieveServiceProviderAvailabilityForTheDay(currentSP, date).get(0);
                 String firstAvaiTime = temp.toString();
-                String address = serviceProviders.get(i).getAddress();
-//                Double rating = 0.0; // Stub
+                String address = currentSP.getAddress();
+                Double rating = this.serviceProviderEntitySessionBeanRemote.generateOverallRating(currentSP); // Stub
 
-                System.out.printf("%-20d | %-15s | %-20s | %-15s", spId, name, firstAvaiTime, address);
-//                System.out.printf("%-20d | %-15s | %-20s | %-15s | %d", spId, "Name", firstAvaiTime, "Address", rating);
+                System.out.printf("%-20d | %-15s | %-20s | %-15s | %.2f", spId, name, firstAvaiTime, address, rating);
+                System.out.println("\n");
+            }
+
+            return date;
+        } catch (BusinessCategoryNotFoundException ex) {
+            System.err.println("An error has occurred while retrieving available service providers for the specified date: " + ex.getMessage() + "\n");
+            return null;
+        }
+
+    }
+
+    public LocalDate searchForAddingAppt() { // Strictly for addAppointments()
+        Scanner sc = new Scanner(System.in);
+
+        // Get all the biz categories and print them
+        List<BusinessCategoryEntity> businessCategories = this.businessCategorySessionBeanRemote.retrieveAllBusinessCategories();
+        for (int i = 0; i < businessCategories.size(); i++) {
+            if (i == businessCategories.size() - 1) {
+                System.out.print(i + 1);
+                System.out.print(" ");
+                System.out.println(businessCategories.get(i).getCategoryName());
+            } else {
+                System.out.print(i + 1);
+                System.out.print(" ");
+                System.out.print(businessCategories.get(i).getCategoryName());
+                System.out.print(" | ");
+            }
+
+        }
+
+        System.out.print("Enter business category> ");
+        Long category = sc.nextLong();
+        sc.nextLine();
+        System.out.print("Enter city> ");
+        String city = sc.nextLine();
+
+        // Init
+        int compare = 1;
+        LocalDate date = LocalDate.now();
+
+        while (compare > 0) { // compare must be <= 0
+            System.out.print("Enter date> ");
+            String dateStr = sc.nextLine();
+            date = LocalDate.parse(dateStr);
+            LocalDate todaysDate = LocalDate.now();
+            compare = todaysDate.compareTo(date); // Returns -1 if today is before "date", 0 if same day, 1 if today is after "date"
+            if (compare > 0) {
+                System.out.println("Date has already passed. Enter another valid date.");
+            }
+        }
+
+        try {
+            List<ServiceProviderEntity> serviceProviders = this.serviceProviderEntitySessionBeanRemote.retrieveAllAvailableServiceProvidersForTheDay(date, category, city);
+
+            // Print record rows
+            for (int i = 0; i < serviceProviders.size(); i++) {
+                ServiceProviderEntity currentSP = serviceProviders.get(i);
+                Long spId = currentSP.getServiceProviderId();
+                String name = currentSP.getName();
+                LocalTime temp = this.serviceProviderEntitySessionBeanRemote.retrieveServiceProviderAvailabilityForTheDay(currentSP, date).get(0);
+                String firstAvaiTime = temp.toString();
+                String address = currentSP.getAddress();
+                Double rating = this.serviceProviderEntitySessionBeanRemote.generateOverallRating(currentSP);
+
+                // Print headers
+                System.out.printf("%-20s | %-15s | %-20s | %-15s | %-15s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
+                System.out.println("\n");
+                // Print records
+                System.out.printf("%-20d | %-15s | %-20s | %-15s | %.2f", spId, name, firstAvaiTime, address, rating);
+                System.out.println("\n");
             }
 
             return date;
@@ -150,63 +223,88 @@ public class CustomerModule {
     public void addAppointments() {
         Scanner sc = new Scanner(System.in);
 
-        LocalDate date = this.searchOperation(); // A list of Service Providers available for that day
-
         System.out.println("*** Customer Terminal :: Add Appointments ***\n");
+        LocalDate date = this.searchForAddingAppt(); // A list of Service Providers available for that day
 
         try {
             System.out.println("Enter 0 to go back to the previous menu.");
-            if (sc.nextInt() == 0) {
-                return; // Break out of the method
-            }
-
             System.out.print("Service provider Id> ");
             Long spId = sc.nextLong();
+            if (spId == 0) {
+                return; // Break out of the method
+            }
             System.out.println();
+            sc.nextLine();
 
-            System.out.println("Available Appointment slots:");
-
-            // Print out all available appointment slots here e.g. 
             ServiceProviderEntity spEntity = this.serviceProviderEntitySessionBeanRemote.retrieveServiceProviderByServiceProviderId(spId);
             List<LocalTime> availableTimeSlots = this.serviceProviderEntitySessionBeanRemote.retrieveServiceProviderAvailabilityForTheDay(spEntity, date);
+            List<String> avaiList = new ArrayList<>();
 
-            for (int i = 0; i < availableTimeSlots.size(); i++) {
-                LocalTime time = availableTimeSlots.get(i);
-                if (i == availableTimeSlots.size() - 1) {
-                    System.out.print(time);
+            int compare = LocalDate.now().compareTo(date);
+
+            for (int i = 0; i < availableTimeSlots.size(); i++) { // To add it into another arraylist
+                LocalTime now = LocalTime.now();
+                LocalTime time = availableTimeSlots.get(i); // Each available time slot
+                Long hourDiff = ChronoUnit.HOURS.between(now, time); // Must be >= 2
+
+                if (compare == 0) { // if date is today
+                    if (hourDiff >= 2) { // check if it is 2hr in advance
+                        avaiList.add(time.toString());
+                    }
+                } else {
+                    avaiList.add(time.toString());
                 }
-
-                System.out.printf("%s | ", time.toString());
             }
+
+            if (avaiList.isEmpty()) {
+                System.out.println("No more available appointment slots for today.");
+
+                System.out.print("Exit> ");
+                String response = sc.nextLine();
+                while (!response.equals("0")) {
+                    System.out.println("Invalid input, please try again!");
+                    System.out.print("Exit> ");
+                    response = sc.nextLine();
+                    if (response.equals("0")) {
+                        return;
+                    }
+                }
+            } else {
+                System.out.println("Available Appointment slots:");
+            }
+
+            for (int i = 0; i < avaiList.size(); i++) {
+                if (i == availableTimeSlots.size() - 1) {
+                    System.out.print(avaiList.get(i));
+                } else {
+                    System.out.printf("%s | ", avaiList.get(i));
+                }
+            }
+
+            System.out.println();
 
             System.out.println("Enter 0 to go back to previous menu");
-            if (sc.nextInt() == 0) {
-                return;
-            }
 
             System.out.print("Enter time> ");
             String timeStr = sc.nextLine(); // e.g. 11:30
-            LocalTime time = LocalTime.parse(timeStr);
-
-            // Construct Appointment Entity
-            AppointmentEntity apptEntity = new AppointmentEntity();
-            apptEntity.setAppointmentDate(date);
-            apptEntity.setAppointmentTime(time);
-            String dateStr = date.toString();
-            apptEntity.setAppointmentStatusEnum(AppointmentStatusEnum.UPCOMING); // Appointment has to be made 2 days in advance
-            String apptNum = apptEntity.getId().toString() + dateStr + timeStr;
-            apptEntity.setAppointmentNum(apptNum);
-            apptEntity.setCustomerEntity(loggedInCustomerEntity);
-            apptEntity.setServiceProviderEntity(spEntity);
+            if (timeStr.equals("0")) {
+                return; // Break out of method
+            }
+            LocalTime selectedTimeSlot = LocalTime.parse(timeStr);
+            System.out.println();
 
             try {
+                // Construct Appointment Entity
+                AppointmentEntity apptEntity = new AppointmentEntity(date, selectedTimeSlot, loggedInCustomerEntity, spEntity);
                 this.appointmentEntitySessionBeanRemote.createAppointmentEntity(apptEntity);
                 this.serviceProviderEntitySessionBeanRemote.addAppointment(apptEntity, spEntity);
+
             } catch (UnknownPersistenceException | AppointmentExistException ex) {
                 System.err.println("Error occured when creating appointment: " + ex.getMessage());
             }
 
-            System.out.printf("The appointment with %s %s at %s on %s is confirmed.", this.loggedInCustomerEntity.getFirstName(), this.loggedInCustomerEntity.getLastName(), timeStr, dateStr);
+            System.out.printf("The appointment with %s %s at %s on %s is confirmed.", this.loggedInCustomerEntity.getFirstName(), this.loggedInCustomerEntity.getLastName(), selectedTimeSlot, date.toString());
+            System.out.println();
 
         } catch (DateTimeException ex) {
             System.out.println("Error occurred when reading date: " + ex.getMessage() + "\n");
@@ -215,13 +313,15 @@ public class CustomerModule {
         }
 
         System.out.println("Enter 0 to go back to previous menu");
-        Integer response = -1;
         System.out.print("Exit> ");
-        response = sc.nextInt();
-        while (response != 0) {
+        String response = sc.nextLine();
+        while (!response.equals("0")) {
             System.out.println("Invalid input, please try again!");
             System.out.print("Exit> ");
-            response = sc.nextInt();
+            response = sc.nextLine();
+            if (response.equals("0")) {
+                return;
+            }
         }
     }
 
@@ -230,29 +330,82 @@ public class CustomerModule {
 
         System.out.println("*** Customer Terminal :: View Appointments ***\n");
 
-        List<AppointmentEntity> appointments = this.loggedInCustomerEntity.getAppointments();
+        try {
+            List<AppointmentEntity> appointments = this.customerEntitySessionBeanRemote.retrieveCustomerEntityAppointments(this.loggedInCustomerEntity.getId());
 
-        if (!appointments.isEmpty()) {
+            if (!appointments.isEmpty()) {
 
-            for (int i = 0; i < appointments.size(); i++) {
-                AppointmentEntity appt = appointments.get(i);
+                // Print headers
+                System.out.printf("%-20s | %-20s | %-20s | %s", "Appointment Number", "Appointment Date", "Appointment Time", "Service Provider");
+                System.out.println("\n");
+                for (int i = 0; i < appointments.size(); i++) {
+                    AppointmentEntity appt = appointments.get(i);
+                    String apptID = appt.getId().toString();
+                    String apptNum = appt.getAppointmentNum();
+                    String apptDate = appt.getAppointmentDate().toString();
+                    String apptTime = appt.getAppointmentTime().toString();
+                    String apptSPName = appt.getServiceProviderEntity().getName();
 
-                System.out.print(appt.getAppointmentNum());
-                System.out.print(" | ");
-                System.out.print(appt.getAppointmentTime());
-                System.out.print(" | ");
-                System.out.print(appt.getAppointmentStatusEnum());
-                System.out.println();
+                    // Print records
+                    System.out.printf("%-20s | %-20s | %-20s | %s", apptNum, apptDate, apptTime, apptSPName);
+                    System.out.println();
+                }
+            } else {
+                System.out.println("There are currently no appointments.");
             }
-        } else {
-            System.out.println("There are currently no appointments.");
+            System.out.println();
+        } catch (CustomerNotFoundException ex) {
+            System.err.println("Error occurred when retrieving customer: " + ex.getMessage());
         }
+
+    }
+
+    public void viewForCancellingAppt() {
+        Scanner sc = new Scanner(System.in);
+        try {
+            List<AppointmentEntity> appointments = this.customerEntitySessionBeanRemote.retrieveCustomerEntityAppointments(this.loggedInCustomerEntity.getId());
+
+            if (!appointments.isEmpty()) {
+
+                // Print headers
+                System.out.printf("%-20s | %-20s | %-20s | %s", "Appointment Number", "Appointment Date", "Appointment Time", "Service Provider");
+                System.out.println("\n");
+                for (int i = 0; i < appointments.size(); i++) {
+                    AppointmentEntity appt = appointments.get(i);
+                    String apptID = appt.getId().toString();
+                    String apptNum = appt.getAppointmentNum();
+                    String apptDate = appt.getAppointmentDate().toString();
+                    String apptTime = appt.getAppointmentTime().toString();
+                    String apptSPName = appt.getServiceProviderEntity().getName();
+
+                    // Print records
+                    System.out.printf("%-20s | %-20s | %-20s | %s", apptNum, apptDate, apptTime, apptSPName);
+                    System.out.println();
+                }
+            } else {
+                System.out.println("There are currently no appointments.");
+            }
+            System.out.println();
+        } catch (CustomerNotFoundException ex) {
+            System.err.println("Error occurred when retrieving customer: " + ex.getMessage());
+        }
+
     }
 
     public void cancelAppointments() {
+        
         Scanner sc = new Scanner(System.in);
-
-        System.out.println("*** Customer Terminal :: Cancel Appointments ***\n");
+        String appointmentNum;
+        System.out.println("*** Customer terminal :: Cancel Appointment ***\n");
+        this.viewAppointments();
+        System.out.print("Enter Appointment ID> ");
+        appointmentNum = sc.nextLine().trim();
+        try {
+            this.appointmentEntitySessionBeanRemote.cancelAppointment(appointmentNum);
+            System.out.println("Appointment " + appointmentNum + " has been cancelled successfully.\n");
+        } catch (AppointmentNotFoundException ex) {
+            System.out.println("An error has occured cancelling the appointment: " + ex.getMessage());
+        }
     }
 
     public void rateServiceProvider() {

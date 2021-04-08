@@ -770,18 +770,18 @@ exists or setup the property manually. For example like this:
     </target>
     <target depends="compile" if="is.server.weblogic" name="library-inclusion-in-archive">
         <basename file="${reference.EasyAppointmentLibrary.jar}" property="manifest.reference.EasyAppointmentLibrary.jar"/>
-        <basename file="${libs.Java_EE_8_API_Library.classpath}" property="manifest.libs.Java_EE_8_API_Library.classpath"/>
+        <basename file="${libs.javaee-api-8.0.classpath}" property="manifest.libs.javaee-api-8.0.classpath"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
             <attribute name="Extension-List" value="jar-1 jar-2 "/>
             <attribute name="jar-1-Extension-Name" value="${manifest.reference.EasyAppointmentLibrary.jar}"/>
-            <attribute name="jar-2-Extension-Name" value="${manifest.libs.Java_EE_8_API_Library.classpath}"/>
+            <attribute name="jar-2-Extension-Name" value="${manifest.libs.javaee-api-8.0.classpath}"/>
         </manifest>
     </target>
     <target depends="compile" if="dist.ear.dir" name="library-inclusion-in-manifest">
         <copyfiles files="${reference.EasyAppointmentLibrary.jar}" manifestproperty="manifest.reference.EasyAppointmentLibrary.jar" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${libs.Java_EE_8_API_Library.classpath}" manifestproperty="manifest.libs.Java_EE_8_API_Library.classpath" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${libs.javaee-api-8.0.classpath}" manifestproperty="manifest.libs.javaee-api-8.0.classpath" todir="${dist.ear.dir}/lib"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${manifest.reference.EasyAppointmentLibrary.jar} lib/${manifest.reference.EasyAppointmentLibrary.jar} ${manifest.libs.Java_EE_8_API_Library.classpath} lib/${manifest.libs.Java_EE_8_API_Library.classpath} "/>
+            <attribute name="Class-Path" value="${manifest.reference.EasyAppointmentLibrary.jar} lib/${manifest.reference.EasyAppointmentLibrary.jar} ${manifest.libs.javaee-api-8.0.classpath} lib/${manifest.libs.javaee-api-8.0.classpath} "/>
         </manifest>
     </target>
     <target name="-copy-meta-inf">
@@ -1246,6 +1246,7 @@ exists or setup the property manually. For example like this:
     </target>
     <target depends="init,compile-test,-debug-start-debugger-test,-debug-start-debuggee-test" name="debug-test"/>
     <target depends="init,compile-test-single,-debug-start-debugger-test,-debug-start-debuggee-test-method" name="debug-test-method"/>
+    <target depends="debug-test-method" name="debug-single-method"/>
     <target depends="init,-pre-debug-fix,compile-test-single" if="netbeans.home" name="-do-debug-fix-test">
         <carproject:nbjpdareload dir="${build.test.classes.dir}"/>
     </target>
