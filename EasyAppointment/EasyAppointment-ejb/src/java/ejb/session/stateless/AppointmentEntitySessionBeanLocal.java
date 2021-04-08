@@ -22,4 +22,6 @@ public interface AppointmentEntitySessionBeanLocal {
     public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
 
     public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
+    
+    public void rateAppointment(AppointmentEntity appointmentEntity);
 }

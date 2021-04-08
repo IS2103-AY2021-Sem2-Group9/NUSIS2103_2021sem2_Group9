@@ -393,7 +393,7 @@ public class CustomerModule {
     }
 
     public void cancelAppointments() {
-        
+
         Scanner sc = new Scanner(System.in);
         String appointmentNum;
         System.out.println("*** Customer terminal :: Cancel Appointment ***\n");
@@ -404,7 +404,7 @@ public class CustomerModule {
             this.appointmentEntitySessionBeanRemote.cancelAppointment(appointmentNum);
             System.out.println("Appointment " + appointmentNum + " has been cancelled successfully.\n");
         } catch (AppointmentNotFoundException ex) {
-            System.out.println("An error has occured cancelling the appointment: " + ex.getMessage());
+            System.out.println("An error has occured when cancelling the appointment: " + ex.getMessage());
         }
     }
 
@@ -412,5 +412,64 @@ public class CustomerModule {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("*** Customer Terminal :: Rate Service Provider ***\n");
+
+        System.out.print("Enter Service Provider Id> ");
+        Long spId = sc.nextLong();
+        List<AppointmentEntity> apptsToRate = new ArrayList<>();
+
+        try {
+            List<AppointmentEntity> appts = this.customerEntitySessionBeanRemote.retrieveCustomerEntityAppointments(this.loggedInCustomerEntity.getId());
+
+            if (appts.isEmpty()) {
+                System.out.println("There are no appointments to rate.");
+            } else {
+                for (int i = 0; i < appts.size(); i++) {
+                    AppointmentEntity apptEntity = appts.get(i);
+                    Long retrievedSPId = apptEntity.getServiceProviderEntity().getServiceProviderId();
+                    if (spId.equals(retrievedSPId) && apptEntity.getRating() == 0) { // if rating == 0 means not yet rated, rating != 0 means rated, dont rate again!
+                        apptsToRate.add(apptEntity);
+                    }
+                }
+
+                System.out.println("Appointments that you have yet to rate:");
+                // Print Headers
+                System.out.printf("%-5s | %-20s | %-20s | %-20s | %s", "Index", "Appointment Number", "Appointment Date", "Appointment Time", "Service Provider");
+                System.out.println("\n");
+                for (int i = 0; i < apptsToRate.size(); i++) {
+                    AppointmentEntity apptEntity = apptsToRate.get(i);
+                    System.out.printf("%-5s | %-20s | %-20s | %-20s | %s", i + 1, apptEntity.getAppointmentNum(), apptEntity.getAppointmentDate(),
+                            apptEntity.getAppointmentTime(), apptEntity.getServiceProviderEntity().getName());
+                    System.out.println();
+                }
+
+                if (apptsToRate.isEmpty()) {
+                    System.out.println("You have no appointments to rate.");
+                } else {
+                    System.out.print("Enter index number of the appointment to rate> ");
+                    Integer index = sc.nextInt();
+                    while (index < 1 || index > apptsToRate.size()) {
+                        System.out.print("Invalid index. Enter index again> ");
+                        index = sc.nextInt();
+                    }
+                    
+                    System.out.print("Enter rating> ");
+                    Integer rating = sc.nextInt();
+                    while (rating < 1 || rating > 5) {
+                        System.out.print("Invalid rating. Enter rating again> ");
+                        rating = sc.nextInt();
+                    }
+                    
+                    System.out.println();
+                    AppointmentEntity apptEntity = apptsToRate.get(index - 1);
+                    apptEntity.setRating(rating);
+                    this.appointmentEntitySessionBeanRemote.rateAppointment(apptEntity);
+                    System.out.println("You have rated Appointment" + apptEntity.getAppointmentNum() + " a rating of " + rating + ".");
+                }
+            }
+
+        } catch (CustomerNotFoundException ex) {
+            System.out.println("An error has occured when retrieving the appointments: " + ex.getMessage());
+        }
+
     }
 }
