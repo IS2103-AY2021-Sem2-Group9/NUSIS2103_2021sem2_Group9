@@ -1,5 +1,6 @@
 package easyappointmentcustomerclient;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import ws.client.CustomerEntity;
 import ws.client.CustomerExistException_Exception;
@@ -19,7 +20,8 @@ public class CustomerTerminal
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
 
-        while (true) {
+        while (true) 
+        {
             System.out.println("*** Welcome to the Customer Terminal ***\n");
             System.out.println("1: Registration");
             System.out.println("2: Login");
@@ -27,11 +29,20 @@ public class CustomerTerminal
             response = 0;
 
             while (response < 1 || response > 3) {
-                System.out.print("> ");
-                response = scanner.nextInt();
+                try
+                {
+                    System.out.print("> ");
+                    response = scanner.nextInt();                   
+                }
+                catch (InputMismatchException ex)
+                {
+                    System.err.println("Please input digits only.");
+                    scanner.next();
+                    continue;
+                }
 
                 if (response == 1) {                  
-                     
+
                     try 
                     {
                         doRegistration();
@@ -44,7 +55,7 @@ public class CustomerTerminal
                         System.out.println("An error occured while registering: " + ex.getMessage());
                         System.out.println();
                     }
-                    
+
 
                 } 
                 else if (response == 2) 
@@ -67,7 +78,7 @@ public class CustomerTerminal
                 } 
                 else 
                 {
-                    System.out.println("Please key in 1 ~ 3 only.");
+                    System.err.println("Please key in 1 ~ 3 only.");
                 }
             }
 
@@ -96,10 +107,10 @@ public class CustomerTerminal
         String firstName = scanner.nextLine().trim();
         System.out.print("Enter Last Name> ");
         String lastName = scanner.nextLine().trim();
-        System.out.print("Enter Gender> ");
         String gender;
         while (true)
         {
+            System.out.print("Enter Gender> ");
             gender = scanner.nextLine().trim().toUpperCase();
             if (gender.length() > 0)
             {
@@ -116,9 +127,7 @@ public class CustomerTerminal
             {
                 System.err.println("Please enter 'M' or 'F'.");
             }
-        }
-        
-        
+        }   
         System.out.print("Enter Age> ");
         Integer age = scanner.nextInt();
         scanner.nextLine();
@@ -140,7 +149,7 @@ public class CustomerTerminal
             customerEntity.setPassword(password);
             customerEntity.setFirstName(firstName);
             customerEntity.setLastName(lastName);
-            customerEntity.setGender(iDNum);
+            customerEntity.setGender(gender);
             customerEntity.setAge(age);
             customerEntity.setPhoneNumber(phoneNum);
             customerEntity.setAddress(address);
