@@ -31,17 +31,6 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
 
         return query.getResultList();
     }
-    
-//    @Override
-//    public AppointmentEntity retrieveAppointmentByAppointmentId(Long id) throws AppointmentNotFoundException {
-//        AppointmentEntity appointmentEntity = em.find(AppointmentEntity.class, id);
-//        
-//        if (appointmentEntity != null) {
-//            return appointmentEntity;
-//        } else {
-//            throw new AppointmentNotFoundException("Appointment ID " + id + " does not exist!\n");
-//        }
-//    }
 
     @Override
     public AppointmentEntity retrieveAppointmentByAppointmentNum(String appointmentNum) throws AppointmentNotFoundException {

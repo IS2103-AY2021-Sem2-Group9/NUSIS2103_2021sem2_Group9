@@ -16,6 +16,10 @@
 
 <xs:element name="customerLoginResponse" type="tns:customerLoginResponse"/>
 
+<xs:element name="retrieveAllBusinessCategories" type="tns:retrieveAllBusinessCategories"/>
+
+<xs:element name="retrieveAllBusinessCategoriesResponse" type="tns:retrieveAllBusinessCategoriesResponse"/>
+
 <xs:element name="retrieveCustomerEntityById" type="tns:retrieveCustomerEntityById"/>
 
 <xs:element name="retrieveCustomerEntityByIdResponse" type="tns:retrieveCustomerEntityByIdResponse"/>
@@ -89,6 +93,23 @@
 <xs:complexType name="InvalidLoginCredentialException">
 <xs:sequence>
 <xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveAllBusinessCategories">
+<xs:sequence/>
+</xs:complexType>
+
+<xs:complexType name="retrieveAllBusinessCategoriesResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:businessCategoryEntity" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="businessCategoryEntity">
+<xs:sequence>
+<xs:element name="categoryName" type="xs:string" minOccurs="0"/>
+<xs:element name="id" type="xs:long" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
