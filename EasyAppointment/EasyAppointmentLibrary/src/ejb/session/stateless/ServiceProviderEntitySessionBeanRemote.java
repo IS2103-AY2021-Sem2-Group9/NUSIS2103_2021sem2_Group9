@@ -47,6 +47,10 @@ public interface ServiceProviderEntitySessionBeanRemote
     
     public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity);
     
+    public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
+
+    public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
+  
     public List<AppointmentEntity> retrieveAppointmentsOfServiceProviderById(Long serviceProviderId) throws ServiceProviderEntityNotFoundException;
 
     public double generateOverallRating(ServiceProviderEntity spEntity);

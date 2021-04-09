@@ -82,30 +82,6 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
     }
 
     @Override
-    public AppointmentEntity updateAppointmentEntity(AppointmentEntity apptEntity) {
-        em.merge(apptEntity);
-        em.flush();
-        return apptEntity;
-    }
-
-    @Override
-    public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
-        Query query = em.createQuery("SELECT a FROM AppointmentEntity a WHERE a.serviceProviderEntity.serviceProviderId = :serviceProviderEntityId AND a.appointmentStatusEnum = :status");
-        query.setParameter("serviceProviderEntityId", serviceProviderEntity.getServiceProviderId());
-        query.setParameter("status", AppointmentStatusEnum.UPCOMING);
-        List<AppointmentEntity> result = query.getResultList();
-        return result;
-    }
-    
-    @Override
-    public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
-        Query query = em.createQuery("SELECT a FROM AppointmentEntity a WHERE a.serviceProviderEntity.serviceProviderId = :serviceProviderEntityId");
-        query.setParameter("serviceProviderEntityId", serviceProviderEntity.getServiceProviderId());
-        List<AppointmentEntity> result = query.getResultList();
-        return result;     
-    }
-    
-    @Override
     public void rateAppointment(AppointmentEntity appointmentEntity) {
         em.merge(appointmentEntity);
         em.flush();

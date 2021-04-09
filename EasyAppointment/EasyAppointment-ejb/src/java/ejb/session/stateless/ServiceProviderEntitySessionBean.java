@@ -39,8 +39,6 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
 
     @EJB
     private BusinessCategorySessionBeanLocal businessCategorySessionBeanLocal;
-    @EJB
-    private AppointmentEntitySessionBeanLocal appointmentEntitySessionBeanLocal;
 
     @Override
     public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, Long categoryId) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException {
@@ -234,7 +232,6 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     @Override
     public double generateOverallRating(ServiceProviderEntity spEntity) {
         List<AppointmentEntity> appointments = appointmentEntitySessionBeanLocal.retrieveAllAppointmentsForServiceProvider(spEntity);
-
         List<Integer> listOfRatings = new ArrayList<>();
         for (AppointmentEntity appt : appointments) {
             System.out.println("appt.getRating()1:");
@@ -253,6 +250,24 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         overallRating = totalRating / listOfRatings.size();
         return overallRating;
     }
+    
+    @Override
+    public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
+        Query query = em.createQuery("SELECT a FROM AppointmentEntity a WHERE a.serviceProviderEntity.serviceProviderId = :serviceProviderEntityId AND a.rating = :rating");
+        query.setParameter("serviceProviderEntityId", serviceProviderEntity.getServiceProviderId());
+        query.setParameter("rating", 0);
+        List<AppointmentEntity> result = query.getResultList();
+        return result;
+    }
+    
+    @Override
+    public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
+        Query query = em.createQuery("SELECT a FROM AppointmentEntity a WHERE a.serviceProviderEntity.serviceProviderId = :serviceProviderEntityId");
+        query.setParameter("serviceProviderEntityId", serviceProviderEntity.getServiceProviderId());
+        List<AppointmentEntity> result = query.getResultList();
+        return result;     
+    }
+}
     
     @Override
     public List<AppointmentEntity> retrieveAppointmentsOfServiceProviderById(Long serviceProviderId) throws ServiceProviderEntityNotFoundException
