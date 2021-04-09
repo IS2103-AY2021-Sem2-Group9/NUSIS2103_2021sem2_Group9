@@ -31,6 +31,17 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
 
         return query.getResultList();
     }
+    
+//    @Override
+//    public AppointmentEntity retrieveAppointmentByAppointmentId(Long id) throws AppointmentNotFoundException {
+//        AppointmentEntity appointmentEntity = em.find(AppointmentEntity.class, id);
+//        
+//        if (appointmentEntity != null) {
+//            return appointmentEntity;
+//        } else {
+//            throw new AppointmentNotFoundException("Appointment ID " + id + " does not exist!\n");
+//        }
+//    }
 
     @Override
     public AppointmentEntity retrieveAppointmentByAppointmentNum(String appointmentNum) throws AppointmentNotFoundException {
@@ -53,10 +64,6 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
     
     @Override
     public AppointmentEntity createAppointmentEntity(AppointmentEntity apptEntity) throws UnknownPersistenceException, AppointmentExistException {
-//        em.persist(apptEntity);
-//        em.flush();
-//        return apptEntity;
-        
         try {
             em.persist(apptEntity);
             em.flush();
@@ -72,5 +79,11 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
                 throw new UnknownPersistenceException(ex.getMessage());
             }
         }
+    }
+
+    @Override
+    public void rateAppointment(AppointmentEntity appointmentEntity) {
+        em.merge(appointmentEntity);
+        em.flush();
     }
 }

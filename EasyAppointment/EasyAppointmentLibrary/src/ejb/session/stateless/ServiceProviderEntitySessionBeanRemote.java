@@ -21,7 +21,8 @@ import util.exception.UnknownPersistenceException;
 import util.exception.UpdateServiceProviderException;
 
 
-public interface ServiceProviderEntitySessionBeanRemote {
+public interface ServiceProviderEntitySessionBeanRemote 
+{
     public ServiceProviderEntity serviceProviderLogin(String address, Integer password) throws InvalidLoginCredentialException;
     
     public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, Long categoryId) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException;
@@ -46,10 +47,11 @@ public interface ServiceProviderEntitySessionBeanRemote {
     
     public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity);
     
-    public double generateOverallRating(ServiceProviderEntity spEntity);
-    
     public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
 
     public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
+  
+    public List<AppointmentEntity> retrieveAppointmentsOfServiceProviderById(Long serviceProviderId) throws ServiceProviderEntityNotFoundException;
 
+    public double generateOverallRating(ServiceProviderEntity spEntity);
 }

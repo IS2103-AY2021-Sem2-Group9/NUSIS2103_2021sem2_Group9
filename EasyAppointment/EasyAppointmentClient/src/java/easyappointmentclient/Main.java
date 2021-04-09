@@ -31,11 +31,6 @@ public class Main {
     
     public static void main(String[] args) throws AdminNotFoundException {
         MainApp mainApp = new MainApp(serviceProviderEntitySessionBeanRemote, adminEntitySessionBeanRemote, customerEntitySessionBeanRemote, businessCategorySessionBeanRemote, appointmentEntitySessionBeanRemote, queueCheckoutNotification, queueCheckoutNotificationFactory);
-        System.out.println(customerEntitySessionBeanRemote);
-        System.out.println(adminEntitySessionBeanRemote);
-        System.out.println(serviceProviderEntitySessionBeanRemote);
-        System.out.println(businessCategorySessionBeanRemote);
-        System.out.println(appointmentEntitySessionBeanRemote);
         mainApp.runApp();
     }
     

@@ -23,7 +23,8 @@ public class CustomerTerminal {
     public CustomerTerminal() {
     }
 
-    public CustomerTerminal(CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote) {
+    public CustomerTerminal(CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote) 
+    {
         this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
         this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
         this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
@@ -100,7 +101,7 @@ public class CustomerTerminal {
         System.out.print("Enter Last Name> ");
         String lastName = scanner.nextLine().trim();
         System.out.print("Enter Gender> ");
-        Character gender = scanner.next().charAt(0);
+        String gender = scanner.nextLine().trim();
         System.out.print("Enter Age> ");
         Integer age = scanner.nextInt();
         scanner.nextLine();
@@ -112,7 +113,7 @@ public class CustomerTerminal {
         String city = scanner.nextLine().trim();
         
         if (iDNum.length() > 0 && email.length() > 0 && password.toString().length() > 0
-                && firstName.length() > 0 && lastName.length() > 0 && gender.toString().length() > 0
+                && firstName.length() > 0 && lastName.length() > 0 && gender.length() > 0
                 && age.toString().length() > 0 && phoneNum.length() > 0 && address.length() > 0
                 && city.length() > 0) {
 

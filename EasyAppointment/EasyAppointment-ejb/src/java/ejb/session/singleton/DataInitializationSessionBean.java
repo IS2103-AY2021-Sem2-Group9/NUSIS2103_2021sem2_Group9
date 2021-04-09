@@ -70,7 +70,7 @@ public class DataInitializationSessionBean {
             businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Fashion"));
             businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Education"));
             
-            CustomerEntity testCustomer = new CustomerEntity("1", "test@gmail.com", 123, "test", "test", 'M', 123, "12345678", "123", "123");
+            CustomerEntity testCustomer = new CustomerEntity("S9898100B", "test@gmail.com", 123, "John", "Doe", "M", 21, "97381199", "123A Temasek Hall", "Singapore");
             customerEntitySessionBeanLocal.createCustomerEntity(testCustomer);
             
             LocalDate testDate = LocalDate.of(2021,04,06);
