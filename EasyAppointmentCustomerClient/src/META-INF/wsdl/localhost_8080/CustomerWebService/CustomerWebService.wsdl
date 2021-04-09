@@ -4,6 +4,12 @@
 <xsd:import namespace="http://ws.session.ejb/" schemaLocation="http://localhost:8080/CustomerWebService/CustomerWebService?xsd=1"/>
 </xsd:schema>
 </types>
+<message name="retrieveAllBusinessCategories">
+<part name="parameters" element="tns:retrieveAllBusinessCategories"/>
+</message>
+<message name="retrieveAllBusinessCategoriesResponse">
+<part name="parameters" element="tns:retrieveAllBusinessCategoriesResponse"/>
+</message>
 <message name="createCustomerEntity">
 <part name="parameters" element="tns:createCustomerEntity"/>
 </message>
@@ -16,15 +22,6 @@
 <message name="CustomerExistException">
 <part name="fault" element="tns:CustomerExistException"/>
 </message>
-<message name="retrieveCustomerEntityById">
-<part name="parameters" element="tns:retrieveCustomerEntityById"/>
-</message>
-<message name="retrieveCustomerEntityByIdResponse">
-<part name="parameters" element="tns:retrieveCustomerEntityByIdResponse"/>
-</message>
-<message name="CustomerNotFoundException">
-<part name="fault" element="tns:CustomerNotFoundException"/>
-</message>
 <message name="customerLogin">
 <part name="parameters" element="tns:customerLogin"/>
 </message>
@@ -34,26 +31,48 @@
 <message name="InvalidLoginCredentialException">
 <part name="fault" element="tns:InvalidLoginCredentialException"/>
 </message>
+<message name="retrieveCustomerEntityById">
+<part name="parameters" element="tns:retrieveCustomerEntityById"/>
+</message>
+<message name="retrieveCustomerEntityByIdResponse">
+<part name="parameters" element="tns:retrieveCustomerEntityByIdResponse"/>
+</message>
+<message name="CustomerNotFoundException">
+<part name="fault" element="tns:CustomerNotFoundException"/>
+</message>
 <portType name="CustomerWebService">
+<operation name="retrieveAllBusinessCategories">
+<input wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveAllBusinessCategoriesRequest" message="tns:retrieveAllBusinessCategories"/>
+<output wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveAllBusinessCategoriesResponse" message="tns:retrieveAllBusinessCategoriesResponse"/>
+</operation>
 <operation name="createCustomerEntity">
 <input wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntityRequest" message="tns:createCustomerEntity"/>
 <output wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntityResponse" message="tns:createCustomerEntityResponse"/>
 <fault message="tns:UnknownPersistenceException" name="UnknownPersistenceException" wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntity/Fault/UnknownPersistenceException"/>
 <fault message="tns:CustomerExistException" name="CustomerExistException" wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntity/Fault/CustomerExistException"/>
 </operation>
-<operation name="retrieveCustomerEntityById">
-<input wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityByIdRequest" message="tns:retrieveCustomerEntityById"/>
-<output wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityByIdResponse" message="tns:retrieveCustomerEntityByIdResponse"/>
-<fault message="tns:CustomerNotFoundException" name="CustomerNotFoundException" wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityById/Fault/CustomerNotFoundException"/>
-</operation>
 <operation name="customerLogin">
 <input wsam:Action="http://ws.session.ejb/CustomerWebService/customerLoginRequest" message="tns:customerLogin"/>
 <output wsam:Action="http://ws.session.ejb/CustomerWebService/customerLoginResponse" message="tns:customerLoginResponse"/>
 <fault message="tns:InvalidLoginCredentialException" name="InvalidLoginCredentialException" wsam:Action="http://ws.session.ejb/CustomerWebService/customerLogin/Fault/InvalidLoginCredentialException"/>
 </operation>
+<operation name="retrieveCustomerEntityById">
+<input wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityByIdRequest" message="tns:retrieveCustomerEntityById"/>
+<output wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityByIdResponse" message="tns:retrieveCustomerEntityByIdResponse"/>
+<fault message="tns:CustomerNotFoundException" name="CustomerNotFoundException" wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityById/Fault/CustomerNotFoundException"/>
+</operation>
 </portType>
 <binding name="CustomerWebServicePortBinding" type="tns:CustomerWebService">
 <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+<operation name="retrieveAllBusinessCategories">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
 <operation name="createCustomerEntity">
 <soap:operation soapAction=""/>
 <input>
@@ -69,18 +88,6 @@
 <soap:fault name="CustomerExistException" use="literal"/>
 </fault>
 </operation>
-<operation name="retrieveCustomerEntityById">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="CustomerNotFoundException">
-<soap:fault name="CustomerNotFoundException" use="literal"/>
-</fault>
-</operation>
 <operation name="customerLogin">
 <soap:operation soapAction=""/>
 <input>
@@ -91,6 +98,18 @@
 </output>
 <fault name="InvalidLoginCredentialException">
 <soap:fault name="InvalidLoginCredentialException" use="literal"/>
+</fault>
+</operation>
+<operation name="retrieveCustomerEntityById">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="CustomerNotFoundException">
+<soap:fault name="CustomerNotFoundException" use="literal"/>
 </fault>
 </operation>
 </binding>

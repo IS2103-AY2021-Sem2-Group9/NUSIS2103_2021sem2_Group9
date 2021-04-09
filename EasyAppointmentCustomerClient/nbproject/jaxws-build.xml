@@ -14,13 +14,12 @@
         <mkdir dir="${build.generated.sources.dir}/jax-ws"/>
         <taskdef name="wsimport" classname="com.sun.tools.ws.ant.WsImport">
             <classpath path="${libs.jaxws21.classpath}"/>
-            <classpath path="${libs.jaxb.classpath}"/>
         </taskdef>
     </target>
     <target name="wsimport-client-CustomerWebService" depends="wsimport-init">
         <mkdir dir="${build.generated.dir}/jax-wsCache/CustomerWebService"/>
         <property name="wsdl-CustomerWebService" location="xml-resources/web-service-references/CustomerWebService/wsdl/localhost_8080/CustomerWebService/CustomerWebService.wsdl"/>
-        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/CustomerWebService" destdir="${build.generated.dir}/jax-wsCache/CustomerWebService" wsdl="${wsdl-CustomerWebService}" catalog="catalog.xml" extension="true" verbose="true" fork="false" wsdlLocation="http://localhost:8080/CustomerWebService/CustomerWebService?WSDL" xnocompile="true" xendorsed="true" package="ws.client">
+        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/CustomerWebService" destdir="${build.generated.dir}/jax-wsCache/CustomerWebService" wsdl="${wsdl-CustomerWebService}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" fork="false" wsdlLocation="http://localhost:8080/CustomerWebService/CustomerWebService?wsdl" xnocompile="true" xendorsed="true" package="ws.client">
             <depends file="${wsdl-CustomerWebService}"/>
             <produces dir="${build.generated.dir}/jax-wsCache/CustomerWebService"/>
         </wsimport>
