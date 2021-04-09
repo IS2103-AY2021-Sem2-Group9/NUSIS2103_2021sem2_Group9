@@ -7,6 +7,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import ws.client.AppointmentEntity;
 import ws.client.BusinessCategoryEntity;
 import ws.client.CustomerEntity;
@@ -286,18 +288,18 @@ public class CustomerModule {
             try {
                 // Construct Appointment Entity
 //                AppointmentEntity apptEntity = new AppointmentEntity(date, selectedTimeSlot, loggedInCustomerEntity, spEntity);
-                AppointmentEntity apptEntity = new AppointmentEntity();
-                apptEntity.setAppointmentDate(date);
-                apptEntity.setAppointmentTime(selectedTimeSlot);
+               // AppointmentEntity apptEntity = new AppointmentEntity();
+               // apptEntity.setAppointmentDate(date);
+              //  apptEntity.setAppointmentTime(selectedTimeSlot);
                 //set customer entity
                 //set sp entity
-                createAppointmentEntity(apptEntity);
+                AppointmentEntity apptEntity = createAppointmentEntity(date.toString(), timeStr, loggedInCustomerEntity.getId(), spEntity.getServiceProviderId());
                 
                 addAppointment(apptEntity, spEntity);
 
-            } catch (UnknownPersistenceException_Exception | AppointmentExistException_Exception ex) {
+            } catch (UnknownPersistenceException_Exception | AppointmentExistException_Exception | CustomerNotFoundException_Exception ex) {
                 System.err.println("Error occured when creating appointment: " + ex.getMessage());
-            }
+            } 
 
             System.out.printf("The appointment with %s %s at %s on %s is confirmed.", this.loggedInCustomerEntity.getFirstName(), this.loggedInCustomerEntity.getLastName(), selectedTimeSlot, date.toString());
             System.out.println();
@@ -340,7 +342,7 @@ public class CustomerModule {
                     String apptNum = appt.getAppointmentNum();
                     String apptDate = appt.getAppointmentDate().toString();
                     String apptTime = appt.getAppointmentTime().toString();
-                    String apptSPName = appt.getServiceProviderEntity().getName();
+                    String apptSPName = "sdasd";
 
                     // Print records
                     System.out.printf("%-20s | %-20s | %-20s | %s", apptNum, apptDate, apptTime, apptSPName);
@@ -372,7 +374,7 @@ public class CustomerModule {
                     String apptNum = appt.getAppointmentNum();
                     String apptDate = appt.getAppointmentDate().toString();
                     String apptTime = appt.getAppointmentTime().toString();
-                    String apptSPName = appt.getServiceProviderEntity().getName();
+                    String apptSPName = "sds";
 
                     // Print records
                     System.out.printf("%-20s | %-20s | %-20s | %s", apptNum, apptDate, apptTime, apptSPName);
@@ -421,7 +423,7 @@ public class CustomerModule {
             } else {
                 for (int i = 0; i < appts.size(); i++) {
                     AppointmentEntity apptEntity = appts.get(i);
-                    Long retrievedSPId = apptEntity.getServiceProviderEntity().getServiceProviderId();
+                    Long retrievedSPId = 1l; //apptEntity.getServiceProviderEntity().getServiceProviderId();
                     if (spId.equals(retrievedSPId) && apptEntity.getRating() == 0) { // if rating == 0 means not yet rated, rating != 0 means rated, dont rate again!
                         apptsToRate.add(apptEntity);
                     }
@@ -433,8 +435,8 @@ public class CustomerModule {
                 System.out.println("\n");
                 for (int i = 0; i < apptsToRate.size(); i++) {
                     AppointmentEntity apptEntity = apptsToRate.get(i);
-                    System.out.printf("%-5s | %-20s | %-20s | %-20s | %s", i + 1, apptEntity.getAppointmentNum(), apptEntity.getAppointmentDate(),
-                            apptEntity.getAppointmentTime(), apptEntity.getServiceProviderEntity().getName());
+                   // System.out.printf("%-5s | %-20s | %-20s | %-20s | %s", i + 1, apptEntity.getAppointmentNum(), apptEntity.getAppointmentDate(),
+                   //         apptEntity.getAppointmentTime(), apptEntity.getServiceProviderEntity().getName());
                     System.out.println();
                 }
 
@@ -489,12 +491,6 @@ public class CustomerModule {
         return port.retrieveServiceProviderByServiceProviderId(serviceProviderId);
     }
 
-    private static AppointmentEntity createAppointmentEntity(ws.client.AppointmentEntity apptEntity) throws AppointmentExistException_Exception, UnknownPersistenceException_Exception {
-        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
-        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
-        return port.createAppointmentEntity(apptEntity);
-    }
-
     private static void addAppointment(ws.client.AppointmentEntity appt, ws.client.ServiceProviderEntity spEntity) {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
@@ -530,5 +526,12 @@ public class CustomerModule {
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
         return port.retrieveServiceProviderAvailabilityForTheDay(spEntity, appointmentDate);
     }
+
+    private static AppointmentEntity createAppointmentEntity(java.lang.String appointmentDate, java.lang.String apptTime, java.lang.Long customerId, java.lang.Long spId) throws AppointmentExistException_Exception, UnknownPersistenceException_Exception, ServiceProviderEntityNotFoundException_Exception, CustomerNotFoundException_Exception {
+        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
+        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
+        return port.createAppointmentEntity(appointmentDate, apptTime, customerId, spId);
+    }
+
     
 }

@@ -168,6 +168,8 @@
 <output wsam:Action="http://ws.session.ejb/CustomerWebService/createAppointmentEntityResponse" message="tns:createAppointmentEntityResponse"/>
 <fault message="tns:UnknownPersistenceException" name="UnknownPersistenceException" wsam:Action="http://ws.session.ejb/CustomerWebService/createAppointmentEntity/Fault/UnknownPersistenceException"/>
 <fault message="tns:AppointmentExistException" name="AppointmentExistException" wsam:Action="http://ws.session.ejb/CustomerWebService/createAppointmentEntity/Fault/AppointmentExistException"/>
+<fault message="tns:CustomerNotFoundException" name="CustomerNotFoundException" wsam:Action="http://ws.session.ejb/CustomerWebService/createAppointmentEntity/Fault/CustomerNotFoundException"/>
+<fault message="tns:ServiceProviderEntityNotFoundException" name="ServiceProviderEntityNotFoundException" wsam:Action="http://ws.session.ejb/CustomerWebService/createAppointmentEntity/Fault/ServiceProviderEntityNotFoundException"/>
 </operation>
 </portType>
 <binding name="CustomerWebServicePortBinding" type="tns:CustomerWebService">
@@ -317,6 +319,12 @@
 </fault>
 <fault name="AppointmentExistException">
 <soap:fault name="AppointmentExistException" use="literal"/>
+</fault>
+<fault name="CustomerNotFoundException">
+<soap:fault name="CustomerNotFoundException" use="literal"/>
+</fault>
+<fault name="ServiceProviderEntityNotFoundException">
+<soap:fault name="ServiceProviderEntityNotFoundException" use="literal"/>
 </fault>
 </operation>
 </binding>

@@ -99,7 +99,12 @@ public class CustomerWebService {
     }
     
     @WebMethod(operationName = "createAppointmentEntity")
-    public AppointmentEntity createAppointmentEntity(@WebParam(name = "apptEntity") AppointmentEntity apptEntity) throws UnknownPersistenceException, AppointmentExistException {
+    public AppointmentEntity createAppointmentEntity(@WebParam(name = "appointmentDate") String apptDate, @WebParam(name = "apptTime") String apptTime, 
+                                                        @WebParam(name = "customerId") Long customerId, 
+                                                        @WebParam(name = "spId") Long spId) throws UnknownPersistenceException, AppointmentExistException, CustomerNotFoundException, ServiceProviderEntityNotFoundException {
+        ServiceProviderEntity spEntity = this.serviceProviderEntitySessionBeanLocal.retrieveServiceProviderByServiceProviderId(spId);
+        CustomerEntity customerEntity = this.customerEntitySessionBeanLocal.retrieveCustomerEntityById(customerId);
+        AppointmentEntity apptEntity = new AppointmentEntity(LocalDate.parse(apptDate), LocalTime.parse(apptTime), customerEntity, spEntity);
         return this.appointmentEntitySessionBeanLocal.createAppointmentEntity(apptEntity);
     }
     
