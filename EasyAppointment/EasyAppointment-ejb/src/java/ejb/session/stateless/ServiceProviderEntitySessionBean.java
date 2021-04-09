@@ -223,7 +223,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
 
     @Override
     public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity) {
-        List<AppointmentEntity> appts = this.appointmentEntitySessionBeanLocal.retrieveAllAppointmentsForServiceProvider(spEntity);
+        List<AppointmentEntity> appts = retrieveAllAppointmentsForServiceProvider(spEntity);
         appts.add(appt);
         em.merge(spEntity);
         em.flush();
@@ -231,7 +231,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
 
     @Override
     public double generateOverallRating(ServiceProviderEntity spEntity) {
-        List<AppointmentEntity> appointments = appointmentEntitySessionBeanLocal.retrieveAllAppointmentsForServiceProvider(spEntity);
+        List<AppointmentEntity> appointments = retrieveAllAppointmentsForServiceProvider(spEntity);
         List<Integer> listOfRatings = new ArrayList<>();
         for (AppointmentEntity appt : appointments) {
             System.out.println("appt.getRating()1:");
@@ -267,7 +267,6 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         List<AppointmentEntity> result = query.getResultList();
         return result;     
     }
-}
     
     @Override
     public List<AppointmentEntity> retrieveAppointmentsOfServiceProviderById(Long serviceProviderId) throws ServiceProviderEntityNotFoundException
