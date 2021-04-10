@@ -9,8 +9,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.Local;
@@ -22,12 +20,14 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.InvalidPasswordFormatException;
 import util.exception.ServiceProviderAlreadyApprovedException;
 import util.exception.ServiceProviderAlreadyBlockedException;
 import util.exception.ServiceProviderEmailExistException;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateServiceProviderException;
+import util.password.PasswordEncrypt;
 
 @Stateless
 @Local(ServiceProviderEntitySessionBeanLocal.class)
@@ -39,16 +39,39 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
 
     @EJB
     private BusinessCategorySessionBeanLocal businessCategorySessionBeanLocal;
+    
+    private final PasswordEncrypt passwordEncrypt = new PasswordEncrypt();
 
     @Override
-    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, Long categoryId) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException {
-        try {
+    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, Long categoryId) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, InvalidPasswordFormatException, UnknownPersistenceException 
+    {
+        try 
+        {
             BusinessCategoryEntity categoryEntity = businessCategorySessionBeanLocal.retrieveBusinessCategoryById(categoryId);
             newServiceProvider.setCategory(categoryEntity);
-            em.persist(newServiceProvider);
-            em.flush();
+            
+            String newPassword = newServiceProvider.getPassword();
+            if (newPassword.length() != 6)
+            {
+                throw new InvalidPasswordFormatException("Password length is not 6!");
+            }
+            else
+            {
+                Integer intPassword = Integer.valueOf(newPassword);
+                String salt = passwordEncrypt.getSalt(30);
+                String encryptedPassword = passwordEncrypt.generateSecurePassword(newServiceProvider.getPassword(), salt);
+                newServiceProvider.setPassword(salt + encryptedPassword);
+                em.persist(newServiceProvider);
+                em.flush();
+            }
             return newServiceProvider;
-        } catch (PersistenceException ex) {
+        }
+        catch (NumberFormatException ex)
+        {
+            throw new InvalidPasswordFormatException("Password can only be digits!");
+        }
+        catch (PersistenceException ex) 
+        {
             if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
                 if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
                     throw new BusinessCategoryNotFoundException("Error! Businesss category cannot be found!");
@@ -76,13 +99,18 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     @Override
     public ServiceProviderEntity serviceProviderLogin(String email, Integer password) throws InvalidLoginCredentialException {
         try {
+            String stringPassword = password.toString();
             ServiceProviderEntity currentServiceProviderEntity = retrieveServiceProviderByServiceProviderAddress(email);
-            if (currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.APPROVED) {
+            String saltAndPassword = currentServiceProviderEntity.getPassword();
+            String salt = saltAndPassword.substring(0, 30);
+            String encryptedPassword = saltAndPassword.substring(31);
+            Boolean passwordVerification = passwordEncrypt.verifyUserPassword(stringPassword, encryptedPassword, salt);
+            if (passwordVerification && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.APPROVED) {
                 return currentServiceProviderEntity;
 
-            } else if (currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.PENDING) {
+            } else if (passwordVerification && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.PENDING) {
                 throw new InvalidLoginCredentialException("Your account is still pending administrator's approval. Please try again later!");
-            } else if (currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.BLOCKED) {
+            } else if (passwordVerification && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.BLOCKED) {
                 throw new InvalidLoginCredentialException("Your account has been blocked by an administrator.");
             } else {
                 throw new InvalidLoginCredentialException("Email address does not exist or invalid password.");

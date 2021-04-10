@@ -37,8 +37,8 @@ public class ServiceProviderEntity implements Serializable {
     private String address; 
     @Column(nullable = false, length = 64, unique = true)
     private String email; 
-    @Column(nullable = false, length = 64)
-    private Integer password; 
+    @Column(nullable = false, length = 286)
+    private String password; 
     @Column (nullable = false)
     private ServiceProviderStatus status;
     @OneToMany(mappedBy = "serviceProviderEntity")
@@ -48,7 +48,7 @@ public class ServiceProviderEntity implements Serializable {
         this.appointmentEntities = new ArrayList<>();
     }
 
-    public ServiceProviderEntity(String name, BusinessCategoryEntity category, String uen, String city, String phoneNumber, String address, String email, Integer password, ServiceProviderStatus status) {
+    public ServiceProviderEntity(String name, BusinessCategoryEntity category, String uen, String city, String phoneNumber, String address, String email, String password, ServiceProviderStatus status) {
         this.name = name;
         this.category = category;
         this.uen = uen;
@@ -60,7 +60,7 @@ public class ServiceProviderEntity implements Serializable {
         this.status = status;
     }
     
-    public ServiceProviderEntity(String name, String uen, String city, String phoneNumber, String address, String email, Integer password, ServiceProviderStatus status) {
+    public ServiceProviderEntity(String name, String uen, String city, String phoneNumber, String address, String email, String password, ServiceProviderStatus status) {
         this.name = name;
         this.uen = uen;
         this.city = city;
@@ -144,11 +144,11 @@ public class ServiceProviderEntity implements Serializable {
         this.email = email;
     }
 
-    public Integer getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(int password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 

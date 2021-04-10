@@ -167,7 +167,7 @@ public class ServiceProviderModule {
         input = scanner.nextLine().trim();
         if(input.length() > 0) {
             try {
-                Integer newPassword = Integer.valueOf(input);
+                String newPassword = input;
                 currentServiceProviderEntity.setPassword(newPassword);
             } catch (NumberFormatException ex) {
                 System.err.println("Please input a password consisting of numbers only!");
