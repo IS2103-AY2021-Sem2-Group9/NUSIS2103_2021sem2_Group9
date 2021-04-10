@@ -7,8 +7,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import ws.client.AppointmentEntity;
 import ws.client.BusinessCategoryEntity;
 import ws.client.CustomerEntity;
@@ -338,11 +336,10 @@ public class CustomerModule {
                 System.out.println("\n");
                 for (int i = 0; i < appointments.size(); i++) {
                     AppointmentEntity appt = appointments.get(i);
-                    String apptID = appt.getId().toString();
                     String apptNum = appt.getAppointmentNum();
                     String apptDate = appt.getAppointmentDate().toString();
                     String apptTime = appt.getAppointmentTime().toString();
-                    String apptSPName = "sdasd";
+                    String apptSPName = appt.getServiceProviderEntity().getName();
 
                     // Print records
                     System.out.printf("%-20s | %-20s | %-20s | %s", apptNum, apptDate, apptTime, apptSPName);
@@ -374,7 +371,7 @@ public class CustomerModule {
                     String apptNum = appt.getAppointmentNum();
                     String apptDate = appt.getAppointmentDate().toString();
                     String apptTime = appt.getAppointmentTime().toString();
-                    String apptSPName = "sds";
+                    String apptSPName = appt.getServiceProviderEntity().getName();
 
                     // Print records
                     System.out.printf("%-20s | %-20s | %-20s | %s", apptNum, apptDate, apptTime, apptSPName);
@@ -423,7 +420,7 @@ public class CustomerModule {
             } else {
                 for (int i = 0; i < appts.size(); i++) {
                     AppointmentEntity apptEntity = appts.get(i);
-                    Long retrievedSPId = 1l; //apptEntity.getServiceProviderEntity().getServiceProviderId();
+                    Long retrievedSPId = apptEntity.getServiceProviderEntity().getServiceProviderId();
                     if (spId.equals(retrievedSPId) && apptEntity.getRating() == 0) { // if rating == 0 means not yet rated, rating != 0 means rated, dont rate again!
                         apptsToRate.add(apptEntity);
                     }

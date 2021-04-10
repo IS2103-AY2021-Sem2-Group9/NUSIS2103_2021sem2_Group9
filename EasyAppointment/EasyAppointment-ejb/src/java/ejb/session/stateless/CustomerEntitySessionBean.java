@@ -77,6 +77,7 @@ public class CustomerEntitySessionBean implements CustomerEntitySessionBeanLocal
         try {
             CustomerEntity customerEntity = retrieveCustomerEntityByEmail(email);
             if(customerEntity.getPassword().equals(password)) {
+                customerEntity.getAppointments().size();
                 return customerEntity;
                 
             }  else {

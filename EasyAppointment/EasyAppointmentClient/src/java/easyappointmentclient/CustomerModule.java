@@ -340,7 +340,6 @@ public class CustomerModule {
                 System.out.println("\n");
                 for (int i = 0; i < appointments.size(); i++) {
                     AppointmentEntity appt = appointments.get(i);
-                    String apptID = appt.getId().toString();
                     String apptNum = appt.getAppointmentNum();
                     String apptDate = appt.getAppointmentDate().toString();
                     String apptTime = appt.getAppointmentTime().toString();
