@@ -154,7 +154,6 @@ public class AppointmentEntity implements Serializable {
     /**
      * @return the customerEntity
      */
-    @XmlTransient
     public CustomerEntity getCustomerEntity() {
         return customerEntity;
     }
@@ -169,7 +168,6 @@ public class AppointmentEntity implements Serializable {
     /**
      * @return the serviceProviderEntity
      */
-    @XmlTransient
     public ServiceProviderEntity getServiceProviderEntity() {
         return serviceProviderEntity;
     }
