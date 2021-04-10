@@ -263,13 +263,19 @@ public class AdminModule {
         Scanner scanner = new Scanner(System.in);
         List<ServiceProviderEntity> serviceProviders = serviceProviderSessionBeanRemote.retrieveAllServiceProviders();
         
-        System.out.printf("%-18s%-20s%-15s%-18s%-10s\n", "Name", "| Business Category", "| City", "| Overall Rating", "| Status");
-        
-        for (ServiceProviderEntity sp : serviceProviders)
+        if (serviceProviders.isEmpty())
         {
-            System.out.printf("%-18s%-20s%-15s%-18s%-10s\n", sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getCity(), "| " + "<rating>", "| " + sp.getStatus());
+            System.out.println("There are no existing service providers.");
         }
-        
+        else
+        {
+            System.out.printf("%-18s%-20s%-15s%-18s%-10s\n", "Name", "| Business Category", "| City", "| Overall Rating", "| Status");
+
+            for (ServiceProviderEntity sp : serviceProviders)
+            {
+                System.out.printf("%-18s%-20s%-15s%-18s%-10s\n", sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getCity(), "| " + "<rating>", "| " + sp.getStatus());
+            }
+        }
         System.out.println();
     }
     
@@ -280,42 +286,49 @@ public class AdminModule {
         System.out.println("List of service providers with pending approval: \n");
         List<ServiceProviderEntity> serviceProviders = serviceProviderSessionBeanRemote.retrieveServiceProvidersByStatus(ServiceProviderStatus.PENDING);
         
-        System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone");
-        
-        for (ServiceProviderEntity sp : serviceProviders)
+        if (serviceProviders.isEmpty())
         {
-            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber());
+            System.out.println("There are no pending service providers.");
         }
-        
-        System.out.println();
-        
-        while (true)
+        else
         {
-            System.out.println("Enter 0 to go back to the previous menu.");
-            System.out.print("Enter Service Provider ID> ");
+            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone");
+
+            for (ServiceProviderEntity sp : serviceProviders)
+            {
+                System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber());
+            }
             
-            try
+            System.out.println();
+        
+            while (true)
             {
-                Long id = scanner.nextLong();
-                scanner.nextLine();
-                if (id == 0)
+                System.out.println("Enter 0 to go back to the previous menu.");
+                System.out.print("Enter Service Provider ID> ");
+
+                try
                 {
-                   break;
+                    Long id = scanner.nextLong();
+                    scanner.nextLine();
+                    if (id == 0)
+                    {
+                       break;
+                    }
+                    String approvedSp = serviceProviderSessionBeanRemote.approveServiceProviderById(id);
+                    System.out.println(approvedSp + "'s registration is approved.\n");
+                    break;
                 }
-                String approvedSp = serviceProviderSessionBeanRemote.approveServiceProviderById(id);
-                System.out.println(approvedSp + "'s registration is approved.\n");
-                break;
+                catch (ServiceProviderEntityNotFoundException | ServiceProviderAlreadyApprovedException ex)
+                {
+                    System.err.println("Error occurred while approving Service Provider: " + ex.getMessage());
+                }
+                catch (InputMismatchException ex)
+                {
+                    System.err.println("Please only enter digits!");
+                    scanner.next();
+                }
             }
-            catch (ServiceProviderEntityNotFoundException | ServiceProviderAlreadyApprovedException ex)
-            {
-                System.err.println("Error occurred while approving Service Provider: " + ex.getMessage());
-            }
-            catch (InputMismatchException ex)
-            {
-                System.err.println("Please only enter digits!");
-                scanner.next();
-            }
-        }
+        }   
     }
     
         private void blockServiceProvider()
@@ -329,40 +342,47 @@ public class AdminModule {
         totalServiceProviders.addAll(approvedServiceProviders);
         totalServiceProviders.addAll(pendingServiceProviders);
         
-        System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone", "| Status");
-        
-        for (ServiceProviderEntity sp : totalServiceProviders)
+        if (totalServiceProviders.isEmpty())
         {
-            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber(), "| " + sp.getStatus());
+            System.out.println("There are no existing pending/approved service providers to block.");
         }
-        
-        System.out.println();
-        
-        while (true)
+        else
         {
-            System.out.println("Enter 0 to go back to the previous menu.");
-            System.out.print("Enter Service Provider ID> ");
+            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone", "| Status");
 
-            try
+            for (ServiceProviderEntity sp : totalServiceProviders)
             {
-                Long id = scanner.nextLong();
-                scanner.nextLine();
-                if (id == 0)
+                System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber(), "| " + sp.getStatus());
+            }
+
+            System.out.println();
+
+            while (true)
+            {
+                System.out.println("Enter 0 to go back to the previous menu.");
+                System.out.print("Enter Service Provider ID> ");
+
+                try
                 {
-                   break;
+                    Long id = scanner.nextLong();
+                    scanner.nextLine();
+                    if (id == 0)
+                    {
+                       break;
+                    }
+                    String blockedSp = serviceProviderSessionBeanRemote.blockServiceProviderById(id);
+                    System.out.println("Service Provider: " + blockedSp + " has been blocked.\n");
+                    break;
                 }
-                String blockedSp = serviceProviderSessionBeanRemote.blockServiceProviderById(id);
-                System.out.println("Service Provider: " + blockedSp + " has been blocked.\n");
-                break;
-            }
-            catch (ServiceProviderEntityNotFoundException | ServiceProviderAlreadyBlockedException ex)
-            {
-                System.err.println("Error occured while blocking Service Provider: " + ex.getMessage());
-            }
-            catch (InputMismatchException ex)
-            {
-                System.err.println("Please only enter digits!");
-                scanner.next();
+                catch (ServiceProviderEntityNotFoundException | ServiceProviderAlreadyBlockedException ex)
+                {
+                    System.err.println("Error occured while blocking Service Provider: " + ex.getMessage());
+                }
+                catch (InputMismatchException ex)
+                {
+                    System.err.println("Please only enter digits!");
+                    scanner.next();
+                }
             }
         }
     }
@@ -414,7 +434,7 @@ public class AdminModule {
                     else 
                     {
                         System.out.println("Please enter 0 if you would like to go back to the previous menu.");
-                        System.out.println("Single digits are not allowed to be category names.");
+                        System.err.println("Single digits are not allowed to be category names.");
                     }
                 }
                 else
@@ -435,63 +455,69 @@ public class AdminModule {
         Scanner scanner = new Scanner(System.in);
         List<BusinessCategoryEntity> businessCategories = businessCategorySessionBeanRemote.retrieveAllBusinessCategories();
         
-        System.out.printf("%11s%16s\n", "Category ID", "Category Name");
-        
-        for (BusinessCategoryEntity category : businessCategories)
+        if(businessCategories.isEmpty())
         {
-            System.out.printf("%11s%16s\n", category.getId(), category.getCategoryName());
+            System.out.println("There are no existing business categories!");
         }
-        
-        System.out.println();
-        
-        Integer zero = 1;
-        
-        while (true)
+        else
         {
-            System.out.println("Enter 0 to go back to the previous menu.");
-            System.out.print("Enter the name of the category you want to remove> ");
+            System.out.printf("%11s%16s\n", "Category ID", "Category Name");
 
-            String toBeRemoved = scanner.nextLine().trim();
-
-            try
+            for (BusinessCategoryEntity category : businessCategories)
             {
-                if (toBeRemoved.length() > 1)
+                System.out.printf("%11s%16s\n", category.getId(), category.getCategoryName());
+            }
+
+            System.out.println();
+
+            Integer zero = 1;
+
+            while (true)
+            {
+                System.out.println("Enter 0 to go back to the previous menu.\n");
+                System.out.print("Enter the name of the category you want to remove> ");
+
+                String toBeRemoved = scanner.nextLine().trim();
+
+                try
                 {
-                    String removedName = businessCategorySessionBeanRemote.deleteBusinessCategory(toBeRemoved);
-                    System.out.println("Business Category " + removedName + " has been removed.\n");
-                    break;
-                }
-                else if (toBeRemoved.length() == 1)
-                {
-                    try
-                    {
-                        zero = Integer.valueOf(toBeRemoved);
-                    }
-                    catch (NumberFormatException ex)
+                    if (toBeRemoved.length() > 1)
                     {
                         String removedName = businessCategorySessionBeanRemote.deleteBusinessCategory(toBeRemoved);
                         System.out.println("Business Category " + removedName + " has been removed.\n");
                         break;
                     }
-                
-                    if (zero == 0) 
+                    else if (toBeRemoved.length() == 1)
                     {
-                        break;
-                    } 
-                    else 
+                        try
+                        {
+                            zero = Integer.valueOf(toBeRemoved);
+                        }
+                        catch (NumberFormatException ex)
+                        {
+                            String removedName = businessCategorySessionBeanRemote.deleteBusinessCategory(toBeRemoved);
+                            System.out.println("Business Category " + removedName + " has been removed.\n");
+                            break;
+                        }
+
+                        if (zero == 0) 
+                        {
+                            break;
+                        } 
+                        else 
+                        {
+                            System.out.println("Please enter 0 if you would like to go back to the previous menu.");
+                        }
+                    }
+                    else
                     {
-                        System.out.println("Please enter 0 if you would like to go back to the previous menu.");
-                        System.out.println("Single digits are not allowed to be category names.");
+                        continue;
                     }
                 }
-                else
+                catch (BusinessCategoryNotFoundException ex)
                 {
-                    continue;
+                    System.out.println("Error removing Business Category: " + ex.getMessage() + "\n");
                 }
-            }
-            catch (BusinessCategoryNotFoundException ex)
-            {
-                System.out.println("Error removing Business Category: " + ex.getMessage() + "\n");
             }
         }
     }
@@ -502,39 +528,45 @@ public class AdminModule {
         
         Scanner sc = new Scanner(System.in);
         Long customerId;
-        
-        try
+        while (true)
         {
-            System.out.print("Enter customer ID> ");
-            customerId = sc.nextLong();
-            sc.nextLine();
-            CustomerEntity customerEntity = customerEntitySessionBeanRemote.retrieveCustomerEntityById(customerId);
-            List<AppointmentEntity> customerAppointments = customerEntitySessionBeanRemote.retrieveCustomerEntityAppointments(customerId);
-                    
-            if (!customerAppointments.isEmpty())
+            try
             {
-                System.out.println(customerEntity.getFirstName() + "'s upcoming appointment: \n");
-                System.out.printf("%-15s%-20s%-15s%-10s%-18s\n", "Name", "| Business Category", "| Date", "| Time", "| Appointment No.");
-                
-                AppointmentEntity appointment = customerAppointments.get(0);
-                ServiceProviderEntity apptServiceProvider = appointment.getServiceProviderEntity();
-                System.out.printf("%-15s%-20s%-15s%-10s%-18s\n", apptServiceProvider.getName(), "| " + apptServiceProvider.getCategory().getCategoryName(), "| " + appointment.getAppointmentDate().toString(), "| " + appointment.getAppointmentTime().toString(), "| " + appointment.getAppointmentNum());
-                sendJMSMessageToQueueAppointmentNotification(customerEntity.getId(), "EasyAppointment_Group9");
-                System.out.println("Email sent successfully!\n");
+                System.out.print("Enter customer ID> ");
+                customerId = sc.nextLong();
+                sc.nextLine();
+                if (customerId.equals(Long.valueOf(0)))
+                {
+                    break;
+                }
+                CustomerEntity customerEntity = customerEntitySessionBeanRemote.retrieveCustomerEntityById(customerId);
+                List<AppointmentEntity> customerAppointments = customerEntitySessionBeanRemote.retrieveCustomerEntityAppointments(customerId);
+
+                if (!customerAppointments.isEmpty())
+                {
+                    System.out.println(customerEntity.getFirstName() + "'s upcoming appointment: \n");
+                    System.out.printf("%-15s%-20s%-15s%-10s%-18s\n", "Name", "| Business Category", "| Date", "| Time", "| Appointment No.");
+
+                    AppointmentEntity appointment = customerAppointments.get(0);
+                    ServiceProviderEntity apptServiceProvider = appointment.getServiceProviderEntity();
+                    System.out.printf("%-15s%-20s%-15s%-10s%-18s\n", apptServiceProvider.getName(), "| " + apptServiceProvider.getCategory().getCategoryName(), "| " + appointment.getAppointmentDate().toString(), "| " + appointment.getAppointmentTime().toString(), "| " + appointment.getAppointmentNum());
+                    sendJMSMessageToQueueAppointmentNotification(customerEntity.getId(), "EasyAppointment_Group9");
+                    System.out.println("Email sent successfully to " + customerEntity.getEmail() + "\n");
+                }
+                else
+                {
+                    System.out.println("Unable to send email as " + customerEntity.getFirstName() + " does not have any upcoming appointments!\n");
+                }
             }
-            else
+            catch(InputMismatchException ex)
             {
-                System.out.println("Unable to send email as " + customerEntity.getFirstName() + " does not have any upcoming appointments!\n");
+                System.err.println("Please enter digits only.\n");
+                sc.next();
             }
-        }
-        catch(InputMismatchException ex)
-        {
-            System.err.println("Please enter digits only.\n");
-            sc.next();
-        }
-        catch (Exception ex)
-        {
-            System.err.println("An error occured while trying to send email: " + ex.getMessage());
+            catch (Exception ex)
+            {
+                System.err.println("An error occured while trying to send email: " + ex.getMessage());
+            }
         }
     }
     
