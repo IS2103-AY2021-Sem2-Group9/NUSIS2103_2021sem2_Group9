@@ -333,7 +333,7 @@ public class AdminModule {
         
         for (ServiceProviderEntity sp : totalServiceProviders)
         {
-            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber(), "| " + sp.getStatus());
+            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber(), "| " + sp.getStatus());
         }
         
         System.out.println();
