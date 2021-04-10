@@ -25,6 +25,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.naming.NamingException;
+import util.exception.BusinessCategoryExistException;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.CustomerNotFoundException;
 import util.exception.DeleteCustomerException;
@@ -381,21 +382,9 @@ public class AdminModule {
             System.out.print("Enter a new business category> ");
             category = scanner.nextLine();
             
-            if (category.length() > 1)
+            try
             {
-                newBusinessCategory.setCategoryName(category);
-
-                String addedCategory = businessCategorySessionBeanRemote.createBusinessCategoryEntity(newBusinessCategory);
-                System.out.println("The business category " + addedCategory + " is added.\n");
-                break;
-            }
-            else if (category.length() == 1)
-            {
-                try
-                {
-                    zero = Integer.valueOf(category);
-                }
-                catch (NumberFormatException ex)
+                if (category.length() > 1)
                 {
                     newBusinessCategory.setCategoryName(category);
 
@@ -403,20 +392,39 @@ public class AdminModule {
                     System.out.println("The business category " + addedCategory + " is added.\n");
                     break;
                 }
-                
-                if (zero == 0) 
+                else if (category.length() == 1)
                 {
-                    break;
-                } 
-                else 
+                    try
+                    {
+                        zero = Integer.valueOf(category);
+                    }
+                    catch (NumberFormatException ex)
+                    {
+                        newBusinessCategory.setCategoryName(category);
+
+                        String addedCategory = businessCategorySessionBeanRemote.createBusinessCategoryEntity(newBusinessCategory);
+                        System.out.println("The business category " + addedCategory + " is added.\n");
+                        break;
+                    }
+
+                    if (zero == 0) 
+                    {
+                        break;
+                    } 
+                    else 
+                    {
+                        System.out.println("Please enter 0 if you would like to go back to the previous menu.");
+                        System.out.println("Single digits are not allowed to be category names.");
+                    }
+                }
+                else
                 {
-                    System.out.println("Please enter 0 if you would like to go back to the previous menu.");
-                    System.out.println("Single digits are not allowed to be category names.");
+                    continue;
                 }
             }
-            else
+            catch(BusinessCategoryExistException ex)
             {
-                continue;
+                System.err.println("An error occured while creating business category: " + ex.getMessage());
             }
         }
     }

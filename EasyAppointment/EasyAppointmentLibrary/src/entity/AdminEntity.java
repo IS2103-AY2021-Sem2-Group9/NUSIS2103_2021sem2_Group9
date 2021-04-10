@@ -14,7 +14,7 @@ public class AdminEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false, length = 32, unique = true)
     private String adminEmail;
     @Column(nullable = false, length = 32)
     private String password;
