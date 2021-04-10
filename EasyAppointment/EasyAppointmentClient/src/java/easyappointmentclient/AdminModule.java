@@ -284,19 +284,23 @@ public class AdminModule {
         System.out.println("*** Admin Terminal :: Approve Service Provider ***\n");
         Scanner scanner = new Scanner(System.in);
         System.out.println("List of service providers with pending approval: \n");
-        List<ServiceProviderEntity> serviceProviders = serviceProviderSessionBeanRemote.retrieveServiceProvidersByStatus(ServiceProviderStatus.PENDING);
+        List<ServiceProviderEntity> pendingServiceProviders = serviceProviderSessionBeanRemote.retrieveServiceProvidersByStatus(ServiceProviderStatus.PENDING);
+        List<ServiceProviderEntity> blockedServiceProviders = serviceProviderSessionBeanRemote.retrieveServiceProvidersByStatus(ServiceProviderStatus.BLOCKED);
+        List<ServiceProviderEntity> totalServiceProviders = new ArrayList<>();
+        totalServiceProviders.addAll(pendingServiceProviders);
+        totalServiceProviders.addAll(blockedServiceProviders);
         
-        if (serviceProviders.isEmpty())
+        if (totalServiceProviders.isEmpty())
         {
-            System.out.println("There are no pending service providers.");
+            System.out.println("There are no pending/blocked service providers.\n");
         }
         else
         {
-            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone");
+            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-12s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone");
 
-            for (ServiceProviderEntity sp : serviceProviders)
+            for (ServiceProviderEntity sp : totalServiceProviders)
             {
-                System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber());
+                System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-12s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber());
             }
             
             System.out.println();
@@ -344,7 +348,7 @@ public class AdminModule {
         
         if (totalServiceProviders.isEmpty())
         {
-            System.out.println("There are no existing pending/approved service providers to block.");
+            System.out.println("There are no existing pending/approved service providers to block.\n");
         }
         else
         {
@@ -429,6 +433,7 @@ public class AdminModule {
 
                     if (zero == 0) 
                     {
+                        System.out.println();
                         break;
                     } 
                     else 
@@ -502,11 +507,12 @@ public class AdminModule {
 
                         if (zero == 0) 
                         {
+                            System.out.println();
                             break;
                         } 
                         else 
                         {
-                            System.out.println("Please enter 0 if you would like to go back to the previous menu.");
+                            System.out.println("Please make sure you are entering the Category Name and not ID.");
                         }
                     }
                     else
