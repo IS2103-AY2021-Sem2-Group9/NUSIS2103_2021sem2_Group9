@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.xml.bind.annotation.XmlTransient;
 
 
 @Entity
@@ -71,6 +72,7 @@ public class ServiceProviderEntity implements Serializable {
         this.status = status;
     }
 
+    @XmlTransient
     public List<AppointmentEntity> getAppointmentEntities() {
         return appointmentEntities;
     }

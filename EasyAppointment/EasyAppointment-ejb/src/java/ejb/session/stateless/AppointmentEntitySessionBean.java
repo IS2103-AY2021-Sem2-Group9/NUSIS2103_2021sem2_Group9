@@ -2,6 +2,7 @@ package ejb.session.stateless;
 
 import Enumeration.AppointmentStatusEnum;
 import entity.AppointmentEntity;
+import entity.CustomerEntity;
 import entity.ServiceProviderEntity;
 import java.util.List;
 import javax.ejb.Local;
@@ -46,8 +47,12 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
 
     @Override
     public void cancelAppointment(String appointmentNum) throws AppointmentNotFoundException {
-        AppointmentEntity appointment = retrieveAppointmentByAppointmentNum(appointmentNum);
-        em.remove(appointment);
+        AppointmentEntity appt = retrieveAppointmentByAppointmentNum(appointmentNum);
+        
+        appt.getCustomerEntity().getAppointments().remove(appt);
+        appt.getServiceProviderEntity().getAppointmentEntities().remove(appt);
+        
+        em.remove(appt);
     }
 
     
@@ -55,6 +60,12 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
     public AppointmentEntity createAppointmentEntity(AppointmentEntity apptEntity) throws UnknownPersistenceException, AppointmentExistException {
         try {
             em.persist(apptEntity);
+            ServiceProviderEntity spEntity = em.find(ServiceProviderEntity.class, apptEntity.getServiceProviderEntity().getServiceProviderId());
+            spEntity.getAppointmentEntities().add(apptEntity);
+            CustomerEntity custEntity = em.find(CustomerEntity.class, apptEntity.getCustomerEntity().getId());
+            custEntity.getAppointments().add(apptEntity);
+            apptEntity.setCustomerEntity(custEntity);
+            apptEntity.setServiceProviderEntity(spEntity);
             em.flush();
             return apptEntity;
         } catch (PersistenceException ex) {
@@ -95,8 +106,30 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
     }
     
     @Override
-    public void rateAppointment(AppointmentEntity appointmentEntity) {
-        em.merge(appointmentEntity);
+    public void rateAppointment(long appointmentEntityId, int rating) {
+        AppointmentEntity appt = em.find(AppointmentEntity.class,appointmentEntityId);
+        appt.setRating(rating);
+    }
+    
+        @Override
+    public void rateAppointment(AppointmentEntity appt) {
+        em.merge(appt);
         em.flush();
+    }
+    
+    @Override
+    public String retrieveAppointmentDateWithApptNum(String apptNum) throws AppointmentNotFoundException {
+        AppointmentEntity apptEntity = this.retrieveAppointmentByAppointmentNum(apptNum);
+        String dateStr = apptEntity.getAppointmentDate().toString();
+        
+        return dateStr;
+    }
+    
+    @Override
+    public String retrieveAppointmentTimeWithApptNum(String apptNum) throws AppointmentNotFoundException {
+        AppointmentEntity apptEntity = this.retrieveAppointmentByAppointmentNum(apptNum);
+        String timeStr = apptEntity.getAppointmentTime().toString();
+        
+        return timeStr;
     }
 }

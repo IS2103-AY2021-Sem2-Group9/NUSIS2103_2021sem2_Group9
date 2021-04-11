@@ -23,5 +23,9 @@ public interface AppointmentEntitySessionBeanLocal {
 
     public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
     
-    public void rateAppointment(AppointmentEntity appointmentEntity);
+    public void rateAppointment(long appointmentEntityId, int rating);
+    
+    public String retrieveAppointmentDateWithApptNum(String apptNum) throws AppointmentNotFoundException;
+    
+    public String retrieveAppointmentTimeWithApptNum(String apptNum) throws AppointmentNotFoundException;
 }

@@ -187,11 +187,11 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     @Override
     public List<LocalTime> retrieveServiceProviderAvailabilityForTheDay(ServiceProviderEntity spEntity, LocalDate appointmentDate) {
 
-        LocalTime[] timeSlots = {LocalTime.of(8, 30, 00), LocalTime.of(9, 30, 00), LocalTime.of(10, 30, 00), LocalTime.of(11, 30, 00), LocalTime.of(12, 30, 00),
-            LocalTime.of(13, 30, 00), LocalTime.of(14, 30, 00), LocalTime.of(15, 30, 00), LocalTime.of(16, 30, 00), LocalTime.of(17, 30, 00)};
+        List<LocalTime> workingTimeSlots = new ArrayList<>();
+        for (int i = 8; i <= 17; i++) {
+            workingTimeSlots.add(LocalTime.of(i, 30, 00));
+        }
 
-        List<LocalTime> workingTimeSlots = Arrays.asList(timeSlots);
-        List<LocalTime> availableTimeSlots = new ArrayList<>();
         List<AppointmentEntity> apptEntities = new ArrayList<>();
 
         try {
@@ -207,17 +207,16 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
             for (AppointmentEntity appointment : apptEntities) {
                 if (appointment.getAppointmentDate().equals(appointmentDate)) {
                     anyApptOnDate = true;
-                    for (LocalTime time : workingTimeSlots) {
-                        if (!time.equals(appointment.getAppointmentTime())) {
-                            availableTimeSlots.add(time);
-                        }
-                    }
+                    boolean removed = workingTimeSlots.remove(appointment.getAppointmentTime());
+                    System.out.println(removed);
+
                 }
             }
         }
 
         if (anyApptOnDate) {
-            return availableTimeSlots;
+            return workingTimeSlots;
+//return availableTimeSlots;
         } else {
             return workingTimeSlots;
         }
@@ -225,10 +224,15 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
 
     @Override
     public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity) {
-        List<AppointmentEntity> appts = this.appointmentEntitySessionBeanLocal.retrieveAllAppointmentsForServiceProvider(spEntity);
-        appts.add(appt);
-        em.merge(spEntity);
-        em.flush();
+        try {
+            ServiceProviderEntity svcpEntity = this.retrieveServiceProviderByServiceProviderId(spEntity.getServiceProviderId());
+            List<AppointmentEntity> appts = svcpEntity.getAppointmentEntities();
+            appts.add(appt);
+            svcpEntity.setAppointmentEntities(appts);
+        } catch (ServiceProviderEntityNotFoundException ex) {
+            System.err.println("Error occurred when retrieving service provider: " + ex.getMessage());
+        }
+
     }
 
     @Override
@@ -250,17 +254,20 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         for (Integer rating : listOfRatings) {
             totalRating += rating.doubleValue();
         }
-        overallRating = totalRating / listOfRatings.size();
-        return overallRating;
+
+        if (listOfRatings.isEmpty()) {
+            return 0;
+        } else {
+            overallRating = totalRating / listOfRatings.size(); // no ratings cannot divide by 0 - output: "thrs no rating yet"
+            return overallRating;
+        }
     }
-    
+
     @Override
-    public List<AppointmentEntity> retrieveAppointmentsOfServiceProviderById(Long serviceProviderId) throws ServiceProviderEntityNotFoundException
-    {
+    public List<AppointmentEntity> retrieveAppointmentsOfServiceProviderById(Long serviceProviderId) throws ServiceProviderEntityNotFoundException {
         ServiceProviderEntity serviceProviderEntity = retrieveServiceProviderByServiceProviderId(serviceProviderId);
         List<AppointmentEntity> apptEntities = serviceProviderEntity.getAppointmentEntities();
         apptEntities.size();
         return apptEntities;
     }
 }
-

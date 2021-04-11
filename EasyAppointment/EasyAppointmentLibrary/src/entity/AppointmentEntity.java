@@ -154,6 +154,7 @@ public class AppointmentEntity implements Serializable {
     /**
      * @return the customerEntity
      */
+    @XmlTransient
     public CustomerEntity getCustomerEntity() {
         return customerEntity;
     }
