@@ -7,6 +7,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import ws.client.AppointmentEntity;
 import ws.client.BusinessCategoryEntity;
 import ws.client.CustomerEntity;
@@ -14,6 +16,7 @@ import ws.client.ServiceProviderEntity;
 import ws.client.AppointmentExistException_Exception;
 import ws.client.AppointmentNotFoundException_Exception;
 import ws.client.BusinessCategoryNotFoundException_Exception;
+import ws.client.CustomerExistException_Exception;
 import ws.client.CustomerNotFoundException_Exception;
 import ws.client.ServiceProviderEntityNotFoundException_Exception;
 import ws.client.UnknownPersistenceException_Exception;
@@ -21,21 +24,18 @@ import ws.client.UnknownPersistenceException_Exception;
 public class CustomerModule {
 
     private CustomerEntity loggedInCustomerEntity;
-    
-    public CustomerModule() 
-    {
+
+    public CustomerModule() {
     }
-    
-    public CustomerModule(CustomerEntity loggedInCustomerEntity) 
-    {
+
+    public CustomerModule(CustomerEntity loggedInCustomerEntity) {
         this.loggedInCustomerEntity = loggedInCustomerEntity;
     }
-    
-    public void mainMenu()
-    {
+
+    public void mainMenu() {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
-        
+
         while (true) {
             System.out.println("*** Customer Terminal :: Main ***\n");
             System.out.println("You are now logged in as " + loggedInCustomerEntity.getFirstName() + " " + loggedInCustomerEntity.getLastName() + "\n");
@@ -75,7 +75,7 @@ public class CustomerModule {
             }
         }
     }
-    
+
     public LocalDate searchOperation() {
         Scanner sc = new Scanner(System.in);
 
@@ -122,7 +122,7 @@ public class CustomerModule {
 //                LocalTime temp = retrieveServiceProviderAvailabilityForTheDay(currentSP, dateStr).get(0);
                 String firstAvaiTime = retrieveServiceProviderAvailabilityForTheDay(currentSP, dateStr).get(0);
                 String address = currentSP.getAddress();
-                Double rating = generateOverallRating(currentSP); 
+                Double rating = generateOverallRating(currentSP);
 
                 System.out.printf("%-20d | %-15s | %-20s | %-15s | %.2f", spId, name, firstAvaiTime, address, rating);
                 System.out.println("\n");
@@ -135,7 +135,7 @@ public class CustomerModule {
         }
 
     }
-    
+
     public LocalDate searchForAddingAppt() { // Strictly for addAppointments()
         Scanner sc = new Scanner(System.in);
 
@@ -190,11 +190,18 @@ public class CustomerModule {
                 Double rating = generateOverallRating(currentSP);
 
                 // Print headers
-                System.out.printf("%-20s | %-15s | %-20s | %-15s | %-15s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
+                System.out.printf("%-20s | %-20s | %-20s | %-20s | %-15s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
                 System.out.println("\n");
-                // Print records
-                System.out.printf("%-20d | %-15s | %-20s | %-15s | %.2f", spId, name, firstAvaiTime, address, rating);
-                System.out.println("\n");
+                if (rating == 0) {
+                    // Print records
+                    System.out.printf("%-20d | %-20s | %-20s | %-20s | %s", spId, name, firstAvaiTime, address, "No Ratings");
+                    System.out.println("\n");
+                } else {
+                    // Print records
+                    System.out.printf("%-20d | %-20s | %-20s | %-20s | %.2f", spId, name, firstAvaiTime, address, rating);
+                    System.out.println("\n");
+                }
+
             }
 
             return date;
@@ -204,12 +211,12 @@ public class CustomerModule {
         }
 
     }
-    
+
     public void addAppointments() {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("*** Customer Terminal :: Add Appointments ***\n");
-        LocalDate date = this.searchForAddingAppt(); 
+        LocalDate date = this.searchForAddingAppt();
 
         try {
             System.out.println("Enter 0 to go back to the previous menu.");
@@ -224,10 +231,10 @@ public class CustomerModule {
             ServiceProviderEntity spEntity = retrieveServiceProviderByServiceProviderId(spId);
             List<String> availableTimeSlotsStr = retrieveServiceProviderAvailabilityForTheDay(spEntity, date.toString());
             List<LocalTime> availableTimeSlots = new ArrayList<>();
-            for (int i = 0; i < availableTimeSlotsStr.size(); i ++) {
+            for (int i = 0; i < availableTimeSlotsStr.size(); i++) {
                 availableTimeSlots.add(LocalTime.parse(availableTimeSlotsStr.get(i)));
             }
-            
+
             List<String> avaiList = new ArrayList<>();
 
             int compare = LocalDate.now().compareTo(date);
@@ -280,32 +287,19 @@ public class CustomerModule {
             if (timeStr.equals("0")) {
                 return; // Break out of method
             }
-            LocalTime selectedTimeSlot = LocalTime.parse(timeStr);
+//            LocalTime selectedTimeSlot = LocalTime.parse(timeStr);
             System.out.println();
 
-            try {
-                // Construct Appointment Entity
-//                AppointmentEntity apptEntity = new AppointmentEntity(date, selectedTimeSlot, loggedInCustomerEntity, spEntity);
-               // AppointmentEntity apptEntity = new AppointmentEntity();
-               // apptEntity.setAppointmentDate(date);
-              //  apptEntity.setAppointmentTime(selectedTimeSlot);
-                //set customer entity
-                //set sp entity
-                AppointmentEntity apptEntity = createAppointmentEntity(date.toString(), timeStr, loggedInCustomerEntity.getId(), spEntity.getServiceProviderId());
-                
-                //addAppointment(apptEntity, spEntity);
+            AppointmentEntity appt = createAppointmentEntity(date.toString(), timeStr, loggedInCustomerEntity.getId(), spEntity.getServiceProviderId()); // customer side
+            addAppointment(date.toString(), timeStr, appt.getAppointmentNum(), spEntity.getServiceProviderId()); // sp side
 
-            } catch (UnknownPersistenceException_Exception | AppointmentExistException_Exception | CustomerNotFoundException_Exception ex) {
-                System.err.println("Error occured when creating appointment: " + ex.getMessage());
-            } 
-
-            System.out.printf("The appointment with %s %s at %s on %s is confirmed.", this.loggedInCustomerEntity.getFirstName(), this.loggedInCustomerEntity.getLastName(), selectedTimeSlot, date.toString());
+            System.out.printf("The appointment with %s %s at %s on %s is confirmed.", this.loggedInCustomerEntity.getFirstName(), this.loggedInCustomerEntity.getLastName(), timeStr, date.toString());
             System.out.println();
 
         } catch (DateTimeException ex) {
             System.out.println("Error occurred when reading date: " + ex.getMessage() + "\n");
-        } catch (ServiceProviderEntityNotFoundException_Exception ex) {
-            System.out.println("Error occurred when retrieving Service Provider: " + ex.getMessage() + "\n");
+        } catch (ServiceProviderEntityNotFoundException_Exception | UnknownPersistenceException_Exception | AppointmentExistException_Exception | CustomerNotFoundException_Exception | AppointmentNotFoundException_Exception ex) {
+            Logger.getLogger(CustomerModule.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         System.out.println("Enter 0 to go back to previous menu");
@@ -320,10 +314,8 @@ public class CustomerModule {
             }
         }
     }
-    
-    public void viewAppointments() {
-        Scanner sc = new Scanner(System.in);
 
+    public void viewAppointments() {
         System.out.println("*** Customer Terminal :: View Appointments ***\n");
 
         try {
@@ -337,26 +329,25 @@ public class CustomerModule {
                 for (int i = 0; i < appointments.size(); i++) {
                     AppointmentEntity appt = appointments.get(i);
                     String apptNum = appt.getAppointmentNum();
-                    String apptDate = appt.getAppointmentDate().toString();
-                    String apptTime = appt.getAppointmentTime().toString();
+                    String dateStr = retrieveAppointmentDateWithApptNum(apptNum);
+                    String timeStr = retrieveAppointmentTimeWithApptNum(apptNum);
                     String apptSPName = appt.getServiceProviderEntity().getName();
 
                     // Print records
-                    System.out.printf("%-20s | %-20s | %-20s | %s", apptNum, apptDate, apptTime, apptSPName);
+                    System.out.printf("%-20s | %-20s | %-20s | %s", apptNum, dateStr, timeStr, apptSPName);
                     System.out.println();
                 }
             } else {
                 System.out.println("There are currently no appointments.");
             }
             System.out.println();
-        } catch (CustomerNotFoundException_Exception ex) {
+        } catch (CustomerNotFoundException_Exception | AppointmentNotFoundException_Exception ex) {
             System.err.println("Error occurred when retrieving customer: " + ex.getMessage());
         }
 
     }
-    
+
     public void viewForCancellingAppt() {
-        Scanner sc = new Scanner(System.in);
         try {
             List<AppointmentEntity> appointments = retrieveCustomerEntityAppointments(this.loggedInCustomerEntity.getId());
 
@@ -367,42 +358,41 @@ public class CustomerModule {
                 System.out.println("\n");
                 for (int i = 0; i < appointments.size(); i++) {
                     AppointmentEntity appt = appointments.get(i);
-                    String apptID = appt.getId().toString();
                     String apptNum = appt.getAppointmentNum();
-                    String apptDate = appt.getAppointmentDate().toString();
-                    String apptTime = appt.getAppointmentTime().toString();
+                    String dateStr = retrieveAppointmentDateWithApptNum(apptNum);
+                    String timeStr = retrieveAppointmentTimeWithApptNum(apptNum);
                     String apptSPName = appt.getServiceProviderEntity().getName();
 
                     // Print records
-                    System.out.printf("%-20s | %-20s | %-20s | %s", apptNum, apptDate, apptTime, apptSPName);
+                    System.out.printf("%-20s | %-20s | %-20s | %s", apptNum, dateStr, timeStr, apptSPName);
                     System.out.println();
                 }
             } else {
                 System.out.println("There are currently no appointments.");
             }
             System.out.println();
-        } catch (CustomerNotFoundException_Exception ex) {
+        } catch (CustomerNotFoundException_Exception | AppointmentNotFoundException_Exception ex) {
             System.err.println("Error occurred when retrieving customer: " + ex.getMessage());
         }
 
     }
-    
+
     public void cancelAppointments() {
 
         Scanner sc = new Scanner(System.in);
         String appointmentNum;
         System.out.println("*** Customer terminal :: Cancel Appointment ***\n");
-        this.viewAppointments();
-        System.out.print("Enter Appointment ID> ");
+        this.viewForCancellingAppt();
+        System.out.print("Enter Appointment Number> ");
         appointmentNum = sc.nextLine().trim();
         try {
-            cancelAppointment(appointmentNum);
+            cancelAppointment(appointmentNum); 
             System.out.println("Appointment " + appointmentNum + " has been cancelled successfully.\n");
         } catch (AppointmentNotFoundException_Exception ex) {
             System.out.println("An error has occured when cancelling the appointment: " + ex.getMessage());
         }
     }
-    
+
     public void rateServiceProvider() {
         Scanner sc = new Scanner(System.in);
 
@@ -432,8 +422,11 @@ public class CustomerModule {
                 System.out.println("\n");
                 for (int i = 0; i < apptsToRate.size(); i++) {
                     AppointmentEntity apptEntity = apptsToRate.get(i);
-                   // System.out.printf("%-5s | %-20s | %-20s | %-20s | %s", i + 1, apptEntity.getAppointmentNum(), apptEntity.getAppointmentDate(),
-                   //         apptEntity.getAppointmentTime(), apptEntity.getServiceProviderEntity().getName());
+                    String apptNum = apptEntity.getAppointmentNum();
+                    String dateStr = retrieveAppointmentDateWithApptNum(apptNum);
+                    String timeStr = retrieveAppointmentTimeWithApptNum(apptNum);
+                    System.out.printf("%-5s | %-20s | %-20s | %-20s | %s", i + 1, apptNum, dateStr,
+                            timeStr, apptEntity.getServiceProviderEntity().getName());
                     System.out.println();
                 }
 
@@ -446,70 +439,33 @@ public class CustomerModule {
                         System.out.print("Invalid index. Enter index again> ");
                         index = sc.nextInt();
                     }
-                    
+
                     System.out.print("Enter rating> ");
                     Integer rating = sc.nextInt();
                     while (rating < 1 || rating > 5) {
                         System.out.print("Invalid rating. Enter rating again> ");
                         rating = sc.nextInt();
                     }
-                    
+
                     System.out.println();
                     AppointmentEntity apptEntity = apptsToRate.get(index - 1);
-                    apptEntity.setRating(rating);
-                    rateAppointment(apptEntity);
-                    System.out.println("You have rated Appointment" + apptEntity.getAppointmentNum() + " a rating of " + rating + ".");
+                    //apptEntity.setRating(rating);
+                    rateAppointment(apptEntity.getId(), rating);
+                    System.out.println("You have rated Appointment " + apptEntity.getAppointmentNum() + " a rating of " + rating + ".");
                 }
             }
 
-        } catch (CustomerNotFoundException_Exception ex) {
+        } catch (CustomerNotFoundException_Exception | AppointmentNotFoundException_Exception ex) {
             System.out.println("An error has occured when retrieving the appointments: " + ex.getMessage());
         }
 
     }
-    
-    // WS
 
+    // WS
     private static java.util.List<ws.client.BusinessCategoryEntity> retrieveAllBusinessCategories() {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
         return port.retrieveAllBusinessCategories();
-    }
-    
-    private static double generateOverallRating(ws.client.ServiceProviderEntity spEntity) {
-        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
-        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
-        return port.generateOverallRating(spEntity);
-    }
-
-    private static ServiceProviderEntity retrieveServiceProviderByServiceProviderId(java.lang.Long serviceProviderId) throws ServiceProviderEntityNotFoundException_Exception {
-        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
-        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
-        return port.retrieveServiceProviderByServiceProviderId(serviceProviderId);
-    }
-
-    private static void addAppointment(ws.client.AppointmentEntity appt, ws.client.ServiceProviderEntity spEntity) {
-        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
-        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
-        port.addAppointment(appt, spEntity);
-    }
-
-    private static java.util.List<ws.client.AppointmentEntity> retrieveCustomerEntityAppointments(java.lang.Long customerId) throws CustomerNotFoundException_Exception {
-        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
-        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
-        return port.retrieveCustomerEntityAppointments(customerId);
-    }
-
-    private static void cancelAppointment(java.lang.String appointmentNum) throws AppointmentNotFoundException_Exception {
-        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
-        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
-        port.cancelAppointment(appointmentNum);
-    }
-
-    private static void rateAppointment(ws.client.AppointmentEntity appointmentEntity) {
-        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
-        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
-        port.rateAppointment(appointmentEntity);
     }
 
     private static java.util.List<ws.client.ServiceProviderEntity> retrieveAllAvailableServiceProvidersForTheDay(java.lang.String appointmentDate, java.lang.Long category, java.lang.String city) throws BusinessCategoryNotFoundException_Exception {
@@ -524,11 +480,58 @@ public class CustomerModule {
         return port.retrieveServiceProviderAvailabilityForTheDay(spEntity, appointmentDate);
     }
 
-    private static AppointmentEntity createAppointmentEntity(java.lang.String appointmentDate, java.lang.String apptTime, java.lang.Long customerId, java.lang.Long spId) throws AppointmentExistException_Exception, UnknownPersistenceException_Exception, ServiceProviderEntityNotFoundException_Exception, CustomerNotFoundException_Exception {
+    private static double generateOverallRating(ws.client.ServiceProviderEntity spEntity) {
+        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
+        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
+        return port.generateOverallRating(spEntity);
+    }
+
+    private static ServiceProviderEntity retrieveServiceProviderByServiceProviderId(java.lang.Long serviceProviderId) throws ServiceProviderEntityNotFoundException_Exception {
+        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
+        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
+        return port.retrieveServiceProviderByServiceProviderId(serviceProviderId);
+    }
+
+    private static void cancelAppointment(java.lang.String appointmentNum) throws AppointmentNotFoundException_Exception {
+        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
+        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
+        port.cancelAppointment(appointmentNum);
+    }
+
+    private static java.util.List<ws.client.AppointmentEntity> retrieveCustomerEntityAppointments(java.lang.Long customerId) throws CustomerNotFoundException_Exception {
+        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
+        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
+        return port.retrieveCustomerEntityAppointments(customerId);
+    }
+
+    private static String retrieveAppointmentDateWithApptNum(java.lang.String apptNum) throws AppointmentNotFoundException_Exception {
+        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
+        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
+        return port.retrieveAppointmentDateWithApptNum(apptNum);
+    }
+
+    private static String retrieveAppointmentTimeWithApptNum(java.lang.String apptNum) throws AppointmentNotFoundException_Exception {
+        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
+        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
+        return port.retrieveAppointmentTimeWithApptNum(apptNum);
+    }
+
+    private static void addAppointment(java.lang.String dateStr, java.lang.String timeStr, java.lang.String apptNum, java.lang.Long spId) throws AppointmentNotFoundException_Exception, ServiceProviderEntityNotFoundException_Exception, CustomerNotFoundException_Exception {
+        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
+        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
+        port.addAppointment(dateStr, timeStr, apptNum, spId);
+    }
+
+    private static AppointmentEntity createAppointmentEntity(java.lang.String appointmentDate, java.lang.String apptTime, java.lang.Long customerId, java.lang.Long spId) throws UnknownPersistenceException_Exception, ServiceProviderEntityNotFoundException_Exception, AppointmentExistException_Exception, CustomerNotFoundException_Exception {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
         return port.createAppointmentEntity(appointmentDate, apptTime, customerId, spId);
     }
 
-    
+    private static void rateAppointment(long apptEntityId, int rating) {
+        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
+        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
+        port.rateAppointment(apptEntityId, rating);
+    }
+
 }

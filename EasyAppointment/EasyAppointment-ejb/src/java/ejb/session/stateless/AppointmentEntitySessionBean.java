@@ -28,6 +28,11 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
 
     @PersistenceContext(unitName = "EasyAppointment-ejbPU")
     private EntityManager em;
+    
+    @EJB
+    private CustomerEntitySessionBeanLocal customerEntitysessionBeanLocal;
+    @EJB
+    private ServiceProviderEntitySessionBeanLocal serviceProviderEntitysessionBeanLocal;
 
     @Override
     public List<AppointmentEntity> retrieveAllAppointments() {
@@ -35,11 +40,6 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
 
         return query.getResultList();
     }
-    
-    @EJB
-    private CustomerEntitySessionBeanLocal customerEntitysessionBeanLocal;
-    @EJB
-    private ServiceProviderEntitySessionBeanLocal serviceProviderEntitysessionBeanLocal;
 
     @Override
     public AppointmentEntity retrieveAppointmentByAppointmentNum(String appointmentNum) throws AppointmentNotFoundException {
@@ -55,20 +55,24 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
 
     @Override
     public void cancelAppointment(String appointmentNum) throws AppointmentNotFoundException {
-        AppointmentEntity appointment = retrieveAppointmentByAppointmentNum(appointmentNum);
-        em.remove(appointment);
+        AppointmentEntity appt = retrieveAppointmentByAppointmentNum(appointmentNum);
+        
+        appt.getCustomerEntity().getAppointments().remove(appt);
+        appt.getServiceProviderEntity().getAppointmentEntities().remove(appt);
+        
+        em.remove(appt);
     }
 
     
     @Override
     public AppointmentEntity createAppointmentEntity(AppointmentEntity apptEntity) throws UnknownPersistenceException, AppointmentExistException {
         try {
-            CustomerEntity managedCustomer = customerEntitysessionBeanLocal.retrieveCustomerEntityById(apptEntity.getCustomerEntity().getId());
-            ServiceProviderEntity managedSp = serviceProviderEntitysessionBeanLocal.retrieveServiceProviderByServiceProviderId(apptEntity.getServiceProviderEntity().getServiceProviderId());
-            managedCustomer.getAppointments().add(apptEntity);
-            managedSp.getAppointmentEntities().add(apptEntity);
-            apptEntity.setCustomerEntity(managedCustomer);
-            apptEntity.setServiceProviderEntity(managedSp);
+            ServiceProviderEntity spEntity = em.find(ServiceProviderEntity.class, apptEntity.getServiceProviderEntity().getServiceProviderId());
+            spEntity.getAppointmentEntities().add(apptEntity);
+            CustomerEntity custEntity = em.find(CustomerEntity.class, apptEntity.getCustomerEntity().getId());
+            custEntity.getAppointments().add(apptEntity);
+            apptEntity.setCustomerEntity(custEntity);
+            apptEntity.setServiceProviderEntity(spEntity);
             em.persist(apptEntity);
             em.flush();
             return apptEntity;
@@ -86,8 +90,48 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
     }
 
     @Override
-    public void rateAppointment(AppointmentEntity appointmentEntity) {
-        em.merge(appointmentEntity);
+    public AppointmentEntity updateAppointmentEntity(AppointmentEntity apptEntity) {
+        em.merge(apptEntity);
         em.flush();
+        return apptEntity;
+    }
+
+    @Override
+    public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
+        Query query = em.createQuery("SELECT a FROM AppointmentEntity a WHERE a.serviceProviderEntity.serviceProviderId = :serviceProviderEntityId AND a.appointmentStatusEnum = :status");
+        query.setParameter("serviceProviderEntityId", serviceProviderEntity.getServiceProviderId());
+        query.setParameter("status", AppointmentStatusEnum.UPCOMING);
+        List<AppointmentEntity> result = query.getResultList();
+        return result;
+    }
+    
+    @Override
+    public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
+        Query query = em.createQuery("SELECT a FROM AppointmentEntity a WHERE a.serviceProviderEntity.serviceProviderId = :serviceProviderEntityId");
+        query.setParameter("serviceProviderEntityId", serviceProviderEntity.getServiceProviderId());
+        List<AppointmentEntity> result = query.getResultList();
+        return result;     
+    }
+    
+    @Override
+    public void rateAppointment(long appointmentEntityId, int rating) {
+        AppointmentEntity appt = em.find(AppointmentEntity.class,appointmentEntityId);
+        appt.setRating(rating);
+    }
+    
+    @Override
+    public String retrieveAppointmentDateWithApptNum(String apptNum) throws AppointmentNotFoundException {
+        AppointmentEntity apptEntity = this.retrieveAppointmentByAppointmentNum(apptNum);
+        String dateStr = apptEntity.getAppointmentDate().toString();
+        
+        return dateStr;
+    }
+    
+    @Override
+    public String retrieveAppointmentTimeWithApptNum(String apptNum) throws AppointmentNotFoundException {
+        AppointmentEntity apptEntity = this.retrieveAppointmentByAppointmentNum(apptNum);
+        String timeStr = apptEntity.getAppointmentTime().toString();
+        
+        return timeStr;
     }
 }

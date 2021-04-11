@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import Enumeration.ServiceProviderStatus;
 import entity.AppointmentEntity;
+import entity.CustomerEntity;
 import entity.ServiceProviderEntity;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -51,7 +52,7 @@ public interface ServiceProviderEntitySessionBeanRemote
     public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
 
     public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
-  
+         
     public List<AppointmentEntity> retrieveAppointmentsOfServiceProviderById(Long serviceProviderId) throws ServiceProviderEntityNotFoundException;
 
     public double generateOverallRating(ServiceProviderEntity spEntity);

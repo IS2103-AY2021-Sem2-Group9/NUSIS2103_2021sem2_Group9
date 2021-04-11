@@ -2,6 +2,7 @@ package ejb.session.stateless;
 
 import Enumeration.ServiceProviderStatus;
 import entity.AppointmentEntity;
+import entity.CustomerEntity;
 import entity.ServiceProviderEntity;
 import java.time.LocalDate;
 import java.time.LocalTime;

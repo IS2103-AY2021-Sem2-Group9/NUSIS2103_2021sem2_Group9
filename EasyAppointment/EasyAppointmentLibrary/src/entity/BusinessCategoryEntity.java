@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
 @Entity
 public class BusinessCategoryEntity implements Serializable {
@@ -18,8 +17,6 @@ public class BusinessCategoryEntity implements Serializable {
     private Long id;
     @Column(nullable = false, length = 32, unique = true)
     private String categoryName;
-    @OneToMany(mappedBy = "category")
-    private List<ServiceProviderEntity> serviceProviderEntities;
 
     public BusinessCategoryEntity() {
     }
