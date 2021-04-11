@@ -12,6 +12,7 @@ import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UpdateServiceProviderException;
 import java.util.List;
 import util.exception.AppointmentNotFoundException;
+import util.exception.InvalidPasswordFormatException;
 
 public class ServiceProviderModule {
     
@@ -161,7 +162,7 @@ public class ServiceProviderModule {
         try {
             serviceProviderEntitySessionBeanRemote.updateServiceProvider(currentServiceProviderEntity);
             System.out.println("Service Provider Profile updated successfully!\n");
-        } catch(ServiceProviderEntityNotFoundException | UpdateServiceProviderException ex) {
+        } catch(ServiceProviderEntityNotFoundException | UpdateServiceProviderException | InvalidPasswordFormatException ex) {
             System.out.println("An error has occured while updating staff: " + ex.getMessage() + "\n");
         }
 

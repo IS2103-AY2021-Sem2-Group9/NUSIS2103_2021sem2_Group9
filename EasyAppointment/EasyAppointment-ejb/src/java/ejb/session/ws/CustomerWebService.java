@@ -25,6 +25,7 @@ import util.exception.BusinessCategoryNotFoundException;
 import util.exception.CustomerExistException;
 import util.exception.CustomerNotFoundException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.InvalidPasswordFormatException;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UnknownPersistenceException;
 
@@ -48,7 +49,7 @@ public class CustomerWebService {
     private BusinessCategorySessionBeanLocal businessCategorySessionBeanLocal;
 
     @WebMethod(operationName = "createCustomerEntity")
-    public CustomerEntity createCustomerEntity(@WebParam(name = "customerEntity") CustomerEntity customerEntity) throws UnknownPersistenceException, CustomerExistException {
+    public CustomerEntity createCustomerEntity(@WebParam(name = "customerEntity") CustomerEntity customerEntity) throws UnknownPersistenceException, CustomerExistException, InvalidPasswordFormatException {
         return customerEntitySessionBeanLocal.createCustomerEntity(customerEntity);
     }
 

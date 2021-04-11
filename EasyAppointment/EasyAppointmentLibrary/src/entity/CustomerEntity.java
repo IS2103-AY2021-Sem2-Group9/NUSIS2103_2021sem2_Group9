@@ -22,8 +22,8 @@ public class CustomerEntity implements Serializable {
     private String identityNumber;
     @Column(nullable = false, length = 64)
     private String email;
-    @Column(nullable = false, length = 64)
-    private Integer password;
+    @Column(nullable = false, length = 286)
+    private String password;
     @Column(nullable = false, length = 32)
     private String firstName;
     @Column(nullable = false, length = 32)
@@ -46,7 +46,7 @@ public class CustomerEntity implements Serializable {
         this.appointments = new ArrayList<>();
     }
 
-    public CustomerEntity(String identityNumber, String email, Integer password, String firstName, String lastName, String gender, Integer age, String phoneNumber, String address, String city) {
+    public CustomerEntity(String identityNumber, String email, String password, String firstName, String lastName, String gender, Integer age, String phoneNumber, String address, String city) {
         this.identityNumber = identityNumber;
         this.email = email;
         this.password = password;
@@ -99,14 +99,14 @@ public class CustomerEntity implements Serializable {
     /**
      * @return the password
      */
-    public Integer getPassword() {
+    public String getPassword() {
         return password;
     }
 
     /**
      * @param password the password to set
      */
-    public void setPassword(Integer password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 

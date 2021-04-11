@@ -5,6 +5,7 @@ import java.util.Scanner;
 import ws.client.CustomerEntity;
 import ws.client.CustomerExistException_Exception;
 import ws.client.InvalidLoginCredentialException_Exception;
+import ws.client.InvalidPasswordFormatException_Exception;
 import ws.client.UnknownPersistenceException_Exception;
 
 public class CustomerTerminal 
@@ -50,7 +51,7 @@ public class CustomerTerminal
                         CustomerModule customerModule = new CustomerModule(loggedInCustomerEntity);
                         customerModule.mainMenu();
                     } 
-                    catch (CustomerExistException_Exception | UnknownPersistenceException_Exception ex) 
+                    catch (CustomerExistException_Exception | UnknownPersistenceException_Exception | InvalidPasswordFormatException_Exception ex) 
                     {
                         System.out.println("An error occured while registering: " + ex.getMessage());
                         System.out.println();
@@ -90,7 +91,7 @@ public class CustomerTerminal
         }
     }
     
-    public void doRegistration() throws UnknownPersistenceException_Exception, CustomerExistException_Exception 
+    public void doRegistration() throws UnknownPersistenceException_Exception, CustomerExistException_Exception, InvalidPasswordFormatException_Exception 
     {
         Scanner scanner = new Scanner(System.in);
 
@@ -101,8 +102,7 @@ public class CustomerTerminal
         System.out.print("Enter Email> ");
         String email = scanner.nextLine().trim();
         System.out.print("Enter Password> ");
-        Integer password = scanner.nextInt();
-        scanner.nextLine();
+        String password = scanner.nextLine().trim();
         System.out.print("Enter First Name> ");
         String firstName = scanner.nextLine().trim();
         System.out.print("Enter Last Name> ");
@@ -138,7 +138,7 @@ public class CustomerTerminal
         System.out.print("Enter City> ");
         String city = scanner.nextLine().trim();
         
-        if (iDNum.length() > 0 && email.length() > 0 && password.toString().length() > 0
+        if (iDNum.length() > 0 && email.length() > 0 && password.length() > 0
                 && firstName.length() > 0 && lastName.length() > 0 && gender.length() > 0
                 && age.toString().length() > 0 && phoneNum.length() > 0 && address.length() > 0
                 && city.length() > 0) 
@@ -183,17 +183,15 @@ public class CustomerTerminal
         }
     }
 
+    private static CustomerEntity createCustomerEntity(ws.client.CustomerEntity customerEntity) throws InvalidPasswordFormatException_Exception, CustomerExistException_Exception, UnknownPersistenceException_Exception {
+        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
+        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
+        return port.createCustomerEntity(customerEntity);
+    }
 
     private static CustomerEntity customerLogin(java.lang.String email, java.lang.Integer password) throws InvalidLoginCredentialException_Exception {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
         return port.customerLogin(email, password);
     }
-    
-    private static CustomerEntity createCustomerEntity(ws.client.CustomerEntity customerEntity) throws UnknownPersistenceException_Exception, CustomerExistException_Exception {
-        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
-        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
-        return port.createCustomerEntity(customerEntity);
-    }
-
 }
