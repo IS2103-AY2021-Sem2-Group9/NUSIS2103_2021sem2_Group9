@@ -6,6 +6,7 @@ import entity.ServiceProviderEntity;
 import entity.AppointmentEntity;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -135,13 +136,11 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         if (serviceProviderEntity.getServiceProviderId() != null) {
             ServiceProviderEntity serviceProviderEntityToUpdate = retrieveServiceProviderByServiceProviderId(serviceProviderEntity.getServiceProviderId());
 
-            if (serviceProviderEntityToUpdate.getEmail().equals(serviceProviderEntity.getEmail())) {
-                serviceProviderEntityToUpdate.setName(serviceProviderEntity.getName());
-                serviceProviderEntityToUpdate.setCategory(serviceProviderEntity.getCategory());
-                serviceProviderEntityToUpdate.setUen(serviceProviderEntity.getUen());
+            if (serviceProviderEntityToUpdate.getServiceProviderId().equals(serviceProviderEntity.getServiceProviderId())) {
                 serviceProviderEntityToUpdate.setCity(serviceProviderEntity.getCity());
-                serviceProviderEntityToUpdate.setPhoneNumber(serviceProviderEntity.getPhoneNumber());
                 serviceProviderEntityToUpdate.setAddress(serviceProviderEntity.getAddress());
+                serviceProviderEntityToUpdate.setEmail(serviceProviderEntity.getEmail());
+                serviceProviderEntityToUpdate.setPhoneNumber(serviceProviderEntity.getPhoneNumber());
                 serviceProviderEntityToUpdate.setPassword(serviceProviderEntity.getPassword());
 
             } else {
@@ -289,7 +288,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     }
 
     @Override
-    public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
+    public List<AppointmentEntity> retrieveUnratedAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
         Query query = em.createQuery("SELECT a FROM AppointmentEntity a WHERE a.serviceProviderEntity.serviceProviderId = :serviceProviderEntityId AND a.rating = :rating");
         query.setParameter("serviceProviderEntityId", serviceProviderEntity.getServiceProviderId());
         query.setParameter("rating", 0);
@@ -311,5 +310,25 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         List<AppointmentEntity> apptEntities = serviceProviderEntity.getAppointmentEntities();
         apptEntities.size();
         return apptEntities;
+    }
+    
+    @Override
+    public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
+        List<AppointmentEntity> allAppointments = retrieveAllAppointmentsForServiceProvider(serviceProviderEntity); 
+        List<AppointmentEntity> result = new ArrayList<>();
+        for(AppointmentEntity appt : allAppointments) {
+            LocalTime now = LocalTime.now(); 
+            LocalTime time = appt.getAppointmentTime();
+            Long timeDiff = ChronoUnit.HOURS.between(now, time) + ChronoUnit.MINUTES.between(now, time);
+            System.out.println(timeDiff);
+            int compare = appt.getAppointmentDate().compareTo(LocalDate.now());
+            System.out.println(compare);
+            if(appt.getRating() == 0 && compare > 0 ) {
+                result.add(appt);
+            } else if (appt.getRating() == 0 && compare == 0 && timeDiff > 0) {
+                result.add(appt);
+            }
+        }
+        return result;
     }
 }

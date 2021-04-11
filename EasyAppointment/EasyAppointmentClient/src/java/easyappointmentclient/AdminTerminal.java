@@ -5,6 +5,7 @@ import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
 import entity.AdminEntity;
+import java.util.InputMismatchException;
 
 import java.util.Scanner;
 import javax.jms.ConnectionFactory;
@@ -50,7 +51,12 @@ public class AdminTerminal {
             while (response < 1 || response > 2)
             {
                 System.out.print("> ");
-                response = scanner.nextInt();
+                try {
+                    response = scanner.nextInt();
+                } catch (InputMismatchException ex) {
+                    System.err.println("Please input digits only.");
+                    scanner.next();
+                }
                 
                 if (response == 1) 
                 {
