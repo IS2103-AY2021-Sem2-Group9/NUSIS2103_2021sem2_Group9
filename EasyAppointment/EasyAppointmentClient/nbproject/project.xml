@@ -12,7 +12,7 @@
                 <root id="test.src.dir"/>
             </test-roots>
             <included-library dirs="200">reference.EasyAppointmentLibrary.jar</included-library>
-            <included-library dirs="200">libs.javaee-api-8.0.classpath</included-library>
+            <included-library dirs="200">libs.Java_EE_8_API_Library.classpath</included-library>
         </data>
         <references xmlns="http://www.netbeans.org/ns/ant-project-references/1">
             <reference>

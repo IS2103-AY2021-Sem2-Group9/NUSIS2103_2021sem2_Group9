@@ -14,6 +14,7 @@
         <mkdir dir="${build.generated.sources.dir}/jax-ws"/>
         <taskdef name="wsimport" classname="com.sun.tools.ws.ant.WsImport">
             <classpath path="${libs.jaxws21.classpath}"/>
+            <classpath path="${libs.jaxb.classpath}"/>
         </taskdef>
     </target>
     <target name="wsimport-client-CustomerWebService" depends="wsimport-init">
