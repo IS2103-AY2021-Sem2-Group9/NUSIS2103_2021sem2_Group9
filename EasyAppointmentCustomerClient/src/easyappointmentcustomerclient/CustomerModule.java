@@ -229,6 +229,7 @@ public class CustomerModule {
             sc.nextLine();
 
             ServiceProviderEntity spEntity = retrieveServiceProviderByServiceProviderId(spId);
+            // check if service provider belongs to city
             List<String> availableTimeSlotsStr = retrieveServiceProviderAvailabilityForTheDay(spEntity, date.toString());
             List<LocalTime> availableTimeSlots = new ArrayList<>();
             for (int i = 0; i < availableTimeSlotsStr.size(); i++) {
@@ -291,14 +292,14 @@ public class CustomerModule {
             System.out.println();
 
             AppointmentEntity appt = createAppointmentEntity(date.toString(), timeStr, loggedInCustomerEntity.getId(), spEntity.getServiceProviderId()); // customer side
-            addAppointment(date.toString(), timeStr, appt.getAppointmentNum(), spEntity.getServiceProviderId()); // sp side
+            // addAppointment(date.toString(), timeStr, appt.getAppointmentNum(), spEntity.getServiceProviderId()); // sp side
 
             System.out.printf("The appointment with %s %s at %s on %s is confirmed.", this.loggedInCustomerEntity.getFirstName(), this.loggedInCustomerEntity.getLastName(), timeStr, date.toString());
             System.out.println();
 
         } catch (DateTimeException ex) {
             System.out.println("Error occurred when reading date: " + ex.getMessage() + "\n");
-        } catch (ServiceProviderEntityNotFoundException_Exception | UnknownPersistenceException_Exception | AppointmentExistException_Exception | CustomerNotFoundException_Exception | AppointmentNotFoundException_Exception ex) {
+        } catch (ServiceProviderEntityNotFoundException_Exception | UnknownPersistenceException_Exception | AppointmentExistException_Exception | CustomerNotFoundException_Exception ex) {
             Logger.getLogger(CustomerModule.class.getName()).log(Level.SEVERE, null, ex);
         }
 
