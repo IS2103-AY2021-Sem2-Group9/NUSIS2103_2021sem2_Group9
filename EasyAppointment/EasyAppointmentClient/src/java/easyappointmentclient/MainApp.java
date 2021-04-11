@@ -5,6 +5,7 @@ import ejb.session.stateless.AdminEntitySessionBeanRemote;
 import ejb.session.stateless.AppointmentEntitySessionBeanRemote;
 import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
+import java.util.InputMismatchException;
 
 import java.util.Scanner;
 import javax.jms.ConnectionFactory;
@@ -50,8 +51,14 @@ public class MainApp {
           
             while (response < 1 || response > 4) {
                 System.out.print("> ");
-                response = scanner.nextInt();
                 
+                
+                try {
+                    response = scanner.nextInt();
+                }   catch (InputMismatchException ex) {
+                    System.err.println("Please input digits only.");
+                    scanner.next();
+                }
                 if(response == 1) {
                     customerTerminal = new CustomerTerminal(customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, businessCategorySessionBeanRemote, appointmentEntitySessionBeanRemote);
                     customerTerminal.runApp();
@@ -64,8 +71,8 @@ public class MainApp {
                 } else if (response == 4) {
                     break;
                 } else {
-                    System.out.println("Invalid option, please try again\n");
-                }
+                    System.out.println("Invalid option, please key in 1 ~ 4 only.\n");
+                }      
             }
             if (response == 4) {
                 System.out.println("Thank you!\n"); 

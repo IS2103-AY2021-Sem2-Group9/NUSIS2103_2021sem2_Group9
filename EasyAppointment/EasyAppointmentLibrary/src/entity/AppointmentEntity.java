@@ -46,21 +46,38 @@ public class AppointmentEntity implements Serializable {
         this.customerEntity = customerEntity;
         this.serviceProviderEntity = serviceProviderEntity;
         Long uid = serviceProviderEntity.getServiceProviderId();
-        String sMonth = "";
+        String sMonth;
         int month = appointmentDate.getMonthValue();
         if (month < 10) {
             sMonth = "0" + String.valueOf(month);
         } else {
             sMonth = String.valueOf(month);
         }
-        String sDate = "";
+        
+        String sDate;
         int date = appointmentDate.getDayOfMonth();
         if (date < 10) {
             sDate = "0" + String.valueOf(date);
         } else {
             sDate = String.valueOf(date);
         }
-        this.appointmentNum = String.valueOf(uid) + sMonth + sDate + String.valueOf(appointmentTime.getHour()) + String.valueOf(appointmentTime.getMinute());
+        
+        String sHour;
+        int hour = appointmentTime.getHour();
+        if(hour < 10) {
+            sHour = "0" + String.valueOf(hour);
+        } else {
+            sHour = String.valueOf(hour);
+        }
+        
+        String sMin;
+        int min = appointmentTime.getMinute();
+        if(min < 10) {
+            sMin = "0" + String.valueOf(min);
+        } else {
+            sMin = String.valueOf(min);
+        }
+        this.appointmentNum = String.valueOf(uid) + sMonth + sDate + sHour + sMin;
       
     }  
 

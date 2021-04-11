@@ -3,6 +3,9 @@ package ejb.session.stateless;
 import Enumeration.AppointmentStatusEnum;
 import entity.AppointmentEntity;
 import entity.ServiceProviderEntity;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -85,5 +88,27 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
     public void rateAppointment(AppointmentEntity appointmentEntity) {
         em.merge(appointmentEntity);
         em.flush();
+    }
+    
+    @Override
+    public String getStatus(AppointmentEntity appointmentEntity) {
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        
+        LocalDate apptDate = appointmentEntity.getAppointmentDate();
+        LocalTime apptTime = appointmentEntity.getAppointmentTime();
+        
+        int compare = apptDate.compareTo(currentDate);
+        double hourDiff = Math.floor(ChronoUnit.HOURS.between(currentTime, apptTime) + ChronoUnit.MINUTES.between(currentTime, apptTime)/60);
+        
+        if(compare > 0 ) { 
+            return "UPCOMING";
+        } else if (compare == 0 && hourDiff > 0) {
+            return "UPCOMING"; 
+        } else if (compare == 0 && hourDiff >= -1 && hourDiff <= 0) {
+            return "ONGOING";
+        } else {
+            return "COMPLETED";
+        }
     }
 }

@@ -18,4 +18,6 @@ public interface AppointmentEntitySessionBeanLocal {
     public AppointmentEntity createAppointmentEntity(AppointmentEntity apptEntity) throws UnknownPersistenceException, AppointmentExistException;
     
     public void rateAppointment(AppointmentEntity appointmentEntity);
+
+    public String getStatus(AppointmentEntity appointmentEntity);
 }

@@ -9,6 +9,7 @@ import entity.ServiceProviderEntity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import util.exception.BusinessCategoryNotFoundException;
@@ -45,19 +46,15 @@ public class ServiceProviderTerminal {
                 
             while (response < 1 || response > 3) {
                 System.out.print("> ");
-                response = scanner.nextInt(); 
-                
+                try {
+                    response = scanner.nextInt();
+                } catch (InputMismatchException ex) {
+                    System.err.println("Please input digits only.");
+                    scanner.next();
+                }  
                 if (response == 1) 
                 {
                     doRegister();
-                    System.out.println("Enter 0 to go back to the previous menu");
-                    System.out.print("> ");
-                    
-                    Integer regResponse = 0; 
-                    regResponse = scanner.nextInt();
-                    if(regResponse == 0) {
-                        break;
-                    }
                 } 
                 else if (response == 2) 
                 {
@@ -78,7 +75,7 @@ public class ServiceProviderTerminal {
                     break;
                 } else 
                 {
-                    System.out.println("Invalid option, please try again");
+                    System.out.println("Invalid option, please key in options 1~3 only.");
                 }
             }
             if (response == 3) 
@@ -115,7 +112,7 @@ public class ServiceProviderTerminal {
         System.out.print("Enter Business Category> ");
         category = scanner.nextLong(); 
         scanner.nextLine();
-        System.out.print("Enter Business Registration Number>");
+        System.out.print("Enter Business Registration Number> ");
         spEntity.setUen(scanner.nextLine().trim());
         System.out.print("Enter City> ");
         spEntity.setCity(scanner.nextLine().trim());
@@ -135,24 +132,35 @@ public class ServiceProviderTerminal {
         } catch(ServiceProviderEmailExistException | BusinessCategoryNotFoundException | UnknownPersistenceException ex ) {
             System.out.println("Error registering! " + ex.getMessage());
         }
-
+        
+        
+        while(true) {
+            Integer response; 
+            System.out.println("Enter 0 to go back to the previous menu"); 
+            System.out.print("> ");
+            response = scanner.nextInt();
+            if(response == 0) {
+                System.out.println("Heading back to Service Provider Terminal...");
+                break;
+            }  
+        }
     }
     
     private void doLogin() throws InvalidLoginCredentialException 
     {
         Scanner scanner = new Scanner(System.in);
         String email = "";
-        Integer password; 
+        String password = ""; 
         
         System.out.println("*** Service provider terminal :: Login ***\n");
         System.out.print("Enter Email Address> ");
         email = scanner.nextLine().trim(); 
         System.out.print("Enter password> "); 
-        password = scanner.nextInt(); 
-        scanner.nextLine(); 
+        password = scanner.nextLine().trim(); 
         
-        if(email.length() > 0 && password.toString().length() > 0) {
-            currentServiceProviderEntity = serviceProviderEntitySessionBeanRemote.serviceProviderLogin(email, password);
+        if(email.length() > 0 && password.length() > 0) {
+            Integer pw = Integer.parseInt(password);
+            currentServiceProviderEntity = serviceProviderEntitySessionBeanRemote.serviceProviderLogin(email, pw);
         } else {
             throw new InvalidLoginCredentialException("Missing login credential");
         }

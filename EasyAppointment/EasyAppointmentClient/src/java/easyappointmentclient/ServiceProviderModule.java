@@ -43,7 +43,7 @@ public class ServiceProviderModule {
             response = 0; 
             
             
-            while (response < 1 || response > 6) {
+            while (response < 1 || response > 5) {
                 System.out.print("> ");
                 
                 try {
@@ -55,27 +55,10 @@ public class ServiceProviderModule {
                 }
                 if (response == 1) {
                    doViewProfile();
-                   System.out.println("Enter 0 to go back to the previous menu");
-                   System.out.print("> ");
-                   Integer viewResponse = 0; 
-                   viewResponse = sc.nextInt();
-                   if (viewResponse == 0) {
-                       break;
-                   } else {
-                       continue;
-                   }
                 } else if (response == 2) {
                     doEditProfile(currentServiceProviderEntity);
-                    System.out.println("Profile successfully updated!");
                 } else if (response == 3) {
-                    System.out.println("*** Service provider terminal :: View Appointments ***\n");
                     doViewAllAppointments(currentServiceProviderEntity);
-                    System.out.println("Enter 0 to go back to the previous menu");
-                    System.out.print("> ");
-                    Integer viewResponse = 0; 
-                    if (viewResponse == 0) {
-                        break;
-                    }
                 } else if (response == 4) {
                     doCancelAppointment(currentServiceProviderEntity);
                 } else if(response == 5) {
@@ -93,6 +76,9 @@ public class ServiceProviderModule {
     }
     
     public void doViewProfile() { 
+        Scanner scanner = new Scanner(System.in);
+        Integer response = 1;
+        
         System.out.println("*** Service Provider Terminal :: View Profile ***");
         
         System.out.println("Name: " + currentServiceProviderEntity.getName());
@@ -101,68 +87,57 @@ public class ServiceProviderModule {
         System.out.println("City: " + currentServiceProviderEntity.getCity());
         System.out.println("Phone: " + currentServiceProviderEntity.getPhoneNumber());
         System.out.println("Business Address: " + currentServiceProviderEntity.getAddress());
-        System.out.println("Email: " + currentServiceProviderEntity.getEmail() + "\n");  
+        System.out.println("Email: " + currentServiceProviderEntity.getEmail() + "\n"); 
+        
+        while (true) {
+            System.out.println("Enter 0 to go back to the previous menu.");
+            System.out.print("> ");
+            
+            try {
+                    response = scanner.nextInt();
+                }   catch (InputMismatchException ex) {
+                    System.err.println("Please input digits only.");
+                    scanner.next();
+                }
+            if (response == 0) {
+                System.out.println("Heading back to Service Provider Main Menu...");
+                break;
+            }
+        }
     }
     
     
    public void doEditProfile(ServiceProviderEntity currentServiceProviderEntity) {
+       
        System.out.println("*** Service Provider Terminal :: Edit Profile ***"); 
        
        Scanner scanner = new Scanner(System.in); 
        String input; 
        
-        System.out.print("Enter Name (blank if no change)> ");
-        input = scanner.nextLine().trim();
-        if(input.length() > 0) {
-            currentServiceProviderEntity.setName(input);
-        }
-        
-        System.out.printf("%11s%16s\n", "Category ID", "Category Name");
-
-        List<BusinessCategoryEntity> businessCategories = businessCategorySessionBeanRemote.retrieveAllBusinessCategories();  
-        for (BusinessCategoryEntity category : businessCategories)
-        {
-            System.out.printf("%11s%16s\n", category.getId(), category.getCategoryName());
-        }
-        System.out.print("Enter Business Category (blank if no change)> ");
-        input = scanner.nextLine().trim();
-        if(input.length() > 0) {
-            for (BusinessCategoryEntity category : businessCategories) {  
-                try {
-                    Long matchEntry = Long.valueOf(input);
-                    if(category.getId().equals(matchEntry)) {
-                        currentServiceProviderEntity.setCategory(category);
-                        break; 
-                    }
-                } catch (NumberFormatException ex) {
-                System.err.println("Please input a category number that matches the categories as displayed!");
-                }            
-            }
-        }        
-        System.out.print("Enter Business Registration Number (blank if no change)> ");
-        input = scanner.nextLine().trim();
-        if(input.length() > 0) {
-            currentServiceProviderEntity.setUen(input);
-        }
-        
-        System.out.print("Enter City (blank if no change)> ");
-        input = scanner.nextLine().trim();
-        if(input.length() > 0) {
+       
+       System.out.print("Enter City (blank if no change)> ");
+       input = scanner.nextLine().trim();
+       if(input.length() > 0) {
             currentServiceProviderEntity.setCity(input);
         }
-        
-        System.out.print("Enter Phone (blank if no change)> ");
-        input = scanner.nextLine().trim();
-        if(input.length() > 0) {
-            currentServiceProviderEntity.setPhoneNumber(input);
-        }
-        
+
         System.out.print("Enter Business Address (blank if no change)> ");
         input = scanner.nextLine().trim();
         if(input.length() > 0) {
             currentServiceProviderEntity.setAddress(input);
         }
-        
+
+        System.out.print("Enter Email Address (blank if no change)> ");
+        input = scanner.nextLine().trim(); 
+        if (input.length() > 0) {
+            currentServiceProviderEntity.setEmail(input);
+        }
+
+        System.out.print("Enter Phone (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0) {
+            currentServiceProviderEntity.setPhoneNumber(input);
+        }
         System.out.print("Enter Password (blank if no change)> ");
         input = scanner.nextLine().trim();
         if(input.length() > 0) {
@@ -171,43 +146,96 @@ public class ServiceProviderModule {
                 currentServiceProviderEntity.setPassword(newPassword);
             } catch (NumberFormatException ex) {
                 System.err.println("Please input a password consisting of numbers only!");
+                scanner.next();
             }
         }
-     
-        
+        System.out.println();
+
         try {
             serviceProviderEntitySessionBeanRemote.updateServiceProvider(currentServiceProviderEntity);
             System.out.println("Service Provider Profile updated successfully!\n");
         } catch(ServiceProviderEntityNotFoundException | UpdateServiceProviderException ex) {
             System.out.println("An error has occured while updating staff: " + ex.getMessage() + "\n");
         }
+
+        while(true) {
+            Integer response = 1; 
+            System.out.println("Enter 0 to go back to the previous menu"); 
+            System.out.print("> ");
+            try {
+                    response = scanner.nextInt();
+                }   catch (InputMismatchException ex) {
+                    System.err.println("Please input digits only.");
+                    scanner.next();
+                }
+            if(response == 0) {
+                System.out.println("Heading back to Service Provider Terminal...");
+                break;
+            }  
+        }
    }
     
    public void doViewAllAppointments(ServiceProviderEntity currentServiceProviderEntity) {
+       Scanner scanner = new Scanner(System.in);
+       Integer response = 1;
+       System.out.println("*** Service provider terminal :: View Appointments ***\n");
        System.out.println("Appointments: ");
        
-       System.out.printf("%-22s%-20s%-20s%-15s\n", "Name", " | Date", " | Time", " | Appointment No.");
-       List<AppointmentEntity> appointments = serviceProviderEntitySessionBeanRemote.retrieveUpcomingAppointmentsForServiceProvider(currentServiceProviderEntity);
+       System.out.printf("%-22s%-15s%-10s%-20s%-15s\n", "Name", " | Date", " | Time", " | Appointment No.", " | Status");
+
+       List<AppointmentEntity> appointments = serviceProviderEntitySessionBeanRemote.retrieveAllAppointmentsForServiceProvider(currentServiceProviderEntity);
        for (AppointmentEntity appointment : appointments) {
-           System.out.printf("%-22s%-20s%-20s%-15s\n", appointment.getCustomerEntity().getFirstName() + " " + appointment.getCustomerEntity().getLastName(), " | " + appointment.getAppointmentDate().toString(), " | " + appointment.getAppointmentTime().toString(), " | " + appointment.getAppointmentNum());
+            
+            System.out.printf("%-22s%-15s%-10s%-20s%-15s\n", appointment.getCustomerEntity().getFirstName() + " " + appointment.getCustomerEntity().getLastName(), " | " + appointment.getAppointmentDate().toString(), " | " + appointment.getAppointmentTime().toString(), " | " + appointment.getAppointmentNum(), " | " + appointmentEntitySessionBeanRemote.getStatus(appointment));
+            
        }
-       System.out.println(); 
-       
+       System.out.println();     
+       while (true) {
+            System.out.println("Enter 0 to go back to the previous menu.");
+            System.out.print("> ");
+            try {
+                    response = scanner.nextInt();
+                }   catch (InputMismatchException ex) {
+                    System.err.println("Please input digits only.");
+                    scanner.next();
+                }
+            if (response == 0) {
+                System.out.println("Heading back to Service Provider Main Menu...");
+                break;
+            }
+        }
    } 
    
    public void doCancelAppointment(ServiceProviderEntity currentProviderEntity) {
        Scanner sc = new Scanner(System.in);
        String appointmentNum; 
        System.out.println("*** Service provider terminal :: Cancel Appointment ***\n");
-       doViewAllAppointments(currentProviderEntity);
-       System.out.print("Enter Appointment ID> ");
-       appointmentNum = sc.nextLine().trim(); 
-       try {
-        appointmentEntitySessionBeanRemote.cancelAppointment(appointmentNum);
-        System.out.println("Appointment " + appointmentNum + " has been cancelled successfully.");
-       } catch (AppointmentNotFoundException ex) {
-           System.out.println("An error has occured cancelling the appointment: " + ex.getMessage());
+       System.out.println("Appointments: ");
+       
+       System.out.printf("%-22s%-15s%-10s%-20s\n", "Name", " | Date", " | Time", " | Appointment No.");
+       List<AppointmentEntity> appointments = serviceProviderEntitySessionBeanRemote.retrieveUpcomingAppointmentsForServiceProvider(currentServiceProviderEntity);
+       for (AppointmentEntity appointment : appointments) {
+           System.out.printf("%-22s%-15s%-10s%-20s\n", appointment.getCustomerEntity().getFirstName() + " " + appointment.getCustomerEntity().getLastName(), " | " + appointment.getAppointmentDate().toString(), " | " + appointment.getAppointmentTime().toString(), " | " + appointment.getAppointmentNum()); 
        }
+       System.out.println();
+       while(true) {
+           System.out.println("Enter 0 to go back to the previous menu.");
+           System.out.print("Enter Appointment ID> ");
+            try {
+                appointmentNum = sc.nextLine().trim();
+                System.out.println(); 
+                if(appointmentNum.equals("0")) {
+                    System.out.println("Heading back to Service Provider Main Menu...");
+                    break;
+                } else {
+                    appointmentEntitySessionBeanRemote.cancelAppointment(appointmentNum);
+                    System.err.println("Appointment " + appointmentNum + " has been cancelled successfully.");
+                    sc.next();
+                }
+            } catch (AppointmentNotFoundException ex) {
+                System.out.println("An error has occured cancelling the appointment: " + ex.getMessage());
+            } 
+        }
    }
    
 }
