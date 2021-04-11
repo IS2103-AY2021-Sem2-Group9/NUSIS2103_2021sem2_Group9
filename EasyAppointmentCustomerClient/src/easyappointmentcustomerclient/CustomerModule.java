@@ -105,7 +105,6 @@ public class CustomerModule {
 
         System.out.print("Enter date> ");
         String dateStr = sc.nextLine(); // e.g. yyyy-MM-dd
-//        LocalDate date = LocalDate.parse(dateStr); 
 
         // Print headers
         System.out.printf("%-20s | %-15s | %-20s | %-15s | %-15s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
@@ -119,7 +118,6 @@ public class CustomerModule {
                 ServiceProviderEntity currentSP = serviceProviders.get(i);
                 Long spId = currentSP.getServiceProviderId();
                 String name = currentSP.getName();
-//                LocalTime temp = retrieveServiceProviderAvailabilityForTheDay(currentSP, dateStr).get(0);
                 String firstAvaiTime = retrieveServiceProviderAvailabilityForTheDay(currentSP, dateStr).get(0);
                 String address = currentSP.getAddress();
                 Double rating = generateOverallRating(currentSP);
@@ -136,7 +134,7 @@ public class CustomerModule {
 
     }
 
-    public LocalDate searchForAddingAppt() { // Strictly for addAppointments()
+    public LocalDate searchForAddingAppt(Long category, String city) { // Strictly for addAppointments()
         Scanner sc = new Scanner(System.in);
 
         // Get all the biz categories and print them
@@ -154,12 +152,6 @@ public class CustomerModule {
             }
 
         }
-
-        System.out.print("Enter business category> ");
-        Long category = sc.nextLong();
-        sc.nextLine();
-        System.out.print("Enter city> ");
-        String city = sc.nextLine();
 
         // Init
         int compare = 1;
@@ -216,7 +208,14 @@ public class CustomerModule {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("*** Customer Terminal :: Add Appointments ***\n");
-        LocalDate date = this.searchForAddingAppt();
+        
+        System.out.print("Enter business category> ");
+        Long category = sc.nextLong();
+        sc.nextLine();
+        System.out.print("Enter city> ");
+        String city = sc.nextLine();
+        
+        LocalDate date = this.searchForAddingAppt(category, city);
 
         try {
             System.out.println("Enter 0 to go back to the previous menu.");
@@ -229,7 +228,7 @@ public class CustomerModule {
             sc.nextLine();
 
             ServiceProviderEntity spEntity = retrieveServiceProviderByServiceProviderId(spId);
-            // check if service provider belongs to city
+            // Check if service provider belongs to city
             List<String> availableTimeSlotsStr = retrieveServiceProviderAvailabilityForTheDay(spEntity, date.toString());
             List<LocalTime> availableTimeSlots = new ArrayList<>();
             for (int i = 0; i < availableTimeSlotsStr.size(); i++) {
@@ -288,7 +287,6 @@ public class CustomerModule {
             if (timeStr.equals("0")) {
                 return; // Break out of method
             }
-//            LocalTime selectedTimeSlot = LocalTime.parse(timeStr);
             System.out.println();
 
             AppointmentEntity appt = createAppointmentEntity(date.toString(), timeStr, loggedInCustomerEntity.getId(), spEntity.getServiceProviderId()); // customer side
@@ -298,7 +296,7 @@ public class CustomerModule {
             System.out.println();
 
         } catch (DateTimeException ex) {
-            System.out.println("Error occurred when reading date: " + ex.getMessage() + "\n");
+            System.err.println("Error occurred when reading date: " + ex.getMessage() + "\n");
         } catch (ServiceProviderEntityNotFoundException_Exception | UnknownPersistenceException_Exception | AppointmentExistException_Exception | CustomerNotFoundException_Exception ex) {
             Logger.getLogger(CustomerModule.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -450,7 +448,6 @@ public class CustomerModule {
 
                     System.out.println();
                     AppointmentEntity apptEntity = apptsToRate.get(index - 1);
-                    //apptEntity.setRating(rating);
                     rateAppointment(apptEntity.getId(), rating);
                     System.out.println("You have rated Appointment " + apptEntity.getAppointmentNum() + " a rating of " + rating + ".");
                 }
