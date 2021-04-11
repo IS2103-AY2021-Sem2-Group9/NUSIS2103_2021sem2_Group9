@@ -100,18 +100,42 @@ public class CustomerModule {
 
         }
 
-        System.out.print("Enter business category> ");
-        Long category = sc.nextLong();
+        Long category;
+
+        while (true) {
+            try {
+                System.out.print("Enter business category> ");
+                category = sc.nextLong();
+                break;
+            } catch (InputMismatchException ex) {
+                System.err.println("Please input a digit.");
+                sc.next();
+            }
+        }
+
         sc.nextLine();
+
         System.out.print("Enter city> ");
         String city = sc.nextLine();
 
-        System.out.print("Enter date> ");
-        String dateStr = sc.nextLine(); // e.g. yyyy-MM-dd
+        LocalDate date = LocalDate.now();
+        String dateStr = "";
+        while (true) {
+            try {
+                System.out.print("Enter date> ");
+                dateStr = sc.nextLine().trim();
+                date = LocalDate.parse(dateStr);
+                break;
+            } catch (DateTimeParseException ex) {
+                System.err.println("Invalid date input. Please try again.");
+            }
+        }
+
+        System.out.println();
 
         // Print headers
-        System.out.printf("%-20s | %-15s | %-20s | %-15s | %-15s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
-        System.out.println();
+        System.out.printf("%-20s | %-20s | %-20s | %-20s | %s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
+        System.out.println("\n");
 
         try {
             List<ServiceProviderEntity> serviceProviders = retrieveAllAvailableServiceProvidersForTheDay(dateStr, category, city);
@@ -125,11 +149,18 @@ public class CustomerModule {
                 String address = currentSP.getAddress();
                 Double rating = generateOverallRating(currentSP);
 
-                System.out.printf("%-20d | %-15s | %-20s | %-15s | %.2f", spId, name, firstAvaiTime, address, rating);
-                System.out.println("\n");
+                if (rating == 0) {
+                    // Print records
+                    System.out.printf("%-20d | %-20s | %-20s | %-20s | %s", spId, name, firstAvaiTime, address, "No Ratings");
+                    System.out.println("\n");
+                } else {
+                    // Print records
+                    System.out.printf("%-20d | %-20s | %-20s | %-20s | %.2f", spId, name, firstAvaiTime, address, rating);
+                    System.out.println("\n");
+                }
             }
 
-            return LocalDate.parse(dateStr);
+            return date;
         } catch (BusinessCategoryNotFoundException_Exception ex) {
             System.err.println("An error has occurred while retrieving available service providers for the specified date: " + ex.getMessage() + "\n");
             return null;
@@ -146,18 +177,18 @@ public class CustomerModule {
         String dateStr = "";
 
         while (compare > 0) { // compare must be <= 0
-            
+
             while (true) {
                 try {
                     System.out.print("Enter date> ");
-                    dateStr = sc.nextLine();
+                    dateStr = sc.nextLine().trim();
                     date = LocalDate.parse(dateStr);
                     break;
                 } catch (DateTimeParseException ex) {
                     System.err.println("Invalid date input. Please try again.");
                 }
             }
-            
+
             LocalDate todaysDate = LocalDate.now();
             compare = todaysDate.compareTo(date); // Returns -1 if today is before "date", 0 if same day, 1 if today is after "date"
             if (compare > 0) {
@@ -178,7 +209,7 @@ public class CustomerModule {
                 Double rating = generateOverallRating(currentSP);
 
                 // Print headers
-                System.out.printf("%-20s | %-20s | %-20s | %-20s | %-15s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
+                System.out.printf("%-20s | %-20s | %-20s | %-20s | %s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
                 System.out.println("\n");
                 if (rating == 0) {
                     // Print records
@@ -221,7 +252,6 @@ public class CustomerModule {
         }
 
         Long category;
-        String city;
         Long spId;
         ServiceProviderEntity spEntity;
 
@@ -231,23 +261,15 @@ public class CustomerModule {
                 category = sc.nextLong();
                 break;
             } catch (InputMismatchException ex) {
-                System.err.println("Please input a digit\n");
+                System.err.println("Please input a digit.");
                 sc.next();
             }
         }
 
         sc.nextLine();
 
-        while (true) {
-            try {
-                System.out.print("Enter city> ");
-                city = sc.nextLine();
-                break;
-            } catch (InputMismatchException ex) {
-                System.err.println("Please input a digit\n");
-                sc.next();
-            }
-        }
+        System.out.print("Enter city> ");
+        String city = sc.nextLine().trim();
 
         LocalDate date = this.searchForAddingAppt(category, city);
 
@@ -403,12 +425,13 @@ public class CustomerModule {
 
     }
 
-    public void viewForCancellingAppt() {
+    public boolean viewForCancellingAppt() {
+        boolean haveAppts = false;
         try {
             List<AppointmentEntity> appointments = retrieveCustomerEntityAppointments(this.loggedInCustomerEntity.getId());
 
             if (!appointments.isEmpty()) {
-
+                haveAppts = true;
                 // Print headers
                 System.out.printf("%-20s | %-20s | %-20s | %s", "Appointment Number", "Appointment Date", "Appointment Time", "Service Provider");
                 System.out.println("\n");
@@ -431,22 +454,30 @@ public class CustomerModule {
             System.err.println("Error occurred when retrieving customer: " + ex.getMessage());
         }
 
+        return haveAppts;
     }
 
     public void cancelAppointments() {
-
         Scanner sc = new Scanner(System.in);
+
         String appointmentNum;
         System.out.println("*** Customer terminal :: Cancel Appointment ***\n");
-        this.viewForCancellingAppt();
-        System.out.print("Enter Appointment Number> ");
-        appointmentNum = sc.nextLine().trim();
-        try {
-            cancelAppointment(appointmentNum);
-            System.out.println("Appointment " + appointmentNum + " has been cancelled successfully.\n");
-        } catch (AppointmentNotFoundException_Exception ex) {
-            System.out.println("An error has occured when cancelling the appointment: " + ex.getMessage());
+        boolean haveAppt = this.viewForCancellingAppt();
+
+        if (haveAppt) {
+            while (true) {
+                System.out.print("Enter Appointment Number> ");
+                appointmentNum = sc.nextLine().trim();
+                try {
+                    cancelAppointment(appointmentNum);
+                    System.out.println("Appointment " + appointmentNum + " has been cancelled successfully.\n");
+                    break;
+                } catch (AppointmentNotFoundException_Exception ex) {
+                    System.err.println("An error has occured when cancelling the appointment: " + ex.getMessage());
+                }
+            }
         }
+
     }
 
     public void rateServiceProvider() {
@@ -454,24 +485,46 @@ public class CustomerModule {
 
         System.out.println("*** Customer Terminal :: Rate Service Provider ***\n");
 
-        System.out.print("Enter Service Provider Id> ");
-        Long spId = sc.nextLong();
         List<AppointmentEntity> apptsToRate = new ArrayList<>();
 
         try {
             List<AppointmentEntity> appts = retrieveCustomerEntityAppointments(this.loggedInCustomerEntity.getId());
 
             if (appts.isEmpty()) {
-                System.out.println("There are no appointments to rate.");
+                System.out.println("There is no appointment to rate.\n");
             } else {
-                for (int i = 0; i < appts.size(); i++) {
-                    AppointmentEntity apptEntity = appts.get(i);
-                    Long retrievedSPId = apptEntity.getServiceProviderEntity().getServiceProviderId();
-                    if (spId.equals(retrievedSPId) && apptEntity.getRating() == 0) { // if rating == 0 means not yet rated, rating != 0 means rated, dont rate again!
-                        apptsToRate.add(apptEntity);
+                Long spId;
+                boolean haveApptWithThisSP = false;
+
+                while (true) {
+                    try {
+                        System.out.print("Enter Service Provider Id> ");
+                        spId = sc.nextLong(); // need to check if there is such sp
+                        retrieveServiceProviderByServiceProviderId(spId);
+                        //if all retrievedSPId != spId no appt with this sp, try again
+                        for (int i = 0; i < appts.size(); i++) {
+                            AppointmentEntity apptEntity = appts.get(i);
+                            Long retrievedSPId = apptEntity.getServiceProviderEntity().getServiceProviderId();
+                            if (spId.equals(retrievedSPId)) { // if rating == 0 means not yet rated, rating != 0 means rated, dont rate again!
+                                haveApptWithThisSP = true; // Will remain false if input spId does not have any matching appt with same spId
+                                if (apptEntity.getRating() == 0) {
+                                    apptsToRate.add(apptEntity);
+                                }
+                            }
+                        }
+                        if (!haveApptWithThisSP) {
+                            System.err.println("You do not have any appointments with this Service Provider. Please try again.");
+                            continue;
+                        }
+                        break;
+                    } catch (InputMismatchException ex) {
+                        System.err.println("Please input a digit.");
+                        sc.next();
+                    } catch (ServiceProviderEntityNotFoundException_Exception ex) {
+                        System.err.println("There is no such Service Provider. Please try again.");
                     }
                 }
-
+                
                 System.out.println("Appointments that you have yet to rate:");
                 // Print Headers
                 System.out.printf("%-5s | %-20s | %-20s | %-20s | %s", "Index", "Appointment Number", "Appointment Date", "Appointment Time", "Service Provider");
@@ -487,20 +540,57 @@ public class CustomerModule {
                 }
 
                 if (apptsToRate.isEmpty()) {
-                    System.out.println("You have no appointments to rate.");
+                    System.out.println("You have rated all appointments.\n");
                 } else {
-                    System.out.print("Enter index number of the appointment to rate> ");
-                    Integer index = sc.nextInt();
-                    while (index < 1 || index > apptsToRate.size()) {
-                        System.out.print("Invalid index. Enter index again> ");
-                        index = sc.nextInt();
+                    Integer index;
+
+                    while (true) {
+                        try {
+                            System.out.print("Enter index number of the appointment to rate> ");
+                            index = sc.nextInt();
+                            break;
+                        } catch (InputMismatchException ex) {
+                            System.err.println("Please input a digit.");
+                            sc.next();
+                        }
                     }
 
-                    System.out.print("Enter rating> ");
-                    Integer rating = sc.nextInt();
+                    while (index < 1 || index > apptsToRate.size()) {
+                        while (true) {
+                            try {
+                                System.err.print("Invalid index. Enter index again> ");
+                                index = sc.nextInt();
+                                break;
+                            } catch (InputMismatchException ex) {
+                                System.err.println("Please input a digit.");
+                                sc.next();
+                            }
+                        }
+                    }
+
+                    Integer rating;
+                    while (true) {
+                        try {
+                            System.out.print("Enter rating> ");
+                            rating = sc.nextInt();
+                            break;
+                        } catch (InputMismatchException ex) {
+                            System.err.println("Please input a digit.");
+                            sc.next();
+                        }
+                    }
+
                     while (rating < 1 || rating > 5) {
-                        System.out.print("Invalid rating. Enter rating again> ");
-                        rating = sc.nextInt();
+                        while (true) {
+                            try {
+                                System.err.print("Invalid rating. Enter rating again> ");
+                                rating = sc.nextInt();
+                                break;
+                            } catch (InputMismatchException ex) {
+                                System.err.println("Please input a digit.");
+                                sc.next();
+                            }
+                        }
                     }
 
                     System.out.println();
@@ -511,7 +601,7 @@ public class CustomerModule {
             }
 
         } catch (CustomerNotFoundException_Exception | AppointmentNotFoundException_Exception ex) {
-            System.out.println("An error has occured when retrieving the appointments: " + ex.getMessage());
+            System.err.println("An error has occured when retrieving the appointments: " + ex.getMessage());
         }
 
     }
