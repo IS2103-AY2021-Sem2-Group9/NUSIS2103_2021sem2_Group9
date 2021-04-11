@@ -293,7 +293,7 @@ public class CustomerModule {
                 //set sp entity
                 AppointmentEntity apptEntity = createAppointmentEntity(date.toString(), timeStr, loggedInCustomerEntity.getId(), spEntity.getServiceProviderId());
                 
-                addAppointment(apptEntity, spEntity);
+                //addAppointment(apptEntity, spEntity);
 
             } catch (UnknownPersistenceException_Exception | AppointmentExistException_Exception | CustomerNotFoundException_Exception ex) {
                 System.err.println("Error occured when creating appointment: " + ex.getMessage());

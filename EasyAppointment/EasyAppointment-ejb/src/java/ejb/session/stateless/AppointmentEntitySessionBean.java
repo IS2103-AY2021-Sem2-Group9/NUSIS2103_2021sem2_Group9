@@ -2,8 +2,10 @@ package ejb.session.stateless;
 
 import Enumeration.AppointmentStatusEnum;
 import entity.AppointmentEntity;
+import entity.CustomerEntity;
 import entity.ServiceProviderEntity;
 import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -15,6 +17,8 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.exception.AppointmentExistException;
 import util.exception.AppointmentNotFoundException;
+import util.exception.CustomerNotFoundException;
+import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 @Stateless
@@ -31,6 +35,11 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
 
         return query.getResultList();
     }
+    
+    @EJB
+    private CustomerEntitySessionBeanLocal customerEntitysessionBeanLocal;
+    @EJB
+    private ServiceProviderEntitySessionBeanLocal serviceProviderEntitysessionBeanLocal;
 
     @Override
     public AppointmentEntity retrieveAppointmentByAppointmentNum(String appointmentNum) throws AppointmentNotFoundException {
@@ -54,10 +63,16 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
     @Override
     public AppointmentEntity createAppointmentEntity(AppointmentEntity apptEntity) throws UnknownPersistenceException, AppointmentExistException {
         try {
+            CustomerEntity managedCustomer = customerEntitysessionBeanLocal.retrieveCustomerEntityById(apptEntity.getCustomerEntity().getId());
+            ServiceProviderEntity managedSp = serviceProviderEntitysessionBeanLocal.retrieveServiceProviderByServiceProviderId(apptEntity.getServiceProviderEntity().getServiceProviderId());
+            managedCustomer.getAppointments().add(apptEntity);
+            managedSp.getAppointmentEntities().add(apptEntity);
+            apptEntity.setCustomerEntity(managedCustomer);
+            apptEntity.setServiceProviderEntity(managedSp);
             em.persist(apptEntity);
             em.flush();
             return apptEntity;
-        } catch (PersistenceException ex) {
+        } catch (PersistenceException | CustomerNotFoundException | ServiceProviderEntityNotFoundException ex) {
             if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) { // A database-related exception
                 if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) { // To get the internal error
                     throw new AppointmentExistException("Error creating appointment");
