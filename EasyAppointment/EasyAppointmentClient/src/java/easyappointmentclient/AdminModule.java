@@ -384,7 +384,13 @@ public class AdminModule {
                     {
                        break;
                     }
-
+                    
+                    ServiceProviderEntity toBlockSp = serviceProviderSessionBeanRemote.retrieveServiceProviderByServiceProviderId(id);
+                    if (toBlockSp.getStatus() == ServiceProviderStatus.APPROVED)
+                    {
+                        //List<AppointmentEntity> appts = serviceProviderSessionBeanRemote.
+                    }
+                    
                     String blockedSp = serviceProviderSessionBeanRemote.blockServiceProviderById(id);
                     System.out.println("Service Provider: " + blockedSp + " has been blocked.\n");
                     break;
