@@ -2,10 +2,11 @@ package ejb.session.stateless;
 
 import entity.BusinessCategoryEntity;
 import java.util.List;
+import util.exception.BusinessCategoryExistException;
 import util.exception.BusinessCategoryNotFoundException;
 
 public interface BusinessCategorySessionBeanRemote {
-    public String createBusinessCategoryEntity(BusinessCategoryEntity businessCategoryEntity);
+    public String createBusinessCategoryEntity(BusinessCategoryEntity businessCategoryEntity) throws BusinessCategoryExistException;
     
     public List<BusinessCategoryEntity> retrieveAllBusinessCategories();
 

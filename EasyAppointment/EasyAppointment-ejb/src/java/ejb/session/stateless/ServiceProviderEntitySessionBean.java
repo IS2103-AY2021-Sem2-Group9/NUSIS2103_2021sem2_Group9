@@ -10,8 +10,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.Local;
@@ -23,12 +21,14 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.InvalidPasswordFormatException;
 import util.exception.ServiceProviderAlreadyApprovedException;
 import util.exception.ServiceProviderAlreadyBlockedException;
 import util.exception.ServiceProviderEmailExistException;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateServiceProviderException;
+import util.password.PasswordEncrypt;
 
 @Stateless
 @Local(ServiceProviderEntitySessionBeanLocal.class)
@@ -40,16 +40,39 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
 
     @EJB
     private BusinessCategorySessionBeanLocal businessCategorySessionBeanLocal;
+    
+    private final PasswordEncrypt passwordEncrypt = new PasswordEncrypt();
 
     @Override
-    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, Long categoryId) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, UnknownPersistenceException {
-        try {
+    public ServiceProviderEntity registerNewServiceProvider(ServiceProviderEntity newServiceProvider, Long categoryId) throws BusinessCategoryNotFoundException, ServiceProviderEmailExistException, InvalidPasswordFormatException, UnknownPersistenceException 
+    {
+        try 
+        {
             BusinessCategoryEntity categoryEntity = businessCategorySessionBeanLocal.retrieveBusinessCategoryById(categoryId);
             newServiceProvider.setCategory(categoryEntity);
-            em.persist(newServiceProvider);
-            em.flush();
+            
+            String newPassword = newServiceProvider.getPassword();
+            if (newPassword.length() != 6)
+            {
+                throw new InvalidPasswordFormatException("Password length is not 6!");
+            }
+            else
+            {
+                Integer intPassword = Integer.valueOf(newPassword);
+                String salt = passwordEncrypt.getSalt(30);
+                String encryptedPassword = passwordEncrypt.generateSecurePassword(newServiceProvider.getPassword(), salt);
+                newServiceProvider.setPassword(salt + encryptedPassword);
+                em.persist(newServiceProvider);
+                em.flush();
+            }
             return newServiceProvider;
-        } catch (PersistenceException ex) {
+        }
+        catch (NumberFormatException ex)
+        {
+            throw new InvalidPasswordFormatException("Password can only be digits!");
+        }
+        catch (PersistenceException ex) 
+        {
             if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
                 if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
                     throw new BusinessCategoryNotFoundException("Error! Businesss category cannot be found!");
@@ -77,13 +100,18 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     @Override
     public ServiceProviderEntity serviceProviderLogin(String email, Integer password) throws InvalidLoginCredentialException {
         try {
+            String stringPassword = password.toString();
             ServiceProviderEntity currentServiceProviderEntity = retrieveServiceProviderByServiceProviderAddress(email);
-            if (currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.APPROVED) {
+            String saltAndPassword = currentServiceProviderEntity.getPassword();
+            String salt = saltAndPassword.substring(0, 30);
+            String encryptedPassword = saltAndPassword.substring(31);
+            Boolean passwordVerification = passwordEncrypt.verifyUserPassword(stringPassword, encryptedPassword, salt);
+            if (passwordVerification && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.APPROVED) {
                 return currentServiceProviderEntity;
 
-            } else if (currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.PENDING) {
+            } else if (passwordVerification && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.PENDING) {
                 throw new InvalidLoginCredentialException("Your account is still pending administrator's approval. Please try again later!");
-            } else if (currentServiceProviderEntity.getPassword().equals(password) && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.BLOCKED) {
+            } else if (passwordVerification && currentServiceProviderEntity.getStatus() == ServiceProviderStatus.BLOCKED) {
                 throw new InvalidLoginCredentialException("Your account has been blocked by an administrator.");
             } else {
                 throw new InvalidLoginCredentialException("Email address does not exist or invalid password.");
@@ -99,7 +127,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         if (serviceProviderEntity != null) {
             return serviceProviderEntity;
         } else {
-            throw new ServiceProviderEntityNotFoundException("Service Provier ID " + serviceProviderId + " does not exist");
+            throw new ServiceProviderEntityNotFoundException("Service Provider ID " + serviceProviderId + " does not exist");
         }
     }
 
@@ -184,11 +212,11 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     @Override
     public List<LocalTime> retrieveServiceProviderAvailabilityForTheDay(ServiceProviderEntity spEntity, LocalDate appointmentDate) {
 
-        LocalTime[] timeSlots = {LocalTime.of(8, 30, 00), LocalTime.of(9, 30, 00), LocalTime.of(10, 30, 00), LocalTime.of(11, 30, 00), LocalTime.of(12, 30, 00),
-            LocalTime.of(13, 30, 00), LocalTime.of(14, 30, 00), LocalTime.of(15, 30, 00), LocalTime.of(16, 30, 00), LocalTime.of(17, 30, 00)};
+        List<LocalTime> workingTimeSlots = new ArrayList<>();
+        for (int i = 8; i <= 17; i++) {
+            workingTimeSlots.add(LocalTime.of(i, 30, 00));
+        }
 
-        List<LocalTime> workingTimeSlots = Arrays.asList(timeSlots);
-        List<LocalTime> availableTimeSlots = new ArrayList<>();
         List<AppointmentEntity> apptEntities = new ArrayList<>();
 
         try {
@@ -204,17 +232,16 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
             for (AppointmentEntity appointment : apptEntities) {
                 if (appointment.getAppointmentDate().equals(appointmentDate)) {
                     anyApptOnDate = true;
-                    for (LocalTime time : workingTimeSlots) {
-                        if (!time.equals(appointment.getAppointmentTime())) {
-                            availableTimeSlots.add(time);
-                        }
-                    }
+                    boolean removed = workingTimeSlots.remove(appointment.getAppointmentTime());
+                    System.out.println(removed);
+
                 }
             }
         }
 
         if (anyApptOnDate) {
-            return availableTimeSlots;
+            return workingTimeSlots;
+//return availableTimeSlots;
         } else {
             return workingTimeSlots;
         }
@@ -222,10 +249,15 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
 
     @Override
     public void addAppointment(AppointmentEntity appt, ServiceProviderEntity spEntity) {
-        List<AppointmentEntity> appts = retrieveAllAppointmentsForServiceProvider(spEntity);
-        appts.add(appt);
-        em.merge(spEntity);
-        em.flush();
+        try {
+            ServiceProviderEntity svcpEntity = this.retrieveServiceProviderByServiceProviderId(spEntity.getServiceProviderId());
+            List<AppointmentEntity> appts = svcpEntity.getAppointmentEntities();
+            appts.add(appt);
+            svcpEntity.setAppointmentEntities(appts);
+        } catch (ServiceProviderEntityNotFoundException ex) {
+            System.err.println("Error occurred when retrieving service provider: " + ex.getMessage());
+        }
+
     }
 
     @Override
@@ -246,10 +278,15 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         for (Integer rating : listOfRatings) {
             totalRating += rating.doubleValue();
         }
-        overallRating = totalRating / listOfRatings.size();
-        return overallRating;
+
+        if (listOfRatings.isEmpty()) {
+            return 0;
+        } else {
+            overallRating = totalRating / listOfRatings.size(); // no ratings cannot divide by 0 - output: "thrs no rating yet"
+            return overallRating;
+        }
     }
-    
+
     @Override
     public List<AppointmentEntity> retrieveUnratedAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity) {
         Query query = em.createQuery("SELECT a FROM AppointmentEntity a WHERE a.serviceProviderEntity.serviceProviderId = :serviceProviderEntityId AND a.rating = :rating");
@@ -268,8 +305,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     }
     
     @Override
-    public List<AppointmentEntity> retrieveAppointmentsOfServiceProviderById(Long serviceProviderId) throws ServiceProviderEntityNotFoundException
-    {
+    public List<AppointmentEntity> retrieveAppointmentsOfServiceProviderById(Long serviceProviderId) throws ServiceProviderEntityNotFoundException {
         ServiceProviderEntity serviceProviderEntity = retrieveServiceProviderByServiceProviderId(serviceProviderId);
         List<AppointmentEntity> apptEntities = serviceProviderEntity.getAppointmentEntities();
         apptEntities.size();
@@ -296,4 +332,3 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         return result;
     }
 }
-

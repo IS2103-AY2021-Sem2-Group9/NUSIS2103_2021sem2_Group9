@@ -19,7 +19,7 @@ public class MainApp {
     private AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote;
     private ServiceProviderTerminal spTerminal;
     private AdminTerminal adminTerminal;
-    private CustomerTerminal customerTerminal;
+//    private CustomerTerminal customerTerminal;
     private Queue queueCheckoutNotification;
     private ConnectionFactory queueCheckoutNotificationFactory;
     
@@ -43,16 +43,14 @@ public class MainApp {
         Integer response = 0; 
         while(true) {
             System.out.println("*** Welcome to EasyAppoinment ***\n"); 
-            System.out.println("1: Customer Terminal");
-            System.out.println("2: Service Provider Terminal");
-            System.out.println("3: Admin Terminal");
-            System.out.println("4: Exit");
+//            System.out.println("1: Customer Terminal");
+            System.out.println("1: Service Provider Terminal");
+            System.out.println("2: Admin Terminal");
+            System.out.println("3: Exit");
             response = 0;
           
-            while (response < 1 || response > 4) {
-                System.out.print("> ");
-                
-                
+            while (response < 1 || response > 3) {
+                System.out.print("> ");          
                 try {
                     response = scanner.nextInt();
                 }   catch (InputMismatchException ex) {
@@ -60,21 +58,18 @@ public class MainApp {
                     scanner.next();
                 }
                 if(response == 1) {
-                    customerTerminal = new CustomerTerminal(customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, businessCategorySessionBeanRemote, appointmentEntitySessionBeanRemote);
-                    customerTerminal.runApp();
-                } else if(response == 2) {
                     spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote, businessCategorySessionBeanRemote, appointmentEntitySessionBeanRemote);
                     spTerminal.runApp();
-                } else if (response == 3) {
+                } else if (response == 2) {
                     adminTerminal = new AdminTerminal(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, queueCheckoutNotification, queueCheckoutNotificationFactory);
                     adminTerminal.runApp();
-                } else if (response == 4) {
+                } else if (response == 3) {
                     break;
                 } else {
                     System.out.println("Invalid option, please key in 1 ~ 4 only.\n");
                 }      
             }
-            if (response == 4) {
+            if (response == 3) {
                 System.out.println("Thank you!\n"); 
                 break;
             }            
