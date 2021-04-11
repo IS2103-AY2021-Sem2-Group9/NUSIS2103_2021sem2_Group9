@@ -460,7 +460,7 @@ public class CustomerModule {
                     System.out.println();
                     AppointmentEntity apptEntity = apptsToRate.get(index - 1);
                     apptEntity.setRating(rating);
-                    this.appointmentEntitySessionBeanRemote.rateAppointment(apptEntity);
+                    //this.appointmentEntitySessionBeanRemote.rateAppointment(apptEntity);
                     System.out.println("You have rated Appointment" + apptEntity.getAppointmentNum() + " a rating of " + rating + ".");
                 }
             }
