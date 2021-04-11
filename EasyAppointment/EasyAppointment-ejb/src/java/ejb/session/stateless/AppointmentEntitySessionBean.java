@@ -76,7 +76,7 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
             em.persist(apptEntity);
             em.flush();
             return apptEntity;
-        } catch (PersistenceException | CustomerNotFoundException | ServiceProviderEntityNotFoundException ex) {
+        } catch (PersistenceException ex) {
             if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) { // A database-related exception
                 if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) { // To get the internal error
                     throw new AppointmentExistException("Error creating appointment");

@@ -17,8 +17,6 @@ public interface AppointmentEntitySessionBeanLocal {
     
     public AppointmentEntity createAppointmentEntity(AppointmentEntity apptEntity) throws UnknownPersistenceException, AppointmentExistException;
     
-    public void rateAppointment(AppointmentEntity appointmentEntity);
-    
     public AppointmentEntity updateAppointmentEntity(AppointmentEntity apptEntity);
 
     public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
