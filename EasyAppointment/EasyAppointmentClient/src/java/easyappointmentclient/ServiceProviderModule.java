@@ -87,7 +87,14 @@ public class ServiceProviderModule {
         System.out.println("City: " + currentServiceProviderEntity.getCity());
         System.out.println("Phone: " + currentServiceProviderEntity.getPhoneNumber());
         System.out.println("Business Address: " + currentServiceProviderEntity.getAddress());
-        System.out.println("Email: " + currentServiceProviderEntity.getEmail() + "\n"); 
+        System.out.println("Email: " + currentServiceProviderEntity.getEmail()); 
+        System.out.println("Account Status: " + currentServiceProviderEntity.getStatus());
+        double rating = serviceProviderEntitySessionBeanRemote.generateOverallRating(currentServiceProviderEntity);
+        if (rating == 0.0) {
+            System.out.println("Overall Rating: You have no ratings yet!\n");
+        } else {
+            System.out.println("Overall Rating: " + rating + "\n");
+        }
         
         while (true) {
             System.out.println("Enter 0 to go back to the previous menu.");
