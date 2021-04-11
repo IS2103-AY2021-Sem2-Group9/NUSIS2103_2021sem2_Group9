@@ -88,6 +88,7 @@ public class ServiceProviderModule {
         System.out.println("Phone: " + currentServiceProviderEntity.getPhoneNumber());
         System.out.println("Business Address: " + currentServiceProviderEntity.getAddress());
         System.out.println("Email: " + currentServiceProviderEntity.getEmail() + "\n"); 
+        System.out.println("Account Status" + currentServiceProviderEntity.getStatus().toString());
         
         while (true) {
             System.out.println("Enter 0 to go back to the previous menu.");
