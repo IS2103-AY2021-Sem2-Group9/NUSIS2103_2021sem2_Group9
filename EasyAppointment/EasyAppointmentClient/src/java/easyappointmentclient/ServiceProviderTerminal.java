@@ -99,8 +99,16 @@ public class ServiceProviderTerminal {
         String password = "";
        
         System.out.println("*** Service Provider Terminal :: Registration Operation ***\n");
-        System.out.print("Enter Name> ");
-        spEntity.setName(scanner.nextLine().trim());
+        while (true) {
+            System.out.print("Enter Name> ");
+            name = scanner.nextLine();
+            if (name.length() > 0 ) {
+                spEntity.setName(name);
+                break;
+            } else {
+                System.err.println("Please input a name!");
+            }
+        }
         List<BusinessCategoryEntity> businessCategories = businessCategorySessionBeanRemote.retrieveAllBusinessCategories(); 
         System.out.printf("%11s%16s\n", "Category ID", "Category Name");
         
@@ -108,40 +116,119 @@ public class ServiceProviderTerminal {
         {
             System.out.printf("%11s%16s\n", categoryEntity.getId(), categoryEntity.getCategoryName());
         }
-        System.out.print("Enter Business Category> ");
-        category = scanner.nextLong(); 
-        scanner.nextLine();
-        System.out.print("Enter Business Registration Number> ");
-        spEntity.setUen(scanner.nextLine().trim());
-        System.out.print("Enter City> ");
-        spEntity.setCity(scanner.nextLine().trim());
-        System.out.print("Enter Phone> ");
-        spEntity.setPhoneNumber(scanner.nextLine().trim());
-        System.out.print("Enter Business Address> ");
-        spEntity.setAddress(scanner.nextLine().trim());
-        System.out.print("Enter Email> ");
-        spEntity.setEmail(scanner.nextLine().trim());
-        System.out.print("Enter Password> ");
-        spEntity.setPassword(scanner.nextLine().trim());
+        while (true) {
+            System.out.print("Enter Business Category> ");
+            String input = scanner.nextLine();
+            if (input.length() > 0) {
+                try {
+                    category = Long.valueOf(input);
+                    if (category <= businessCategories.size()) {
+                        break;
+                    } else {
+                        System.err.println("Please input a valid Business Category ID. ");
+                    }
+                } catch (NumberFormatException ex) {
+                    System.err.println("Please input digits only!");
+                }
+            } else {
+                System.err.println("Please input a Business Category ID.");
+            }
+        }
+        
+        while (true) {
+            System.out.print("Enter Business Registration Number> ");
+            uen = scanner.nextLine();
+            if (uen.length() > 0) {
+                spEntity.setUen(uen);
+                break;
+            } else {
+                System.err.println("Please input a Business Registration Number");
+            }
+        }
+        
+        while (true) {
+            System.out.print("Enter City> ");
+            city = scanner.nextLine();
+            if (city.length() > 0) {
+                spEntity.setCity(city);
+                break;
+            } else {
+                System.err.println("Please input a City name.");
+            }
+        }
+        
+        while (true) {
+            System.out.print("Enter Phone> ");
+            phone = scanner.nextLine(); 
+            if (phone.length() > 0) {
+                spEntity.setPhoneNumber(phone);
+                break;
+            } else {
+                System.err.println("Please input a Phone Number.");
+            }
+        }
+
+        while (true) {
+            System.out.print("Enter Business Address> ");
+            address = scanner.nextLine(); 
+            if (address.length() > 0) {
+                spEntity.setAddress(address);
+                break;
+            } else {
+                System.err.println("Please input a Business Address.");
+            }
+        }
+        
+        while (true) {
+            System.out.print("Enter Email> ");
+            email = scanner.nextLine(); 
+            if (email.length() > 0) {
+                if (serviceProviderEntitySessionBeanRemote.checkEmail(email)) {
+                    spEntity.setEmail(email);
+                    break;
+                } else {
+                    System.err.println("Email inputed has already been registered, try again with a new Email.");
+                }
+            } else {
+                System.err.println("Please input an Email.");
+            }
+            
+        }
+        
+        while (true) {
+            System.out.print("Enter Password (6 digit)> ");
+            password = scanner.nextLine(); 
+            if (password.length() ==  6) {
+                spEntity.setPassword(password);
+                break;
+            } else {
+                System.err.println("Please input a 6 digit Password.");
+            }
+        }
         spEntity.setStatus(ServiceProviderStatus.PENDING);
         
         try {
             spEntity = serviceProviderEntitySessionBeanRemote.registerNewServiceProvider(spEntity, category);
             System.out.println("You have registered Service Provider: " + spEntity.getName() + " successfully!\n"); 
         } catch(ServiceProviderEmailExistException | BusinessCategoryNotFoundException | InvalidPasswordFormatException | UnknownPersistenceException ex ) {
-            System.err.println("Error registering! " + ex.getMessage());
+            System.out.println("Error registering! " + ex.getMessage() + " Please try again.");
         }
         
         
         while(true) {
-            Integer response; 
+            Integer response = 1; 
             System.out.println("Enter 0 to go back to the previous menu"); 
             System.out.print("> ");
-            response = scanner.nextInt();
-            if(response == 0) {
+            try {
+                response = scanner.nextInt();
+            } catch (InputMismatchException ex) {
+                System.err.println("Please input digits only.");
+                scanner.next();
+            }
+            if (response == 0) {
                 System.out.println("Heading back to Service Provider Terminal...");
                 break;
-            }  
+            } 
         }
     }
     

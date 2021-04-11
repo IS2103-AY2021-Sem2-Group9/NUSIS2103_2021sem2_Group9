@@ -119,50 +119,61 @@ public class ServiceProviderModule {
        System.out.println("*** Service Provider Terminal :: Edit Profile ***"); 
        
        Scanner scanner = new Scanner(System.in); 
-       String input; 
-       
+       String newCity;
+       String newAddress;
+       String newPhone; 
+       String newEmail;
+       String newPassword;
        
        System.out.print("Enter City (blank if no change)> ");
-       input = scanner.nextLine().trim();
-       if(input.length() > 0) {
-            currentServiceProviderEntity.setCity(input);
+       newCity = scanner.nextLine().trim();
+       if(newCity.length() > 0) {
+            currentServiceProviderEntity.setCity(newCity);
         }
 
         System.out.print("Enter Business Address (blank if no change)> ");
-        input = scanner.nextLine().trim();
-        if(input.length() > 0) {
-            currentServiceProviderEntity.setAddress(input);
-        }
-
-        System.out.print("Enter Email Address (blank if no change)> ");
-        input = scanner.nextLine().trim(); 
-        if (input.length() > 0) {
-            currentServiceProviderEntity.setEmail(input);
+        newAddress = scanner.nextLine().trim();
+        if(newAddress.length() > 0) {
+            currentServiceProviderEntity.setAddress(newAddress);
         }
 
         System.out.print("Enter Phone (blank if no change)> ");
-        input = scanner.nextLine().trim();
-        if(input.length() > 0) {
-            currentServiceProviderEntity.setPhoneNumber(input);
+        newPhone = scanner.nextLine().trim();
+        if(newPhone.length() > 0) {
+            currentServiceProviderEntity.setPhoneNumber(newPhone);
         }
-        System.out.print("Enter Password (blank if no change)> ");
-        input = scanner.nextLine().trim();
-        if(input.length() > 0) {
-            try {
-                String newPassword = input;
-                currentServiceProviderEntity.setPassword(newPassword);
-            } catch (NumberFormatException ex) {
-                System.err.println("Please input a password consisting of numbers only!");
-                scanner.next();
+        
+        System.out.print("Enter Email Address (blank if no change)> ");
+        newEmail = scanner.nextLine().trim(); 
+        if (newEmail.length() > 0) {
+            currentServiceProviderEntity.setEmail(newEmail);
+        }
+
+        while (true) {
+            System.out.print("Enter Password (blank if no change)> ");
+            newPassword = scanner.nextLine().trim();
+            if(newPassword.length() > 0 ) {
+                if(newPassword.length() ==  6) {
+                    currentServiceProviderEntity.setPassword(newPassword);
+                    break;
+                } else {
+                    System.err.println("Please input a 6 digit password.");
+                }
+            } else {
+                break;
             }
         }
         System.out.println();
-
-        try {
-            serviceProviderEntitySessionBeanRemote.updateServiceProvider(currentServiceProviderEntity);
-            System.out.println("Service Provider Profile updated successfully!\n");
-        } catch(ServiceProviderEntityNotFoundException | UpdateServiceProviderException ex) {
-            System.out.println("An error has occured while updating staff: " + ex.getMessage() + "\n");
+        
+        if (newCity.length() > 0 || newAddress.length() > 0 || newPhone.length() > 0 || newEmail.length() > 0 || newPassword.length() > 0) {
+            try {
+                serviceProviderEntitySessionBeanRemote.updateServiceProvider(currentServiceProviderEntity);
+                System.out.println("Service Provider Profile updated successfully!\n");
+            } catch(ServiceProviderEntityNotFoundException | UpdateServiceProviderException ex) {
+                System.out.println("An error has occured while updating staff: " + ex.getMessage() + "\n");
+            }
+        } else {
+            System.out.println("No changes has been made.");
         }
 
         while(true) {
@@ -170,11 +181,11 @@ public class ServiceProviderModule {
             System.out.println("Enter 0 to go back to the previous menu"); 
             System.out.print("> ");
             try {
-                    response = scanner.nextInt();
-                }   catch (InputMismatchException ex) {
-                    System.err.println("Please input digits only.");
-                    scanner.next();
-                }
+                response = scanner.nextInt();
+            }   catch (InputMismatchException ex) {
+                System.err.println("Please input digits only.");
+                scanner.next();
+            }
             if(response == 0) {
                 System.out.println("Heading back to Service Provider Terminal...");
                 break;

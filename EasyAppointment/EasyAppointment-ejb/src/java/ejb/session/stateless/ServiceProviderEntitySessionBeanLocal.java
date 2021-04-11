@@ -52,5 +52,7 @@ public interface ServiceProviderEntitySessionBeanLocal {
     public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
 
     public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
+
+    public boolean checkEmail(String email);
     
 }

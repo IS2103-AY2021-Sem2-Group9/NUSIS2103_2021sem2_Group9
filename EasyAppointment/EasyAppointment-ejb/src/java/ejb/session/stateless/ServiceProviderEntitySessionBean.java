@@ -75,7 +75,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         {
             if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
                 if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
-                    throw new BusinessCategoryNotFoundException("Error! Businesss category cannot be found!");
+                    throw new BusinessCategoryNotFoundException("Businesss category cannot be found!");
                 } else {
                     throw new UnknownPersistenceException(ex.getMessage());
                 }
@@ -144,7 +144,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
                 serviceProviderEntityToUpdate.setPassword(serviceProviderEntity.getPassword());
 
             } else {
-                throw new UpdateServiceProviderException("Username of service provider to be updated does not match the existing record");
+                throw new UpdateServiceProviderException("ID of service provider to be updated does not match the existing record");
             }
         } else {
             throw new ServiceProviderEntityNotFoundException("Service Provider does not exist!");
@@ -330,5 +330,19 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
             }
         }
         return result;
+    }
+    
+    @Override
+    public boolean checkEmail(String email) {
+        boolean valid = true;
+        Query query = em.createQuery("SELECT sp.email FROM ServiceProviderEntity sp");
+        List<String> result = query.getResultList();
+        for (String e : result) {
+            if (e.equals(email)) {
+                valid = false;
+                break;
+            }
+        }
+        return valid;
     }
 }

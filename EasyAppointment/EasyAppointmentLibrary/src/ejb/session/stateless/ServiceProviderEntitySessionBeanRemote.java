@@ -58,4 +58,6 @@ public interface ServiceProviderEntitySessionBeanRemote
     public double generateOverallRating(ServiceProviderEntity spEntity);
     
     public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
+
+    public boolean checkEmail(String email);
 }
