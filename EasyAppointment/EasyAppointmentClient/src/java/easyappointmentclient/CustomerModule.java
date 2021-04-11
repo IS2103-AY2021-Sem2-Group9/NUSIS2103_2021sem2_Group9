@@ -297,7 +297,7 @@ public class CustomerModule {
                 // Construct Appointment Entity
                 AppointmentEntity apptEntity = new AppointmentEntity(date, selectedTimeSlot, loggedInCustomerEntity, spEntity);
                 this.appointmentEntitySessionBeanRemote.createAppointmentEntity(apptEntity);
-                this.serviceProviderEntitySessionBeanRemote.addAppointment(apptEntity, spEntity);
+                //this.serviceProviderEntitySessionBeanRemote.addAppointment(apptEntity, spEntity);
 
             } catch (UnknownPersistenceException | AppointmentExistException ex) {
                 System.err.println("Error occured when creating appointment: " + ex.getMessage());
@@ -340,7 +340,6 @@ public class CustomerModule {
                 System.out.println("\n");
                 for (int i = 0; i < appointments.size(); i++) {
                     AppointmentEntity appt = appointments.get(i);
-                    String apptID = appt.getId().toString();
                     String apptNum = appt.getAppointmentNum();
                     String apptDate = appt.getAppointmentDate().toString();
                     String apptTime = appt.getAppointmentTime().toString();
@@ -372,7 +371,6 @@ public class CustomerModule {
                 System.out.println("\n");
                 for (int i = 0; i < appointments.size(); i++) {
                     AppointmentEntity appt = appointments.get(i);
-                    String apptID = appt.getId().toString();
                     String apptNum = appt.getAppointmentNum();
                     String apptDate = appt.getAppointmentDate().toString();
                     String apptTime = appt.getAppointmentTime().toString();

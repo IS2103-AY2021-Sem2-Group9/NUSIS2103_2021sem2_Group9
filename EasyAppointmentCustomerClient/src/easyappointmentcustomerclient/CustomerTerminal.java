@@ -183,17 +183,17 @@ public class CustomerTerminal
         }
     }
 
+
     private static CustomerEntity customerLogin(java.lang.String email, java.lang.Integer password) throws InvalidLoginCredentialException_Exception {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
         return port.customerLogin(email, password);
     }
-
+    
     private static CustomerEntity createCustomerEntity(ws.client.CustomerEntity customerEntity) throws UnknownPersistenceException_Exception, CustomerExistException_Exception {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
         return port.createCustomerEntity(customerEntity);
     }
-    
-    
+
 }

@@ -71,17 +71,19 @@ public class DataInitializationSessionBean {
             businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Education"));
             
             CustomerEntity testCustomer = new CustomerEntity("S9898100B", "test@gmail.com", 123, "John", "Doe", "M", 21, "97381199", "123A Temasek Hall", "Singapore");
+            CustomerEntity newCustomer = new CustomerEntity("S9892011A", "1", 1, "Test", "Customer", "M", 21, "90000009", "321A Eusoff Hall", "Clementi");
             customerEntitySessionBeanLocal.createCustomerEntity(testCustomer);
+            customerEntitySessionBeanLocal.createCustomerEntity(newCustomer);
             
             LocalDate testDate = LocalDate.of(2021,04,06);
             LocalTime testTime = LocalTime.of(10, 30);
-            ServiceProviderEntity testSP = new ServiceProviderEntity("1", "1", "1", "1", "1", "1", 1, ServiceProviderStatus.APPROVED);
+            ServiceProviderEntity testSP = new ServiceProviderEntity("1", "1", "1", "1", "1", "1", "123456", ServiceProviderStatus.APPROVED);
             Long categoryId = 1L;
             serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(testSP, categoryId);
-            serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(new ServiceProviderEntity("Kevin Paterson", "1111001111", "Clementi", "93718799", "13, Clementi Road", "kevin@nuh.com.sg", 113322, ServiceProviderStatus.APPROVED), categoryId);
-            AppointmentEntity testAppointment = new AppointmentEntity(testDate, testTime, testCustomer, testSP);
+            serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(new ServiceProviderEntity("Kevin Paterson", "1111001111", "Clementi", "93718799", "13, Clementi Road", "kevin@nuh.com.sg", "654321", ServiceProviderStatus.APPROVED), categoryId);
+            AppointmentEntity testAppointment = new AppointmentEntity(testDate, testTime, newCustomer, testSP);
             appointmentEntitySessionBeanLocal.createAppointmentEntity(testAppointment);
-            serviceProviderEntitySessionBeanLocal.addAppointment(testAppointment, testSP);
+            //serviceProviderEntitySessionBeanLocal.addAppointment(testAppointment, testSP);
             
             
         } catch (Exception ex) {

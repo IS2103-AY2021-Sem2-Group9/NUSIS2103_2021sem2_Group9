@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
 @Entity
@@ -38,6 +39,7 @@ public class CustomerEntity implements Serializable {
     @Column(nullable = false, length = 32)
     private String city;
     @OneToMany(mappedBy="customerEntity")
+    @JoinColumn(nullable = false)
     private List<AppointmentEntity> appointments;
 
     public CustomerEntity() {

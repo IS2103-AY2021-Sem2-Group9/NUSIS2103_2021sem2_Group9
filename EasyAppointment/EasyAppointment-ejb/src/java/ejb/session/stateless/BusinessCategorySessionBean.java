@@ -10,6 +10,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.BusinessCategoryExistException;
 import util.exception.BusinessCategoryNotFoundException;
 
 @Stateless
@@ -21,18 +22,25 @@ public class BusinessCategorySessionBean implements BusinessCategorySessionBeanR
     private EntityManager em;
 
     @Override
-    public String createBusinessCategoryEntity(BusinessCategoryEntity businessCategoryEntity) 
+    public String createBusinessCategoryEntity(BusinessCategoryEntity businessCategoryEntity) throws BusinessCategoryExistException
     {
-        em.persist(businessCategoryEntity);
-        em.flush();
+        try
+        {
+            BusinessCategoryEntity category = retrieveBusinessCategoryByName(businessCategoryEntity.getCategoryName());
+            throw new BusinessCategoryExistException("Business Category already exists!");
+        }
+        catch(BusinessCategoryNotFoundException ex)
+        {
+            em.persist(businessCategoryEntity);
+            em.flush();    
+        }
         return businessCategoryEntity.getCategoryName();
     }
 
     @Override
     public List<BusinessCategoryEntity> retrieveAllBusinessCategories()
     {
-        System.out.println("hello");
-        Query query = em.createQuery("SELECT b FROM BusinessCategoryEntity b");
+        Query query = em.createQuery("SELECT b FROM BusinessCategoryEntity b ORDER BY b.id");
         
         return query.getResultList();
     }

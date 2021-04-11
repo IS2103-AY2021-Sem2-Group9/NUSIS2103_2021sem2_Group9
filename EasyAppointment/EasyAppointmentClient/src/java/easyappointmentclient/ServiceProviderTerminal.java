@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Scanner;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.InvalidPasswordFormatException;
 import util.exception.ServiceProviderEmailExistException;
 import util.exception.UnknownPersistenceException;
 
@@ -69,9 +70,10 @@ public class ServiceProviderTerminal {
                         serviceProviderModule = new ServiceProviderModule(serviceProviderEntitySessionBeanRemote, currentServiceProviderEntity, businessCategorySessionBeanRemote, appointmentEntitySessionBeanRemote);
                         serviceProviderModule.menuServiceProvider();
                     }
-                    catch (InvalidLoginCredentialException ex)
+                    catch (InvalidLoginCredentialException | InvalidPasswordFormatException ex)
                     {
-                        System.out.println("An error occured while logging in: " + ex.getMessage());
+                        System.err.println("An error occured while logging in: " + ex.getMessage());
+                        continue;
                     }
                 } else if (response == 3) 
                 { 
@@ -126,33 +128,47 @@ public class ServiceProviderTerminal {
         System.out.print("Enter Email> ");
         spEntity.setEmail(scanner.nextLine().trim());
         System.out.print("Enter Password> ");
-        spEntity.setPassword(scanner.nextInt());
+        spEntity.setPassword(scanner.nextLine().trim());
         spEntity.setStatus(ServiceProviderStatus.PENDING);
         
         try {
             spEntity = serviceProviderEntitySessionBeanRemote.registerNewServiceProvider(spEntity, category);
             System.out.println("You have registered Service Provider: " + spEntity.getName() + " successfully!\n"); 
-        } catch(ServiceProviderEmailExistException | BusinessCategoryNotFoundException | UnknownPersistenceException ex ) {
-            System.out.println("Error registering! " + ex.getMessage());
+        } catch(ServiceProviderEmailExistException | BusinessCategoryNotFoundException | InvalidPasswordFormatException | UnknownPersistenceException ex ) {
+            System.err.println("Error registering! " + ex.getMessage());
         }
 
     }
     
-    private void doLogin() throws InvalidLoginCredentialException 
+    private void doLogin() throws InvalidLoginCredentialException, InvalidPasswordFormatException 
     {
         Scanner scanner = new Scanner(System.in);
         String email = "";
-        Integer password; 
+        String password = ""; 
         
         System.out.println("*** Service provider terminal :: Login ***\n");
         System.out.print("Enter Email Address> ");
         email = scanner.nextLine().trim(); 
         System.out.print("Enter password> "); 
-        password = scanner.nextInt(); 
-        scanner.nextLine(); 
+        password = scanner.nextLine().trim(); 
         
-        if(email.length() > 0 && password.toString().length() > 0) {
-            currentServiceProviderEntity = serviceProviderEntitySessionBeanRemote.serviceProviderLogin(email, password);
+        if(email.length() > 0 && password.length() > 0) {
+            if (password.length() != 6)
+            {
+                throw new InvalidPasswordFormatException("Password should be 6 digits long only.");
+            }
+            else 
+            {
+                try
+                {
+                    Integer pw = Integer.parseInt(password);
+                    currentServiceProviderEntity = serviceProviderEntitySessionBeanRemote.serviceProviderLogin(email, pw);
+                }
+                catch(NumberFormatException ex)
+                {
+                    throw new InvalidPasswordFormatException("Please enter digits only.");
+                }  
+            }
         } else {
             throw new InvalidLoginCredentialException("Missing login credential");
         }
