@@ -70,7 +70,7 @@ public class AdminTerminal {
                     }
                     catch (InvalidLoginCredentialException ex)
                     {
-                        System.out.println("An error has occurred while logging in: " + ex.getMessage() + "\n");
+                        System.err.println("An error has occurred while logging in: " + ex.getMessage() + "\n");
                     }
                 } else if (response == 2) {
                     break;

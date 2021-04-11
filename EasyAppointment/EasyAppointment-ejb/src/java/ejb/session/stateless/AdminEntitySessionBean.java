@@ -11,6 +11,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.AdminNotFoundException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.InvalidPasswordFormatException;
+import util.password.PasswordEncrypt;
 
 @Stateless
 @Local(AdminEntitySessionBeanLocal.class)
@@ -19,13 +21,34 @@ public class AdminEntitySessionBean implements AdminEntitySessionBeanRemote, Adm
 
     @PersistenceContext(unitName = "EasyAppointment-ejbPU")
     private EntityManager entityManager;
+    
+    private final PasswordEncrypt passwordEncrypt = new PasswordEncrypt();
 
     @Override
-    public Long createAdminEntity(AdminEntity adminEntity) 
+    public Long createAdminEntity(AdminEntity adminEntity) throws InvalidPasswordFormatException
     {
-        entityManager.persist(adminEntity);
-        entityManager.flush();
-        return adminEntity.getId();
+        try 
+        {
+            String newPassword = adminEntity.getPassword();
+            if (newPassword.length() != 6)
+            {
+                throw new InvalidPasswordFormatException("Password length is not 6!");
+            }
+            else
+            {
+                Integer intPassword = Integer.valueOf(newPassword);
+                String salt = passwordEncrypt.getSalt(30);
+                String encryptedPassword = passwordEncrypt.generateSecurePassword(adminEntity.getPassword(), salt);
+                adminEntity.setPassword(salt + encryptedPassword);
+                entityManager.persist(adminEntity);
+                entityManager.flush();
+            }
+            return adminEntity.getId();
+        }
+        catch (NumberFormatException ex)
+        {
+            throw new InvalidPasswordFormatException("Password can only be digits!");
+        }
     }
     
     @Override
@@ -63,8 +86,12 @@ public class AdminEntitySessionBean implements AdminEntitySessionBeanRemote, Adm
         try
         {
             AdminEntity adminEntity = retrieveAdminEntityByAdminEmail(email);
+            String saltAndPassword = adminEntity.getPassword();
+            String salt = saltAndPassword.substring(0, 30);
+            String encryptedPassword = saltAndPassword.substring(31);
+            Boolean passwordVerification = passwordEncrypt.verifyUserPassword(password, encryptedPassword, salt);
             
-            if (adminEntity.getPassword().equals(password))
+            if (passwordVerification)
             {
                 return adminEntity;
             }
