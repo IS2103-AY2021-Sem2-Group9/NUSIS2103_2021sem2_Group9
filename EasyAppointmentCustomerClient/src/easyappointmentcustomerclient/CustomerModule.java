@@ -3,8 +3,10 @@ package easyappointmentcustomerclient;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -19,6 +21,7 @@ import ws.client.BusinessCategoryNotFoundException_Exception;
 import ws.client.CustomerExistException_Exception;
 import ws.client.CustomerNotFoundException_Exception;
 import ws.client.ServiceProviderEntityNotFoundException_Exception;
+import ws.client.ServiceProviderStatus;
 import ws.client.UnknownPersistenceException_Exception;
 
 public class CustomerModule {
@@ -137,31 +140,24 @@ public class CustomerModule {
     public LocalDate searchForAddingAppt(Long category, String city) { // Strictly for addAppointments()
         Scanner sc = new Scanner(System.in);
 
-        // Get all the biz categories and print them
-        List<BusinessCategoryEntity> businessCategories = retrieveAllBusinessCategories();
-        for (int i = 0; i < businessCategories.size(); i++) {
-            if (i == businessCategories.size() - 1) {
-                System.out.print(i + 1);
-                System.out.print(" ");
-                System.out.println(businessCategories.get(i).getCategoryName());
-            } else {
-                System.out.print(i + 1);
-                System.out.print(" ");
-                System.out.print(businessCategories.get(i).getCategoryName());
-                System.out.print(" | ");
-            }
-
-        }
-
         // Init
         int compare = 1;
         LocalDate date = LocalDate.now();
         String dateStr = "";
 
         while (compare > 0) { // compare must be <= 0
-            System.out.print("Enter date> ");
-            dateStr = sc.nextLine();
-            date = LocalDate.parse(dateStr);
+            
+            while (true) {
+                try {
+                    System.out.print("Enter date> ");
+                    dateStr = sc.nextLine();
+                    date = LocalDate.parse(dateStr);
+                    break;
+                } catch (DateTimeParseException ex) {
+                    System.err.println("Invalid date input. Please try again.");
+                }
+            }
+            
             LocalDate todaysDate = LocalDate.now();
             compare = todaysDate.compareTo(date); // Returns -1 if today is before "date", 0 if same day, 1 if today is after "date"
             if (compare > 0) {
@@ -208,34 +204,88 @@ public class CustomerModule {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("*** Customer Terminal :: Add Appointments ***\n");
-        
-        System.out.print("Enter business category> ");
-        Long category = sc.nextLong();
+        // Get all the biz categories and print them
+        List<BusinessCategoryEntity> businessCategories = retrieveAllBusinessCategories();
+        for (int i = 0; i < businessCategories.size(); i++) {
+            if (i == businessCategories.size() - 1) {
+                System.out.print(i + 1);
+                System.out.print(" ");
+                System.out.println(businessCategories.get(i).getCategoryName());
+            } else {
+                System.out.print(i + 1);
+                System.out.print(" ");
+                System.out.print(businessCategories.get(i).getCategoryName());
+                System.out.print(" | ");
+            }
+
+        }
+
+        Long category;
+        String city;
+        Long spId;
+        ServiceProviderEntity spEntity;
+
+        while (true) {
+            try {
+                System.out.print("Enter business category> ");
+                category = sc.nextLong();
+                break;
+            } catch (InputMismatchException ex) {
+                System.err.println("Please input a digit\n");
+                sc.next();
+            }
+        }
+
         sc.nextLine();
-        System.out.print("Enter city> ");
-        String city = sc.nextLine();
-        
+
+        while (true) {
+            try {
+                System.out.print("Enter city> ");
+                city = sc.nextLine();
+                break;
+            } catch (InputMismatchException ex) {
+                System.err.println("Please input a digit\n");
+                sc.next();
+            }
+        }
+
         LocalDate date = this.searchForAddingAppt(category, city);
 
         try {
-            System.out.println("Enter 0 to go back to the previous menu.");
-            System.out.print("Service provider Id> ");
-            Long spId = sc.nextLong();
-            if (spId == 0) {
-                return; // Break out of the method
-            }
-            System.out.println();
-            sc.nextLine();
+            while (true) {
+                try {
+                    System.out.println("Enter 0 to go back to the previous menu.");
+                    System.out.print("Service provider Id> ");
+                    spId = sc.nextLong();
+                    if (spId == 0) {
+                        return; // Break out of the method
+                    }
 
-            ServiceProviderEntity spEntity = retrieveServiceProviderByServiceProviderId(spId);
-            // Check if service provider belongs to city
+                    spEntity = retrieveServiceProviderByServiceProviderId(spId);
+                    // Only allow user to enter spid that is shown
+                    // Check if service provider belongs to city
+                    if (!spEntity.getStatus().equals(ServiceProviderStatus.APPROVED) || !spEntity.getCity().equals(city) || spEntity.getCategory().getId() != category) {
+                        System.err.println("No such Service Provider ID. Please enter another.");
+                        continue;
+                    }
+                    System.out.println();
+                    sc.nextLine();
+                    break;
+                } catch (InputMismatchException ex) {
+                    System.err.println("Please input a digit\n");
+                    sc.next();
+                } catch (ServiceProviderEntityNotFoundException_Exception ex) {
+                    System.err.println("No such Service Provider ID. Please enter another.");
+                }
+            }
+
             List<String> availableTimeSlotsStr = retrieveServiceProviderAvailabilityForTheDay(spEntity, date.toString());
             List<LocalTime> availableTimeSlots = new ArrayList<>();
             for (int i = 0; i < availableTimeSlotsStr.size(); i++) {
                 availableTimeSlots.add(LocalTime.parse(availableTimeSlotsStr.get(i)));
             }
 
-            List<String> avaiList = new ArrayList<>();
+            List<String> avaiList = new ArrayList<>(); // To add all the available time slots for the service provider, factoring in the same day 2h in advance condition
 
             int compare = LocalDate.now().compareTo(date);
 
@@ -259,11 +309,11 @@ public class CustomerModule {
                 System.out.print("Exit> ");
                 String response = sc.nextLine();
                 while (!response.equals("0")) {
-                    System.out.println("Invalid input, please try again!");
+                    System.err.println("Invalid input, please try again!");
                     System.out.print("Exit> ");
                     response = sc.nextLine();
                     if (response.equals("0")) {
-                        return;
+                        return; // Break out of method
                     }
                 }
             } else {
@@ -282,35 +332,42 @@ public class CustomerModule {
 
             System.out.println("Enter 0 to go back to previous menu");
 
-            System.out.print("Enter time> ");
-            String timeStr = sc.nextLine(); // e.g. 11:30
-            if (timeStr.equals("0")) {
-                return; // Break out of method
-            }
-            System.out.println();
+            String timeStr;
 
-            AppointmentEntity appt = createAppointmentEntity(date.toString(), timeStr, loggedInCustomerEntity.getId(), spEntity.getServiceProviderId()); // customer side
-            // addAppointment(date.toString(), timeStr, appt.getAppointmentNum(), spEntity.getServiceProviderId()); // sp side
+            while (true) {
+                System.out.print("Enter time> ");
+                timeStr = sc.nextLine(); // e.g. 11:30
+                if (timeStr.equals("0")) {
+                    return; // Break out of method
+                }
+
+                // Check through available time slot list -> only can select if match e.g. only can select 08:30 if 08:30 is in the list
+                if (!avaiList.contains(timeStr)) {
+                    System.err.println("Time slot is unavailable. Please select another.");
+                    continue;
+                }
+                System.out.println();
+                break;
+            }
+
+            createAppointmentEntity(date.toString(), timeStr, loggedInCustomerEntity.getId(), spEntity.getServiceProviderId());
 
             System.out.printf("The appointment with %s %s at %s on %s is confirmed.", this.loggedInCustomerEntity.getFirstName(), this.loggedInCustomerEntity.getLastName(), timeStr, date.toString());
             System.out.println();
 
-        } catch (DateTimeException ex) {
-            System.err.println("Error occurred when reading date: " + ex.getMessage() + "\n");
-        } catch (ServiceProviderEntityNotFoundException_Exception | UnknownPersistenceException_Exception | AppointmentExistException_Exception | CustomerNotFoundException_Exception ex) {
-            Logger.getLogger(CustomerModule.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        System.out.println("Enter 0 to go back to previous menu");
-        System.out.print("Exit> ");
-        String response = sc.nextLine();
-        while (!response.equals("0")) {
-            System.out.println("Invalid input, please try again!");
+            System.out.println("Enter 0 to go back to previous menu");
             System.out.print("Exit> ");
-            response = sc.nextLine();
-            if (response.equals("0")) {
-                return;
+            String response = sc.nextLine();
+            while (!response.equals("0")) {
+                System.err.println("Invalid input, please try again!");
+                System.out.print("Exit> ");
+                response = sc.nextLine();
+                if (response.equals("0")) {
+                    return;
+                }
             }
+        } catch (UnknownPersistenceException_Exception | ServiceProviderEntityNotFoundException_Exception | AppointmentExistException_Exception | CustomerNotFoundException_Exception ex) {
+            System.err.println("Error occurred when creating appointment: " + ex.getMessage());
         }
     }
 
@@ -385,7 +442,7 @@ public class CustomerModule {
         System.out.print("Enter Appointment Number> ");
         appointmentNum = sc.nextLine().trim();
         try {
-            cancelAppointment(appointmentNum); 
+            cancelAppointment(appointmentNum);
             System.out.println("Appointment " + appointmentNum + " has been cancelled successfully.\n");
         } catch (AppointmentNotFoundException_Exception ex) {
             System.out.println("An error has occured when cancelling the appointment: " + ex.getMessage());
@@ -512,12 +569,6 @@ public class CustomerModule {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
         return port.retrieveAppointmentTimeWithApptNum(apptNum);
-    }
-
-    private static void addAppointment(java.lang.String dateStr, java.lang.String timeStr, java.lang.String apptNum, java.lang.Long spId) throws AppointmentNotFoundException_Exception, ServiceProviderEntityNotFoundException_Exception, CustomerNotFoundException_Exception {
-        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
-        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
-        port.addAppointment(dateStr, timeStr, apptNum, spId);
     }
 
     private static AppointmentEntity createAppointmentEntity(java.lang.String appointmentDate, java.lang.String apptTime, java.lang.Long customerId, java.lang.Long spId) throws UnknownPersistenceException_Exception, ServiceProviderEntityNotFoundException_Exception, AppointmentExistException_Exception, CustomerNotFoundException_Exception {
