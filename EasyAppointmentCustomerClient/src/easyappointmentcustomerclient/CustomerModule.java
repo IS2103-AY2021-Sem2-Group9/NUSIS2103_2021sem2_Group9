@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
+import ws.client.AppointmentCannotBeCancelledException_Exception;
 import ws.client.AppointmentEntity;
 import ws.client.BusinessCategoryEntity;
 import ws.client.CustomerEntity;
@@ -495,7 +496,7 @@ public class CustomerModule {
                     cancelAppointment(appointmentNum);
                     System.out.println("Appointment " + appointmentNum + " has been cancelled successfully.\n");
                     break;
-                } catch (AppointmentNotFoundException_Exception ex) {
+                } catch (AppointmentNotFoundException_Exception | AppointmentCannotBeCancelledException_Exception ex) {
                     System.err.println("An error has occured when cancelling the appointment: " + ex.getMessage());
                 }
             }
@@ -660,7 +661,7 @@ public class CustomerModule {
         return port.retrieveServiceProviderByServiceProviderId(serviceProviderId);
     }
 
-    private static void cancelAppointment(java.lang.String appointmentNum) throws AppointmentNotFoundException_Exception {
+    private static void cancelAppointment(java.lang.String appointmentNum) throws AppointmentNotFoundException_Exception, AppointmentCannotBeCancelledException_Exception {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
         port.cancelAppointment(appointmentNum);
