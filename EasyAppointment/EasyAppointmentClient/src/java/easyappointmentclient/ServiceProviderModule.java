@@ -11,6 +11,7 @@ import java.util.Scanner;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UpdateServiceProviderException;
 import java.util.List;
+import util.exception.AppointmentCannotBeCancelledException;
 import util.exception.AppointmentNotFoundException;
 import util.exception.InvalidPasswordFormatException;
 
@@ -120,50 +121,78 @@ public class ServiceProviderModule {
        System.out.println("*** Service Provider Terminal :: Edit Profile ***"); 
        
        Scanner scanner = new Scanner(System.in); 
-       String input; 
-       
+       String newCity;
+       String newAddress;
+       String newPhone; 
+       String newEmail;
+       String newPassword;
        
        System.out.print("Enter City (blank if no change)> ");
-       input = scanner.nextLine().trim();
-       if(input.length() > 0) {
-            currentServiceProviderEntity.setCity(input);
+       newCity = scanner.nextLine().trim();
+       if(newCity.length() > 0) {
+            currentServiceProviderEntity.setCity(newCity);
         }
 
         System.out.print("Enter Business Address (blank if no change)> ");
-        input = scanner.nextLine().trim();
-        if(input.length() > 0) {
-            currentServiceProviderEntity.setAddress(input);
+        newAddress = scanner.nextLine().trim();
+        if(newAddress.length() > 0) {
+            currentServiceProviderEntity.setAddress(newAddress);
         }
 
-        System.out.print("Enter Email Address (blank if no change)> ");
-        input = scanner.nextLine().trim(); 
-        if (input.length() > 0) {
-            currentServiceProviderEntity.setEmail(input);
-        }
-
-        System.out.print("Enter Phone (blank if no change)> ");
-        input = scanner.nextLine().trim();
-        if(input.length() > 0) {
-            currentServiceProviderEntity.setPhoneNumber(input);
-        }
-        System.out.print("Enter Password (blank if no change)> ");
-        input = scanner.nextLine().trim();
-        if(input.length() > 0) {
-            try {
-                String newPassword = input;
-                currentServiceProviderEntity.setPassword(newPassword);
-            } catch (NumberFormatException ex) {
-                System.err.println("Please input a password consisting of numbers only!");
-                scanner.next();
+        while (true) {
+            System.out.print("Enter Phone (blank if no change)> ");
+            newPhone = scanner.nextLine().trim();
+            if(newPhone.length() > 0) {
+                if (serviceProviderEntitySessionBeanRemote.checkPhoneNumber(newPhone)) {
+                    currentServiceProviderEntity.setPhoneNumber(newPhone);
+                    break;
+                } else {
+                    System.err.println("Phone number inputed is currently registered to another account, please try again with a different phone number");
+                }
+            } else {
+                break;
             }
         }
-        System.out.println();
+        
+        while (true) {
+            System.out.print("Enter Email Address (blank if no change)> ");
+            newEmail = scanner.nextLine().trim(); 
+            if (newEmail.length() > 0) {
+                if (serviceProviderEntitySessionBeanRemote.checkEmail(newEmail)) {
+                    currentServiceProviderEntity.setEmail(newEmail);
+                    break;
+                } else {
+                    System.err.println("Email address inputed is currently registered to another account, please try again with a different email address.");
+                }
+            } else {
+                break;
+            }
+        }
 
-        try {
-            serviceProviderEntitySessionBeanRemote.updateServiceProvider(currentServiceProviderEntity);
-            System.out.println("Service Provider Profile updated successfully!\n");
-        } catch(ServiceProviderEntityNotFoundException | UpdateServiceProviderException | InvalidPasswordFormatException ex) {
-            System.out.println("An error has occured while updating staff: " + ex.getMessage() + "\n");
+        while (true) {
+            System.out.print("Enter Password (blank if no change)> ");
+            newPassword = scanner.nextLine().trim();
+            if(newPassword.length() > 0 ) {
+                if(newPassword.length() ==  6) {
+                    currentServiceProviderEntity.setPassword(newPassword);
+                    break;
+                } else {
+                    System.err.println("Please input a 6 digit password.");
+                }
+            } else {
+                break;
+            }
+        }
+        System.out.println();        
+        if (newCity.length() > 0 || newAddress.length() > 0 || newPhone.length() > 0 || newEmail.length() > 0 || newPassword.length() > 0) {
+            try {
+                serviceProviderEntitySessionBeanRemote.updateServiceProvider(currentServiceProviderEntity);
+                System.out.println("Service Provider Profile updated successfully!\n");
+            } catch(ServiceProviderEntityNotFoundException | UpdateServiceProviderException ex) {
+                System.out.println("An error has occured while updating staff: " + ex.getMessage() + "\n");
+            }
+        } else {
+            System.out.println("No changes has been made.");
         }
 
         while(true) {
@@ -171,11 +200,11 @@ public class ServiceProviderModule {
             System.out.println("Enter 0 to go back to the previous menu"); 
             System.out.print("> ");
             try {
-                    response = scanner.nextInt();
-                }   catch (InputMismatchException ex) {
-                    System.err.println("Please input digits only.");
-                    scanner.next();
-                }
+                response = scanner.nextInt();
+            }   catch (InputMismatchException ex) {
+                System.err.println("Please input digits only.");
+                scanner.next();
+            }
             if(response == 0) {
                 System.out.println("Heading back to Service Provider Terminal...");
                 break;
@@ -237,13 +266,13 @@ public class ServiceProviderModule {
                     break;
                 } else {
                     appointmentEntitySessionBeanRemote.cancelAppointment(appointmentNum);
-                    System.err.println("Appointment " + appointmentNum + " has been cancelled successfully.");
-                    sc.next();
+                    System.out.println("Appointment " + appointmentNum + " has been cancelled successfully.");
                 }
             } catch (AppointmentNotFoundException ex) {
                 System.out.println("An error has occured cancelling the appointment: " + ex.getMessage());
-            } 
+            } catch (AppointmentCannotBeCancelledException ex) {
+                System.err.println("Error cancelling appointment " + ex.getMessage());
+            }
         }
    }
-   
 }

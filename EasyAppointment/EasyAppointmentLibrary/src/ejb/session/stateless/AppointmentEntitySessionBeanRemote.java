@@ -3,6 +3,7 @@ package ejb.session.stateless;
 import entity.AppointmentEntity;
 import entity.ServiceProviderEntity;
 import java.util.List;
+import util.exception.AppointmentCannotBeCancelledException;
 import util.exception.AppointmentExistException;
 import util.exception.AppointmentNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -11,7 +12,7 @@ public interface AppointmentEntitySessionBeanRemote {
     
     public List<AppointmentEntity> retrieveAllAppointments();
 
-    public void cancelAppointment(String appointmentNum) throws AppointmentNotFoundException;
+    public void cancelAppointment(String appointmentNum) throws AppointmentNotFoundException, AppointmentCannotBeCancelledException;
 
     public AppointmentEntity retrieveAppointmentByAppointmentNum(String appointmentNum) throws AppointmentNotFoundException;
     
