@@ -167,16 +167,21 @@ public class ServiceProviderTerminal {
         while (true) {
             System.out.print("Enter Phone> ");
             phone = scanner.nextLine(); 
-            if (phone.length() > 0) {
-                if (serviceProviderEntitySessionBeanRemote.checkPhoneNumber(phone)) {
-                    spEntity.setPhoneNumber(phone);
-                    break;
+            try {
+                Integer testPhoneNumber = Integer.parseInt(phone);
+                if (phone.length() > 0) {
+                    if (serviceProviderEntitySessionBeanRemote.checkPhoneNumber(phone)) {
+                        spEntity.setPhoneNumber(phone);
+                        break;
+                    } else {
+                        System.err.println("Phone number inputed has already been registered, try again with a different phone number.");
+                    }
                 } else {
-                    System.err.println("Phone number inputed has already been registered, try again with a different phone number.");
-                }
-            } else {
-                System.err.println("Please input a phone number.");
-            }      
+                    System.err.println("Please input a phone number.");
+                }      
+            } catch (NumberFormatException ex) {
+                System.err.println("Please enter a phone number consisting of numbers.");
+            }
         }
 
         while (true) {
