@@ -64,20 +64,20 @@ public class DataInitializationSessionBean {
     public void initializeData() 
     {
         try {
-            adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("terry@easyadmin.com", "654321", "Terry", "Tan"));
-            adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("1", "123456", "Test", "Test"));
+            adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("terry@easyadmin.com", "123456", "Terry", "Tan"));
+            adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("jean@easyadmin.com", "123456", "Jean", "Lim"));
             businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Health"));
             businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Fashion"));
             businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Education"));
             
             CustomerEntity testCustomer = new CustomerEntity("S9898100B", "test@gmail.com", "123456", "John", "Doe", "M", 21, "97381199", "123A Temasek Hall", "Singapore");
-            CustomerEntity newCustomer = new CustomerEntity("S9892011A", "1", "123456", "Test", "Customer", "M", 21, "90000009", "321A Eusoff Hall", "Clementi");
+            CustomerEntity newCustomer = new CustomerEntity("S9892011A", "lawson.tkw@gmail.com", "123456", "Test", "Customer", "M", 21, "90000009", "321A Eusoff Hall", "Clementi");
             customerEntitySessionBeanLocal.createCustomerEntity(testCustomer);
             customerEntitySessionBeanLocal.createCustomerEntity(newCustomer);
             
             LocalDate testDate = LocalDate.of(2021,04,06);
             LocalTime testTime = LocalTime.of(10, 30);
-            ServiceProviderEntity testSP = new ServiceProviderEntity("1", "1", "1", "1", "1", "1", "123456", ServiceProviderStatus.APPROVED);
+            ServiceProviderEntity testSP = new ServiceProviderEntity("Marcus", "UEN1010", "Clementi", "90099009", "50 Computing Dr", "marcus@gmail.com", "123456", ServiceProviderStatus.APPROVED);
             Long categoryId = 1L;
             serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(testSP, categoryId);
             serviceProviderEntitySessionBeanLocal.registerNewServiceProvider(new ServiceProviderEntity("Kevin Paterson", "1111001111", "Clementi", "93718799", "13, Clementi Road", "kevin@nuh.com.sg", "654321", ServiceProviderStatus.APPROVED), categoryId);
