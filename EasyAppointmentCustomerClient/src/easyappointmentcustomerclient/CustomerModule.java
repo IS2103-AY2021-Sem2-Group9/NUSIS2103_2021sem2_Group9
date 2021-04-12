@@ -304,7 +304,7 @@ public class CustomerModule {
                     
                     // Only allow user to enter spid that is shown - SP must be approved/City must be correct/Category must be correct
                     if (!spEntity.getStatus().equals(ServiceProviderStatus.APPROVED) || !spEntity.getCity().equals(city) || spEntity.getCategory().getId() != category) {
-                        System.err.println("No such Service Provider ID. Please enter another.");
+                        System.err.println("No such Service Provider. Please enter another.");
                         continue;
                     }
                     System.out.println();
@@ -314,7 +314,7 @@ public class CustomerModule {
                     System.err.println("Please input a digit\n");
                     sc.next();
                 } catch (ServiceProviderEntityNotFoundException_Exception ex) {
-                    System.err.println("No such Service Provider ID. Please enter another.");
+                    System.err.println("No such Service Provider. Please enter another.");
                 }
             }
 
@@ -637,11 +637,6 @@ public class CustomerModule {
         return port.retrieveAllBusinessCategories();
     }
 
-    private static java.util.List<ws.client.ServiceProviderEntity> retrieveAllAvailableServiceProvidersForTheDay(java.lang.String appointmentDate, java.lang.Long category, java.lang.String city) throws BusinessCategoryNotFoundException_Exception {
-        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
-        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
-        return port.retrieveAllAvailableServiceProvidersForTheDay(appointmentDate, category, city);
-    }
 
     private static java.util.List<java.lang.String> retrieveServiceProviderAvailabilityForTheDay(ws.client.ServiceProviderEntity spEntity, java.lang.String appointmentDate) {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
@@ -695,6 +690,12 @@ public class CustomerModule {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
         port.rateAppointment(apptEntityId, rating);
+    }
+
+    private static java.util.List<ws.client.ServiceProviderEntity> retrieveAllAvailableServiceProvidersForTheDay(java.lang.String appointmentDate, java.lang.Long category, java.lang.String city) throws ws.client.BusinessCategoryNotFoundException_Exception {
+        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
+        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
+        return port.retrieveAllAvailableServiceProvidersForTheDay(appointmentDate, category, city);
     }
 
 }

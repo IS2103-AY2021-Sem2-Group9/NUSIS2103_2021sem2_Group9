@@ -145,16 +145,22 @@ public class ServiceProviderModule {
             System.out.print("Enter Phone (blank if no change)> ");
             newPhone = scanner.nextLine().trim();
             if(newPhone.length() > 0) {
-                if (serviceProviderEntitySessionBeanRemote.checkPhoneNumber(newPhone)) {
-                    currentServiceProviderEntity.setPhoneNumber(newPhone);
-                    break;
-                } else {
-                    System.err.println("Phone number inputed is currently registered to another account, please try again with a different phone number");
+                try {
+                    Integer testPhoneNumber = Integer.parseInt(newPhone);
+                    if (serviceProviderEntitySessionBeanRemote.checkPhoneNumber(newPhone)) {
+                        currentServiceProviderEntity.setPhoneNumber(newPhone);
+                        break;
+                    } else {
+                        System.err.println("Phone number inputed is currently registered to another account, please try again with a different phone number");
+                    }
+                } catch(NumberFormatException ex) {
+                    System.err.println("Please enter a phone number consisting of numbers.");
                 }
             } else {
                 break;
             }
-        }
+        } 
+        
         
         while (true) {
             System.out.print("Enter Email Address (blank if no change)> ");
@@ -193,7 +199,7 @@ public class ServiceProviderModule {
             } catch(ServiceProviderEntityNotFoundException | UpdateServiceProviderException ex) {
                 System.out.println("An error has occured while updating staff: " + ex.getMessage() + "\n");
             } catch (InvalidPasswordFormatException ex) {
-               System.out.println("An error has occured while updating staff:" + ex.getMessage() + "\n");
+               System.out.println("An error has occured while updating staff: " + ex.getMessage() + "\n");
            }
         } else {
             System.out.println("No changes has been made.");
@@ -225,10 +231,14 @@ public class ServiceProviderModule {
        System.out.printf("%-22s%-15s%-10s%-20s%-15s\n", "Name", " | Date", " | Time", " | Appointment No.", " | Status");
 
        List<AppointmentEntity> appointments = serviceProviderEntitySessionBeanRemote.retrieveAllAppointmentsForServiceProvider(currentServiceProviderEntity);
-       for (AppointmentEntity appointment : appointments) {
-            
-            System.out.printf("%-22s%-15s%-10s%-20s%-15s\n", appointment.getCustomerEntity().getFirstName() + " " + appointment.getCustomerEntity().getLastName(), " | " + appointment.getAppointmentDate().toString(), " | " + appointment.getAppointmentTime().toString(), " | " + appointment.getAppointmentNum(), " | " + appointmentEntitySessionBeanRemote.getStatus(appointment));
-            
+       if (!appointments.isEmpty()) {
+        for (AppointmentEntity appointment : appointments) {
+
+             System.out.printf("%-22s%-15s%-10s%-20s%-15s\n", appointment.getCustomerEntity().getFirstName() + " " + appointment.getCustomerEntity().getLastName(), " | " + appointment.getAppointmentDate().toString(), " | " + appointment.getAppointmentTime().toString(), " | " + appointment.getAppointmentNum(), " | " + appointmentEntitySessionBeanRemote.getStatus(appointment));
+
+        }
+       } else {
+           System.out.println("You have no appointments.");
        }
        System.out.println();     
        while (true) {
@@ -255,8 +265,12 @@ public class ServiceProviderModule {
        
        System.out.printf("%-22s%-15s%-10s%-20s\n", "Name", " | Date", " | Time", " | Appointment No.");
        List<AppointmentEntity> appointments = serviceProviderEntitySessionBeanRemote.retrieveUpcomingAppointmentsForServiceProvider(currentServiceProviderEntity);
-       for (AppointmentEntity appointment : appointments) {
-           System.out.printf("%-22s%-15s%-10s%-20s\n", appointment.getCustomerEntity().getFirstName() + " " + appointment.getCustomerEntity().getLastName(), " | " + appointment.getAppointmentDate().toString(), " | " + appointment.getAppointmentTime().toString(), " | " + appointment.getAppointmentNum()); 
+       if(!appointments.isEmpty()) {
+        for (AppointmentEntity appointment : appointments) {
+            System.out.printf("%-22s%-15s%-10s%-20s\n", appointment.getCustomerEntity().getFirstName() + " " + appointment.getCustomerEntity().getLastName(), " | " + appointment.getAppointmentDate().toString(), " | " + appointment.getAppointmentTime().toString(), " | " + appointment.getAppointmentNum()); 
+        }
+       } else {
+           System.out.println("You have no upcoming appoinments!");
        }
        System.out.println();
        while(true) {

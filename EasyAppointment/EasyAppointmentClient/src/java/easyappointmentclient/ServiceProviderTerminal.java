@@ -103,7 +103,7 @@ public class ServiceProviderTerminal {
         System.out.println("*** Service Provider Terminal :: Registration Operation ***\n");
         while (true) {
             System.out.print("Enter Name> ");
-            name = scanner.nextLine();
+            name = scanner.nextLine().trim();
             if (name.length() > 0 ) {
                 spEntity.setName(name);
                 break;
@@ -120,7 +120,7 @@ public class ServiceProviderTerminal {
         }
         while (true) {
             System.out.print("Enter Business Category> ");
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().trim();
             if (input.length() > 0) {
                 try {
                     category = Long.valueOf(input);
@@ -139,7 +139,7 @@ public class ServiceProviderTerminal {
         
         while (true) {
             System.out.print("Enter Business Registration Number> ");
-            uen = scanner.nextLine(); 
+            uen = scanner.nextLine().trim(); 
             if (uen.length() > 0) {
                 if (serviceProviderEntitySessionBeanRemote.checkUen(uen)) {
                     spEntity.setUen(uen);
@@ -155,7 +155,7 @@ public class ServiceProviderTerminal {
         
         while (true) {
             System.out.print("Enter City> ");
-            city = scanner.nextLine();
+            city = scanner.nextLine().trim();
             if (city.length() > 0) {
                 spEntity.setCity(city);
                 break;
@@ -166,7 +166,7 @@ public class ServiceProviderTerminal {
         
         while (true) {
             System.out.print("Enter Phone> ");
-            phone = scanner.nextLine(); 
+            phone = scanner.nextLine().trim(); 
             try {
                 Integer testPhoneNumber = Integer.parseInt(phone);
                 if (phone.length() > 0) {
@@ -186,7 +186,7 @@ public class ServiceProviderTerminal {
 
         while (true) {
             System.out.print("Enter Business Address> ");
-            address = scanner.nextLine(); 
+            address = scanner.nextLine().trim(); 
             if (address.length() > 0) {
                 spEntity.setAddress(address);
                 break;
@@ -197,7 +197,7 @@ public class ServiceProviderTerminal {
         
         while (true) {
             System.out.print("Enter Email> ");
-            email = scanner.nextLine(); 
+            email = scanner.nextLine().trim(); 
             if (email.length() > 0) {
                 if (serviceProviderEntitySessionBeanRemote.checkEmail(email)) {
                     spEntity.setEmail(email);
@@ -213,7 +213,7 @@ public class ServiceProviderTerminal {
         
         while (true) {
             System.out.print("Enter Password (6 digit)> ");
-            password = scanner.nextLine(); 
+            password = scanner.nextLine().trim(); 
             if (password.length() > 0) {
                 try {
                     Integer intPassword = Integer.valueOf(password);
