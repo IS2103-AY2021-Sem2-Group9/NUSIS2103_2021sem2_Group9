@@ -22,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import util.exception.AppointmentCannotBeCancelledException;
 import util.exception.AppointmentExistException;
+import util.exception.AppointmentNotCompletedException;
 import util.exception.AppointmentNotFoundException;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.CustomerExistException;
@@ -181,7 +182,7 @@ public class CustomerWebService {
     }
 
     @WebMethod(operationName = "rateAppointment")
-    public void rateAppointment(@WebParam(name = "apptEntityId") long apptEntityId, @WebParam(name = "rating") int rating) {
+    public void rateAppointment(@WebParam(name = "apptEntityId") long apptEntityId, @WebParam(name = "rating") int rating) throws AppointmentNotCompletedException {
         this.appointmentEntitySessionBeanLocal.rateAppointment(apptEntityId, rating);
     }
 

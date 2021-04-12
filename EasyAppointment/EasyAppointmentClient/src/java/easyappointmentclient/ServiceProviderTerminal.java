@@ -68,7 +68,7 @@ public class ServiceProviderTerminal {
                     }
                     catch (InvalidLoginCredentialException | InvalidPasswordFormatException ex)
                     {
-                        System.out.println("An error occured while logging in: " + ex.getMessage());
+                        System.err.println("An error occured while logging in: " + ex.getMessage());
                         continue;
                     }
                 } else if (response == 3) 
@@ -76,7 +76,7 @@ public class ServiceProviderTerminal {
                     break;
                 } else 
                 {
-                    System.out.println("Invalid option, please key in options 1~3 only.");
+                    System.err.println("Invalid option, please key in options 1~3 only.");
                 }
             }
             if (response == 3) 

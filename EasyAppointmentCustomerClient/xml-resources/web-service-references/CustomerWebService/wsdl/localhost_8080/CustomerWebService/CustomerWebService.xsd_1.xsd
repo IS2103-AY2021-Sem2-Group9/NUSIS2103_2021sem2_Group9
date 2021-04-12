@@ -4,6 +4,8 @@
 
 <xs:element name="AppointmentExistException" type="tns:AppointmentExistException"/>
 
+<xs:element name="AppointmentNotCompletedException" type="tns:AppointmentNotCompletedException"/>
+
 <xs:element name="AppointmentNotFoundException" type="tns:AppointmentNotFoundException"/>
 
 <xs:element name="BusinessCategoryNotFoundException" type="tns:BusinessCategoryNotFoundException"/>
@@ -102,22 +104,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="cancelAppointment">
-<xs:sequence>
-<xs:element name="appointmentNum" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="cancelAppointmentResponse">
-<xs:sequence/>
-</xs:complexType>
-
-<xs:complexType name="AppointmentCannotBeCancelledException">
-<xs:sequence>
-<xs:element name="message" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="retrieveCustomerEntityById">
 <xs:sequence>
 <xs:element name="customerId" type="xs:long" minOccurs="0"/>
@@ -194,6 +180,22 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="cancelAppointment">
+<xs:sequence>
+<xs:element name="appointmentNum" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="cancelAppointmentResponse">
+<xs:sequence/>
+</xs:complexType>
+
+<xs:complexType name="AppointmentCannotBeCancelledException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="customerLogin">
 <xs:sequence>
 <xs:element name="email" type="xs:string" minOccurs="0"/>
@@ -263,6 +265,12 @@
 <xs:sequence/>
 </xs:complexType>
 
+<xs:complexType name="AppointmentNotCompletedException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="generateOverallRating">
 <xs:sequence>
 <xs:element name="spEntity" type="tns:serviceProviderEntity" minOccurs="0"/>
@@ -324,18 +332,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="getApptStatus">
-<xs:sequence>
-<xs:element name="apptId" type="xs:long" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="getApptStatusResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="createAppointmentEntity">
 <xs:sequence>
 <xs:element name="appointmentDate" type="xs:string" minOccurs="0"/>
@@ -360,6 +356,18 @@
 <xs:complexType name="AppointmentExistException">
 <xs:sequence>
 <xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="getApptStatus">
+<xs:sequence>
+<xs:element name="apptId" type="xs:long" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="getApptStatusResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
