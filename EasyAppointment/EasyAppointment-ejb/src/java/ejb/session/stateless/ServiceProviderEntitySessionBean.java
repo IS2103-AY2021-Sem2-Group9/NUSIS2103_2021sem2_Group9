@@ -135,32 +135,39 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     public void updateServiceProvider(ServiceProviderEntity serviceProviderEntity) throws ServiceProviderEntityNotFoundException, UpdateServiceProviderException, InvalidPasswordFormatException {
         if (serviceProviderEntity.getServiceProviderId() != null) {
             ServiceProviderEntity serviceProviderEntityToUpdate = retrieveServiceProviderByServiceProviderId(serviceProviderEntity.getServiceProviderId());
-
+            
             if (serviceProviderEntityToUpdate.getServiceProviderId().equals(serviceProviderEntity.getServiceProviderId())) {
-                String unencryptedPassword = serviceProviderEntity.getPassword();
-                try 
-                {
-                    Integer intPw = Integer.valueOf(unencryptedPassword);
-                    String salt = passwordEncrypt.getSalt(30);
-                    String encryptedPassword = passwordEncrypt.generateSecurePassword(unencryptedPassword, salt);
+            
+                if(!serviceProviderEntity.getPassword().equalsIgnoreCase(serviceProviderEntityToUpdate.getPassword())) {
+                    String unencryptedPassword = serviceProviderEntity.getPassword();
+                    try 
+                    {
+                        Integer intPw = Integer.valueOf(unencryptedPassword);
+                        String salt = passwordEncrypt.getSalt(30);
+                        String encryptedPassword = passwordEncrypt.generateSecurePassword(unencryptedPassword, salt);
+                        serviceProviderEntityToUpdate.setCity(serviceProviderEntity.getCity());
+                        serviceProviderEntityToUpdate.setAddress(serviceProviderEntity.getAddress());
+                        serviceProviderEntityToUpdate.setEmail(serviceProviderEntity.getEmail());
+                        serviceProviderEntityToUpdate.setPhoneNumber(serviceProviderEntity.getPhoneNumber());
+                        serviceProviderEntityToUpdate.setPassword(salt + encryptedPassword);
+                    }
+                    catch (NumberFormatException ex)
+                    {
+                        throw new InvalidPasswordFormatException("Password can only be digits.");
+                    }
                     
+                } else {
                     serviceProviderEntityToUpdate.setCity(serviceProviderEntity.getCity());
                     serviceProviderEntityToUpdate.setAddress(serviceProviderEntity.getAddress());
                     serviceProviderEntityToUpdate.setEmail(serviceProviderEntity.getEmail());
                     serviceProviderEntityToUpdate.setPhoneNumber(serviceProviderEntity.getPhoneNumber());
-                    serviceProviderEntityToUpdate.setPassword(salt + encryptedPassword);
                 }
-                catch (NumberFormatException ex)
-                {
-                    throw new InvalidPasswordFormatException("Password can only be digits.");
-                }
-
             } else {
                 throw new UpdateServiceProviderException("ID of service provider to be updated does not match the existing record");
             }
         } else {
             throw new ServiceProviderEntityNotFoundException("Service Provider does not exist!");
-        }
+        }     
     }
 
     @Override
@@ -205,10 +212,11 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     @Override
     public List<ServiceProviderEntity> retrieveAllAvailableServiceProvidersForTheDay(LocalDate appointmentDate, Long category, String city) throws BusinessCategoryNotFoundException {
         BusinessCategoryEntity bcEntity = businessCategorySessionBeanLocal.retrieveBusinessCategoryById(category);
-        Query query = em.createQuery("SELECT sp FROM ServiceProviderEntity sp WHERE sp.category = :bcEntity AND sp.city = :city");
+        Query query = em.createQuery("SELECT sp FROM ServiceProviderEntity sp WHERE sp.category = :bcEntity AND sp.city = :city AND sp.status = :status");
         query.setParameter("bcEntity", bcEntity);
         query.setParameter("city", city);
-
+        query.setParameter("status", ServiceProviderStatus.APPROVED);
+        
         List<ServiceProviderEntity> results = query.getResultList();
         List<ServiceProviderEntity> availableServiceProviders = new ArrayList<>();
         for (ServiceProviderEntity serviceProvider : results) {

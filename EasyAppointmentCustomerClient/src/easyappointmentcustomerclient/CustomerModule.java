@@ -117,7 +117,6 @@ public class CustomerModule {
             System.out.print("Enter city> ");
             city = sc.nextLine();
             if (city.length() > 0) {
-                System.out.println("city is not empty");
                 break;
             }
         }
@@ -137,12 +136,17 @@ public class CustomerModule {
 
         System.out.println();
 
-        // Print headers
-        System.out.printf("%-20s | %-20s | %-20s | %-20s | %s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
-        System.out.println("\n");
-
         try {
             List<ServiceProviderEntity> serviceProviders = retrieveAllAvailableServiceProvidersForTheDay(dateStr, category, city);
+
+            if (serviceProviders.isEmpty()) {
+                System.out.println("There are no Service Providers available.\n");
+                return null;
+            }
+
+            // Print headers
+            System.out.printf("%-20s | %-20s | %-20s | %-20s | %s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
+            System.out.println("\n");
 
             // Print record rows
             for (int i = 0; i < serviceProviders.size(); i++) {
@@ -199,6 +203,8 @@ public class CustomerModule {
                     System.err.println("Invalid date input. Please try again.");
                 }
             }
+            
+            System.out.println();
 
             LocalDate todaysDate = LocalDate.now();
             compare = todaysDate.compareTo(date); // Returns -1 if today is before "date", 0 if same day, 1 if today is after "date"
@@ -207,11 +213,17 @@ public class CustomerModule {
             }
         }
 
-        // Print headers
-        System.out.printf("%-20s | %-20s | %-20s | %-20s | %s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
-        System.out.println("\n");
         try {
             List<ServiceProviderEntity> serviceProviders = retrieveAllAvailableServiceProvidersForTheDay(dateStr, category, city);
+
+            if (serviceProviders.isEmpty()) {
+                System.out.println("There are no Service Providers available.\n");
+                return null;
+            }
+
+            // Print headers
+            System.out.printf("%-20s | %-20s | %-20s | %-20s | %s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
+            System.out.println("\n");
 
             // Print record rows
             for (int i = 0; i < serviceProviders.size(); i++) {
@@ -289,6 +301,9 @@ public class CustomerModule {
         }
 
         LocalDate date = this.searchForAddingAppt(category, city);
+        if (date == null) {
+            return;
+        }
 
         try {
             while (true) {
@@ -304,7 +319,7 @@ public class CustomerModule {
 
                     // Only allow user to enter spid that is shown - SP must be approved/City must be correct/Category must be correct
                     if (!spEntity.getStatus().equals(ServiceProviderStatus.APPROVED) || !spEntity.getCity().equals(city) || spEntity.getCategory().getId() != category) {
-                        System.err.println("No such Service Provider ID. Please enter another.");
+                        System.err.println("No such Service Provider. Please enter another.");
                         continue;
                     }
                     System.out.println();
@@ -314,7 +329,7 @@ public class CustomerModule {
                     System.err.println("Please input a number");
                     sc.next();
                 } catch (ServiceProviderEntityNotFoundException_Exception ex) {
-                    System.err.println("No such Service Provider ID. Please enter another.");
+                    System.err.println("No such Service Provider. Please enter another.");
                 }
             }
 
@@ -641,18 +656,13 @@ public class CustomerModule {
     }
 
     /**
-     * *********************************************************** Web Services *************************************************************
+     * *********************************************************** Web Services
+     * *************************************************************
      */
     private static java.util.List<ws.client.BusinessCategoryEntity> retrieveAllBusinessCategories() {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
         return port.retrieveAllBusinessCategories();
-    }
-
-    private static java.util.List<ws.client.ServiceProviderEntity> retrieveAllAvailableServiceProvidersForTheDay(java.lang.String appointmentDate, java.lang.Long category, java.lang.String city) throws BusinessCategoryNotFoundException_Exception {
-        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
-        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
-        return port.retrieveAllAvailableServiceProvidersForTheDay(appointmentDate, category, city);
     }
 
     private static java.util.List<java.lang.String> retrieveServiceProviderAvailabilityForTheDay(ws.client.ServiceProviderEntity spEntity, java.lang.String appointmentDate) {
@@ -714,4 +724,11 @@ public class CustomerModule {
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
         return port.getApptStatus(apptId);
     }
+
+    private static java.util.List<ws.client.ServiceProviderEntity> retrieveAllAvailableServiceProvidersForTheDay(java.lang.String appointmentDate, java.lang.Long category, java.lang.String city) throws ws.client.BusinessCategoryNotFoundException_Exception {
+        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
+        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
+        return port.retrieveAllAvailableServiceProvidersForTheDay(appointmentDate, category, city);
+    }
+
 }
