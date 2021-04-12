@@ -22,4 +22,6 @@ public interface CustomerEntitySessionBeanLocal {
     public void deleteCustomerEntity(Long CustomerId) throws CustomerNotFoundException, DeleteCustomerException;
 
     public List<AppointmentEntity> retrieveCustomerEntityAppointments(Long customerId) throws CustomerNotFoundException;
+
+    public List<AppointmentEntity> retrieveCustomerEntityUpcomingAppointments(Long customerId) throws CustomerNotFoundException;
 }

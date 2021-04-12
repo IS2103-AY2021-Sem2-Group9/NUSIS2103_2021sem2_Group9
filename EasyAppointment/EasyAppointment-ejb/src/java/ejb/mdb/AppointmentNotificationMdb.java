@@ -37,15 +37,14 @@ public class AppointmentNotificationMdb implements MessageListener
         {
             if (message instanceof MapMessage)
             {
-                MapMessage mapMessage = (MapMessage)message;                //String toEmailAddress = mapMessage.getString("toEmailAddress");
+                MapMessage mapMessage = (MapMessage)message;              
                 String fromEmailAddress = mapMessage.getString("fromEmailAddress");
                 Long customerEntityId = (Long)mapMessage.getLong("customerEntityId");
                 
                 CustomerEntity customerEntity = customerEntitySessionBeanLocal.retrieveCustomerEntityById(customerEntityId);
-                List<AppointmentEntity> appointments = customerEntitySessionBeanLocal.retrieveCustomerEntityAppointments(customerEntityId);
+                List<AppointmentEntity> appointments = customerEntitySessionBeanLocal.retrieveCustomerEntityUpcomingAppointments(customerEntityId);
                 AppointmentEntity appointment = appointments.get(0);
-                // String toEmailAddress = customerEntity.getEmail();
-                String toEmailAddress = "lawson.tkw@gmail.com";
+                String toEmailAddress = customerEntity.getEmail();
                 
                 emailSessionBeanLocal.emailCheckoutNotificationSync(customerEntity, appointment, fromEmailAddress, toEmailAddress);
             }

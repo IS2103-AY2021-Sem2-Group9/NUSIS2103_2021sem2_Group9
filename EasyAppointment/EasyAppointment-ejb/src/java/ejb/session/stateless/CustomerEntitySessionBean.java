@@ -2,6 +2,10 @@ package ejb.session.stateless;
 
 import entity.AppointmentEntity;
 import entity.CustomerEntity;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -133,5 +137,25 @@ public class CustomerEntitySessionBean implements CustomerEntitySessionBeanLocal
             List<AppointmentEntity> appointments = customerEntity.getAppointments();
             appointments.size();
             return appointments;
+    }
+    
+    public List<AppointmentEntity> retrieveCustomerEntityUpcomingAppointments(Long customerId) throws CustomerNotFoundException
+    {
+        List<AppointmentEntity> allAppointments = retrieveCustomerEntityAppointments(customerId); 
+        List<AppointmentEntity> result = new ArrayList<>();
+        for(AppointmentEntity appt : allAppointments) {
+            LocalTime now = LocalTime.now(); 
+            LocalTime time = appt.getAppointmentTime();
+            Long timeDiff = ChronoUnit.HOURS.between(now, time) + ChronoUnit.MINUTES.between(now, time);
+            System.out.println(timeDiff);
+            int compare = appt.getAppointmentDate().compareTo(LocalDate.now());
+            System.out.println(compare);
+            if(appt.getRating() == 0 && compare > 0 ) {
+                result.add(appt);
+            } else if (appt.getRating() == 0 && compare == 0 && timeDiff > 0) {
+                result.add(appt);
+            }
+        }
+        return result;
     }
 }
