@@ -26,6 +26,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.naming.NamingException;
+import util.exception.AppointmentCannotBeCancelledException;
 import util.exception.AppointmentNotFoundException;
 import util.exception.BusinessCategoryExistException;
 import util.exception.BusinessCategoryNotFoundException;
@@ -454,6 +455,9 @@ public class AdminModule {
                 {
                     System.err.println("Please only enter digits!");
                     scanner.next();
+                }
+                catch (AppointmentCannotBeCancelledException ex) {
+                    System.err.println("Error occured while cancelling appointments: " + ex.getMessage());
                 }
             }
         }
