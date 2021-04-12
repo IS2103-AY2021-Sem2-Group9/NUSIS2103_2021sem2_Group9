@@ -213,13 +213,14 @@ public class CustomerModule {
             }
         }
 
-        try {
+        try 
+        {
             List<ServiceProviderEntity> serviceProviders = retrieveAllAvailableServiceProvidersForTheDay(dateStr, category, city);
 
             if (serviceProviders.isEmpty()) {
                 System.out.println("There are no Service Providers available.\n");
                 return null;
-
+            }
             // Print headers
             System.out.printf("%-20s | %-20s | %-20s | %-20s | %s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
             System.out.println("\n");
@@ -246,7 +247,9 @@ public class CustomerModule {
             }
 
             return date;
-        } catch (BusinessCategoryNotFoundException_Exception ex) {
+        } 
+        catch (BusinessCategoryNotFoundException_Exception ex) 
+        {
             System.err.println("An error has occurred while retrieving available service providers for the specified date: " + ex.getMessage() + "\n");
             return null;
         }
@@ -724,10 +727,12 @@ public class CustomerModule {
         return port.getApptStatus(apptId);
     }
 
-    private static java.util.List<ws.client.ServiceProviderEntity> retrieveAllAvailableServiceProvidersForTheDay(java.lang.String appointmentDate, java.lang.Long category, java.lang.String city) throws ws.client.BusinessCategoryNotFoundException_Exception {
+    private static java.util.List<ws.client.ServiceProviderEntity> retrieveAllAvailableServiceProvidersForTheDay(java.lang.String appointmentDate, java.lang.Long category, java.lang.String city) throws BusinessCategoryNotFoundException_Exception {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
         return port.retrieveAllAvailableServiceProvidersForTheDay(appointmentDate, category, city);
     }
+
+    
 
 }
