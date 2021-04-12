@@ -1,6 +1,7 @@
 package ejb.session.stateless;
 
 import entity.BusinessCategoryEntity;
+import entity.ServiceProviderEntity;
 import java.util.List;
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -70,6 +71,7 @@ public class BusinessCategorySessionBean implements BusinessCategorySessionBeanR
         return businessCategoryEntity.getCategoryName();
     }
     
+    @Override
     public BusinessCategoryEntity retrieveBusinessCategoryById(Long categoryId) throws BusinessCategoryNotFoundException {
         Query query = em.createQuery("SELECT b from BusinessCategoryEntity b WHERE b.id = :categoryId");
         query.setParameter("categoryId", categoryId);
@@ -82,5 +84,14 @@ public class BusinessCategorySessionBean implements BusinessCategorySessionBeanR
         {
             throw new BusinessCategoryNotFoundException("Business Category " + categoryId + " does not exist!");
         }
+    }
+    
+    @Override
+    public List<ServiceProviderEntity> retrieveServiceProvidersByBusinessCategory(Long categoryId) throws BusinessCategoryNotFoundException
+    {
+            BusinessCategoryEntity businessCategory = retrieveBusinessCategoryById(categoryId);
+            List<ServiceProviderEntity> spEntities = businessCategory.getServiceProviderEntities();
+            spEntities.size();
+            return spEntities;
     }
 }

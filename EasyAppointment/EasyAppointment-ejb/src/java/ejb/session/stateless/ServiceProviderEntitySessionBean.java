@@ -64,6 +64,10 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
                 newServiceProvider.setPassword(salt + encryptedPassword);
                 em.persist(newServiceProvider);
                 em.flush();
+                
+                List<ServiceProviderEntity> spEntities = categoryEntity.getServiceProviderEntities();
+                spEntities.add(newServiceProvider);
+                categoryEntity.setServiceProviderEntities(spEntities);
             }
             return newServiceProvider;
         }
