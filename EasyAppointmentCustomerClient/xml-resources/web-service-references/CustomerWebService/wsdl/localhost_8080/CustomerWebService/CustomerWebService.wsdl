@@ -4,6 +4,47 @@
 <xsd:import namespace="http://ws.session.ejb/" schemaLocation="http://localhost:8080/CustomerWebService/CustomerWebService?xsd=1"/>
 </xsd:schema>
 </types>
+
+<message name="createCustomerEntity">
+<part name="parameters" element="tns:createCustomerEntity"/>
+</message>
+<message name="createCustomerEntityResponse">
+<part name="parameters" element="tns:createCustomerEntityResponse"/>
+</message>
+<message name="UnknownPersistenceException">
+<part name="fault" element="tns:UnknownPersistenceException"/>
+</message>
+<message name="CustomerExistException">
+<part name="fault" element="tns:CustomerExistException"/>
+</message>
+<message name="InvalidPasswordFormatException">
+<part name="fault" element="tns:InvalidPasswordFormatException"/>
+</message>
+<message name="retrieveCustomerEntityById">
+<part name="parameters" element="tns:retrieveCustomerEntityById"/>
+</message>
+<message name="retrieveCustomerEntityByIdResponse">
+<part name="parameters" element="tns:retrieveCustomerEntityByIdResponse"/>
+</message>
+<message name="CustomerNotFoundException">
+<part name="fault" element="tns:CustomerNotFoundException"/>
+
+</message>
+<message name="customerLogin">
+<part name="parameters" element="tns:customerLogin"/>
+</message>
+<message name="customerLoginResponse">
+<part name="parameters" element="tns:customerLoginResponse"/>
+</message>
+<message name="InvalidLoginCredentialException">
+<part name="fault" element="tns:InvalidLoginCredentialException"/>
+</message>
+<message name="retrieveCustomerEntityAppointments">
+<part name="parameters" element="tns:retrieveCustomerEntityAppointments"/>
+</message>
+<message name="retrieveCustomerEntityAppointmentsResponse">
+<part name="parameters" element="tns:retrieveCustomerEntityAppointmentsResponse"/>
+</message>
 <message name="retrieveServiceProviderByServiceProviderId">
 <part name="parameters" element="tns:retrieveServiceProviderByServiceProviderId"/>
 </message>
@@ -22,29 +63,14 @@
 <message name="BusinessCategoryNotFoundException">
 <part name="fault" element="tns:BusinessCategoryNotFoundException"/>
 </message>
-<message name="retrieveCustomerEntityById">
-<part name="parameters" element="tns:retrieveCustomerEntityById"/>
+<message name="retrieveServiceProviderAvailabilityForTheDay">
+<part name="parameters" element="tns:retrieveServiceProviderAvailabilityForTheDay"/>
 </message>
-<message name="retrieveCustomerEntityByIdResponse">
-<part name="parameters" element="tns:retrieveCustomerEntityByIdResponse"/>
+<message name="retrieveServiceProviderAvailabilityForTheDayResponse">
+<part name="parameters" element="tns:retrieveServiceProviderAvailabilityForTheDayResponse"/>
 </message>
-<message name="CustomerNotFoundException">
-<part name="fault" element="tns:CustomerNotFoundException"/>
-</message>
-<message name="customerLogin">
-<part name="parameters" element="tns:customerLogin"/>
-</message>
-<message name="customerLoginResponse">
-<part name="parameters" element="tns:customerLoginResponse"/>
-</message>
-<message name="InvalidLoginCredentialException">
-<part name="fault" element="tns:InvalidLoginCredentialException"/>
-</message>
-<message name="retrieveCustomerEntityAppointments">
-<part name="parameters" element="tns:retrieveCustomerEntityAppointments"/>
-</message>
-<message name="retrieveCustomerEntityAppointmentsResponse">
-<part name="parameters" element="tns:retrieveCustomerEntityAppointmentsResponse"/>
+<message name="addAppointment">
+<part name="parameters" element="tns:addAppointment"/>
 </message>
 <message name="createCustomerEntity">
 <part name="parameters" element="tns:createCustomerEntity"/>
@@ -61,18 +87,6 @@
 <message name="InvalidPasswordFormatException">
 <part name="fault" element="tns:InvalidPasswordFormatException"/>
 </message>
-<message name="retrieveServiceProviderAvailabilityForTheDay">
-<part name="parameters" element="tns:retrieveServiceProviderAvailabilityForTheDay"/>
-</message>
-<message name="retrieveServiceProviderAvailabilityForTheDayResponse">
-<part name="parameters" element="tns:retrieveServiceProviderAvailabilityForTheDayResponse"/>
-</message>
-<message name="addAppointment">
-<part name="parameters" element="tns:addAppointment"/>
-</message>
-<message name="addAppointmentResponse">
-<part name="parameters" element="tns:addAppointmentResponse"/>
-</message>
 <message name="AppointmentNotFoundException">
 <part name="fault" element="tns:AppointmentNotFoundException"/>
 </message>
@@ -82,11 +96,32 @@
 <message name="generateOverallRatingResponse">
 <part name="parameters" element="tns:generateOverallRatingResponse"/>
 </message>
+<message name="customerLogin">
+<part name="parameters" element="tns:customerLogin"/>
+</message>
+<message name="customerLoginResponse">
+<part name="parameters" element="tns:customerLoginResponse"/>
+</message>
+<message name="InvalidLoginCredentialException">
+<part name="fault" element="tns:InvalidLoginCredentialException"/>
+</message>
+<message name="retrieveCustomerEntityAppointments">
+<part name="parameters" element="tns:retrieveCustomerEntityAppointments"/>
+</message>
+<message name="retrieveCustomerEntityAppointmentsResponse">
+<part name="parameters" element="tns:retrieveCustomerEntityAppointmentsResponse"/>
+</message>
 <message name="retrieveAllBusinessCategories">
 <part name="parameters" element="tns:retrieveAllBusinessCategories"/>
 </message>
 <message name="retrieveAllBusinessCategoriesResponse">
 <part name="parameters" element="tns:retrieveAllBusinessCategoriesResponse"/>
+</message>
+<message name="cancelAppointment">
+<part name="parameters" element="tns:cancelAppointment"/>
+</message>
+<message name="cancelAppointmentResponse">
+<part name="parameters" element="tns:cancelAppointmentResponse"/>
 </message>
 <message name="createAppointmentEntity">
 <part name="parameters" element="tns:createAppointmentEntity"/>
@@ -115,31 +150,13 @@
 <message name="retrieveAppointmentTimeWithApptNumResponse">
 <part name="parameters" element="tns:retrieveAppointmentTimeWithApptNumResponse"/>
 </message>
-<message name="cancelAppointment">
-<part name="parameters" element="tns:cancelAppointment"/>
-</message>
-<message name="cancelAppointmentResponse">
-<part name="parameters" element="tns:cancelAppointmentResponse"/>
-</message>
-<message name="AppointmentCannotBeCancelledException">
-<part name="fault" element="tns:AppointmentCannotBeCancelledException"/>
-</message>
-<message name="getApptStatus">
-<part name="parameters" element="tns:getApptStatus"/>
-</message>
-<message name="getApptStatusResponse">
-<part name="parameters" element="tns:getApptStatusResponse"/>
-</message>
 <portType name="CustomerWebService">
-<operation name="retrieveServiceProviderByServiceProviderId">
-<input wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveServiceProviderByServiceProviderIdRequest" message="tns:retrieveServiceProviderByServiceProviderId"/>
-<output wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveServiceProviderByServiceProviderIdResponse" message="tns:retrieveServiceProviderByServiceProviderIdResponse"/>
-<fault message="tns:ServiceProviderEntityNotFoundException" name="ServiceProviderEntityNotFoundException" wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveServiceProviderByServiceProviderId/Fault/ServiceProviderEntityNotFoundException"/>
-</operation>
-<operation name="retrieveAllAvailableServiceProvidersForTheDay">
-<input wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveAllAvailableServiceProvidersForTheDayRequest" message="tns:retrieveAllAvailableServiceProvidersForTheDay"/>
-<output wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveAllAvailableServiceProvidersForTheDayResponse" message="tns:retrieveAllAvailableServiceProvidersForTheDayResponse"/>
-<fault message="tns:BusinessCategoryNotFoundException" name="BusinessCategoryNotFoundException" wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveAllAvailableServiceProvidersForTheDay/Fault/BusinessCategoryNotFoundException"/>
+<operation name="createCustomerEntity">
+<input wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntityRequest" message="tns:createCustomerEntity"/>
+<output wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntityResponse" message="tns:createCustomerEntityResponse"/>
+<fault message="tns:UnknownPersistenceException" name="UnknownPersistenceException" wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntity/Fault/UnknownPersistenceException"/>
+<fault message="tns:CustomerExistException" name="CustomerExistException" wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntity/Fault/CustomerExistException"/>
+<fault message="tns:InvalidPasswordFormatException" name="InvalidPasswordFormatException" wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntity/Fault/InvalidPasswordFormatException"/>
 </operation>
 <operation name="retrieveCustomerEntityById">
 <input wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityByIdRequest" message="tns:retrieveCustomerEntityById"/>
@@ -156,12 +173,15 @@
 <output wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityAppointmentsResponse" message="tns:retrieveCustomerEntityAppointmentsResponse"/>
 <fault message="tns:CustomerNotFoundException" name="CustomerNotFoundException" wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityAppointments/Fault/CustomerNotFoundException"/>
 </operation>
-<operation name="createCustomerEntity">
-<input wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntityRequest" message="tns:createCustomerEntity"/>
-<output wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntityResponse" message="tns:createCustomerEntityResponse"/>
-<fault message="tns:UnknownPersistenceException" name="UnknownPersistenceException" wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntity/Fault/UnknownPersistenceException"/>
-<fault message="tns:CustomerExistException" name="CustomerExistException" wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntity/Fault/CustomerExistException"/>
-<fault message="tns:InvalidPasswordFormatException" name="InvalidPasswordFormatException" wsam:Action="http://ws.session.ejb/CustomerWebService/createCustomerEntity/Fault/InvalidPasswordFormatException"/>
+<operation name="retrieveServiceProviderByServiceProviderId">
+<input wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveServiceProviderByServiceProviderIdRequest" message="tns:retrieveServiceProviderByServiceProviderId"/>
+<output wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveServiceProviderByServiceProviderIdResponse" message="tns:retrieveServiceProviderByServiceProviderIdResponse"/>
+<fault message="tns:ServiceProviderEntityNotFoundException" name="ServiceProviderEntityNotFoundException" wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveServiceProviderByServiceProviderId/Fault/ServiceProviderEntityNotFoundException"/>
+</operation>
+<operation name="retrieveAllAvailableServiceProvidersForTheDay">
+<input wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveAllAvailableServiceProvidersForTheDayRequest" message="tns:retrieveAllAvailableServiceProvidersForTheDay"/>
+<output wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveAllAvailableServiceProvidersForTheDayResponse" message="tns:retrieveAllAvailableServiceProvidersForTheDayResponse"/>
+<fault message="tns:BusinessCategoryNotFoundException" name="BusinessCategoryNotFoundException" wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveAllAvailableServiceProvidersForTheDay/Fault/BusinessCategoryNotFoundException"/>
 </operation>
 <operation name="retrieveServiceProviderAvailabilityForTheDay">
 <input wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveServiceProviderAvailabilityForTheDayRequest" message="tns:retrieveServiceProviderAvailabilityForTheDay"/>
@@ -178,9 +198,24 @@
 <input wsam:Action="http://ws.session.ejb/CustomerWebService/generateOverallRatingRequest" message="tns:generateOverallRating"/>
 <output wsam:Action="http://ws.session.ejb/CustomerWebService/generateOverallRatingResponse" message="tns:generateOverallRatingResponse"/>
 </operation>
+<operation name="customerLogin">
+<input wsam:Action="http://ws.session.ejb/CustomerWebService/customerLoginRequest" message="tns:customerLogin"/>
+<output wsam:Action="http://ws.session.ejb/CustomerWebService/customerLoginResponse" message="tns:customerLoginResponse"/>
+<fault message="tns:InvalidLoginCredentialException" name="InvalidLoginCredentialException" wsam:Action="http://ws.session.ejb/CustomerWebService/customerLogin/Fault/InvalidLoginCredentialException"/>
+</operation>
+<operation name="retrieveCustomerEntityAppointments">
+<input wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityAppointmentsRequest" message="tns:retrieveCustomerEntityAppointments"/>
+<output wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityAppointmentsResponse" message="tns:retrieveCustomerEntityAppointmentsResponse"/>
+<fault message="tns:CustomerNotFoundException" name="CustomerNotFoundException" wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveCustomerEntityAppointments/Fault/CustomerNotFoundException"/>
+</operation>
 <operation name="retrieveAllBusinessCategories">
 <input wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveAllBusinessCategoriesRequest" message="tns:retrieveAllBusinessCategories"/>
 <output wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveAllBusinessCategoriesResponse" message="tns:retrieveAllBusinessCategoriesResponse"/>
+</operation>
+<operation name="cancelAppointment">
+<input wsam:Action="http://ws.session.ejb/CustomerWebService/cancelAppointmentRequest" message="tns:cancelAppointment"/>
+<output wsam:Action="http://ws.session.ejb/CustomerWebService/cancelAppointmentResponse" message="tns:cancelAppointmentResponse"/>
+<fault message="tns:AppointmentNotFoundException" name="AppointmentNotFoundException" wsam:Action="http://ws.session.ejb/CustomerWebService/cancelAppointment/Fault/AppointmentNotFoundException"/>
 </operation>
 <operation name="createAppointmentEntity">
 <input wsam:Action="http://ws.session.ejb/CustomerWebService/createAppointmentEntityRequest" message="tns:createAppointmentEntity"/>
@@ -204,20 +239,10 @@
 <output wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveAppointmentTimeWithApptNumResponse" message="tns:retrieveAppointmentTimeWithApptNumResponse"/>
 <fault message="tns:AppointmentNotFoundException" name="AppointmentNotFoundException" wsam:Action="http://ws.session.ejb/CustomerWebService/retrieveAppointmentTimeWithApptNum/Fault/AppointmentNotFoundException"/>
 </operation>
-<operation name="cancelAppointment">
-<input wsam:Action="http://ws.session.ejb/CustomerWebService/cancelAppointmentRequest" message="tns:cancelAppointment"/>
-<output wsam:Action="http://ws.session.ejb/CustomerWebService/cancelAppointmentResponse" message="tns:cancelAppointmentResponse"/>
-<fault message="tns:AppointmentNotFoundException" name="AppointmentNotFoundException" wsam:Action="http://ws.session.ejb/CustomerWebService/cancelAppointment/Fault/AppointmentNotFoundException"/>
-<fault message="tns:AppointmentCannotBeCancelledException" name="AppointmentCannotBeCancelledException" wsam:Action="http://ws.session.ejb/CustomerWebService/cancelAppointment/Fault/AppointmentCannotBeCancelledException"/>
-</operation>
-<operation name="getApptStatus">
-<input wsam:Action="http://ws.session.ejb/CustomerWebService/getApptStatusRequest" message="tns:getApptStatus"/>
-<output wsam:Action="http://ws.session.ejb/CustomerWebService/getApptStatusResponse" message="tns:getApptStatusResponse"/>
-</operation>
 </portType>
 <binding name="CustomerWebServicePortBinding" type="tns:CustomerWebService">
 <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-<operation name="retrieveServiceProviderByServiceProviderId">
+<operation name="createCustomerEntity">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -225,20 +250,14 @@
 <output>
 <soap:body use="literal"/>
 </output>
-<fault name="ServiceProviderEntityNotFoundException">
-<soap:fault name="ServiceProviderEntityNotFoundException" use="literal"/>
+<fault name="UnknownPersistenceException">
+<soap:fault name="UnknownPersistenceException" use="literal"/>
 </fault>
-</operation>
-<operation name="retrieveAllAvailableServiceProvidersForTheDay">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="BusinessCategoryNotFoundException">
-<soap:fault name="BusinessCategoryNotFoundException" use="literal"/>
+<fault name="CustomerExistException">
+<soap:fault name="CustomerExistException" use="literal"/>
+</fault>
+<fault name="InvalidPasswordFormatException">
+<soap:fault name="InvalidPasswordFormatException" use="literal"/>
 </fault>
 </operation>
 <operation name="retrieveCustomerEntityById">
@@ -277,33 +296,6 @@
 <soap:fault name="CustomerNotFoundException" use="literal"/>
 </fault>
 </operation>
-<operation name="createCustomerEntity">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="UnknownPersistenceException">
-<soap:fault name="UnknownPersistenceException" use="literal"/>
-</fault>
-<fault name="CustomerExistException">
-<soap:fault name="CustomerExistException" use="literal"/>
-</fault>
-<fault name="InvalidPasswordFormatException">
-<soap:fault name="InvalidPasswordFormatException" use="literal"/>
-</fault>
-</operation>
-<operation name="retrieveServiceProviderAvailabilityForTheDay">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-</operation>
 <operation name="addAppointment">
 <soap:operation soapAction=""/>
 <input>
@@ -320,6 +312,39 @@
 </fault>
 <fault name="AppointmentNotFoundException">
 <soap:fault name="AppointmentNotFoundException" use="literal"/>
+</fault>
+</operation>
+<operation name="retrieveAllAvailableServiceProvidersForTheDay">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="BusinessCategoryNotFoundException">
+<soap:fault name="BusinessCategoryNotFoundException" use="literal"/>
+</fault>
+</operation>
+<operation name="retrieveServiceProviderAvailabilityForTheDay">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="customerLogin">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="InvalidLoginCredentialException">
+<soap:fault name="InvalidLoginCredentialException" use="literal"/>
 </fault>
 </operation>
 <operation name="generateOverallRating">
@@ -339,6 +364,18 @@
 <output>
 <soap:body use="literal"/>
 </output>
+</operation>
+<operation name="cancelAppointment">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="AppointmentNotFoundException">
+<soap:fault name="AppointmentNotFoundException" use="literal"/>
+</fault>
 </operation>
 <operation name="createAppointmentEntity">
 <soap:operation soapAction=""/>
@@ -393,30 +430,6 @@
 <fault name="AppointmentNotFoundException">
 <soap:fault name="AppointmentNotFoundException" use="literal"/>
 </fault>
-</operation>
-<operation name="cancelAppointment">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="AppointmentNotFoundException">
-<soap:fault name="AppointmentNotFoundException" use="literal"/>
-</fault>
-<fault name="AppointmentCannotBeCancelledException">
-<soap:fault name="AppointmentCannotBeCancelledException" use="literal"/>
-</fault>
-</operation>
-<operation name="getApptStatus">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
 </operation>
 </binding>
 <service name="CustomerWebService">

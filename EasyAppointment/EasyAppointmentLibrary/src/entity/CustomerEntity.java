@@ -18,9 +18,9 @@ public class CustomerEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, length = 32, unique = true)
+    @Column(nullable = false, length = 32)
     private String identityNumber;
-    @Column(nullable = false, length = 64, unique = true)
+    @Column(nullable = false, length = 64)
     private String email;
     @Column(nullable = false, length = 286)
     private String password;
@@ -32,7 +32,7 @@ public class CustomerEntity implements Serializable {
     private String gender;
     @Column(nullable = false, length = 32)
     private Integer age;
-    @Column(nullable = false, length = 32, unique = true)
+    @Column(nullable = false, length = 32)
     private String phoneNumber;
     @Column(nullable = false, length = 128)
     private String address;

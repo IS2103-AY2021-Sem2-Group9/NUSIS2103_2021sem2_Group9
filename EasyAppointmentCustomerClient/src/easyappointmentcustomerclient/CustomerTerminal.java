@@ -149,7 +149,6 @@ public class CustomerTerminal {
                 break;
             } catch (InputMismatchException ex) {
                 System.err.println("Please input a number.");
-                scanner.next();
             }
         }
 
@@ -228,7 +227,6 @@ public class CustomerTerminal {
                 break;
             } catch (InputMismatchException ex) {
                 System.err.println("Please input a number.");
-                scanner.next();
             }
         }
 
