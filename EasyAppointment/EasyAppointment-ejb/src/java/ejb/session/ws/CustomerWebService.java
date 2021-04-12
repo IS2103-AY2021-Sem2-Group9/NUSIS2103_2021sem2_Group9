@@ -78,7 +78,7 @@ public class CustomerWebService {
             em.detach(appt);
             appt.setCustomerEntity(null);
             em.detach(appt.getServiceProviderEntity());
-            appt.getServiceProviderEntity().getAppointmentEntities().clear(); // set all 
+            appt.getServiceProviderEntity().getAppointmentEntities().clear();
         }
         return cust;
     }

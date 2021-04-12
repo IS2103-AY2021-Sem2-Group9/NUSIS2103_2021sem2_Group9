@@ -1,6 +1,5 @@
 package easyappointmentcustomerclient;
 
-import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
@@ -9,8 +8,6 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import ws.client.AppointmentEntity;
 import ws.client.BusinessCategoryEntity;
 import ws.client.CustomerEntity;
@@ -18,7 +15,6 @@ import ws.client.ServiceProviderEntity;
 import ws.client.AppointmentExistException_Exception;
 import ws.client.AppointmentNotFoundException_Exception;
 import ws.client.BusinessCategoryNotFoundException_Exception;
-import ws.client.CustomerExistException_Exception;
 import ws.client.CustomerNotFoundException_Exception;
 import ws.client.ServiceProviderEntityNotFoundException_Exception;
 import ws.client.ServiceProviderStatus;
@@ -304,8 +300,8 @@ public class CustomerModule {
                     }
 
                     spEntity = retrieveServiceProviderByServiceProviderId(spId);
-                    // Only allow user to enter spid that is shown
-                    // Check if service provider belongs to city
+                    
+                    // Only allow user to enter spid that is shown - SP must be approved/City must be correct/Category must be correct
                     if (!spEntity.getStatus().equals(ServiceProviderStatus.APPROVED) || !spEntity.getCity().equals(city) || spEntity.getCategory().getId() != category) {
                         System.err.println("No such Service Provider ID. Please enter another.");
                         continue;
