@@ -26,6 +26,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.naming.NamingException;
+import util.exception.AppointmentNotFoundException;
 import util.exception.BusinessCategoryExistException;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.CustomerNotFoundException;
@@ -345,7 +346,7 @@ public class AdminModule {
         }   
     }
     
-        private void blockServiceProvider()
+    private void blockServiceProvider()
     {
         System.out.println("*** Admin Terminal :: Block Service Provider ***\n");
         Scanner scanner = new Scanner(System.in);
@@ -355,18 +356,18 @@ public class AdminModule {
         List<ServiceProviderEntity> totalServiceProviders = new ArrayList<>();
         totalServiceProviders.addAll(approvedServiceProviders);
         totalServiceProviders.addAll(pendingServiceProviders);
-        
+
         if (totalServiceProviders.isEmpty())
         {
             System.out.println("There are no existing pending/approved service providers to block.\n");
         }
         else
         {
-            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone", "| Status");
+            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-13s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone", "| Status");
 
             for (ServiceProviderEntity sp : totalServiceProviders)
             {
-                System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber(), "| " + sp.getStatus());
+                System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-13s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber(), "| " + sp.getStatus());
             }
 
             System.out.println();
@@ -384,18 +385,67 @@ public class AdminModule {
                     {
                        break;
                     }
-                    
+
                     ServiceProviderEntity toBlockSp = serviceProviderSessionBeanRemote.retrieveServiceProviderByServiceProviderId(id);
                     if (toBlockSp.getStatus() == ServiceProviderStatus.APPROVED)
                     {
-                        //List<AppointmentEntity> appts = serviceProviderSessionBeanRemote.
+                        List<AppointmentEntity> appts = serviceProviderSessionBeanRemote.retrieveUpcomingAppointmentsForServiceProvider(toBlockSp);
+                        if (appts.isEmpty())
+                        {
+                            String blockedSp = serviceProviderSessionBeanRemote.blockServiceProviderById(id);
+                            System.out.println("Service Provider: " + blockedSp + " has been blocked.\n");
+                            break;
+                        }
+                        else
+                        {
+                            System.out.println("Are you sure you want to block service provider: " + toBlockSp.getName() + "?");
+                            System.out.println(toBlockSp.getName() + " currently has these upcoming appointments:\n");
+                            System.out.printf("%-18s%-18s%-15s%-15s%-10s%-15s\n", "Appointment No.", "| Customer Name", "| Phone Number", "| Date", "| Time", "| Status");
+
+                            for(AppointmentEntity appointment : appts)
+                            {
+                                CustomerEntity customer = appointment.getCustomerEntity();
+                                String status = appointmentEntitySessionBeanRemote.getStatus(appointment);
+                                System.out.printf("%-18s%-18s%-15s%-15s%-10s%-15s\n", appointment.getAppointmentNum(), "| " + customer.getFirstName() + " " + customer.getLastName(), "| " + customer.getPhoneNumber(), "| " + appointment.getAppointmentDate(), "| " + appointment.getAppointmentTime(), "| " + status);
+                            }
+
+                            System.out.println("These appointments will be cancelled upon blocking of service provider!");
+                            System.out.print("Block? Enter Y/N >");
+                            String response = scanner.nextLine().trim().toUpperCase();
+
+                            if (response.equals("Y"))
+                            {
+                                // have to catch unable to cancel 24hr appt
+                                for (AppointmentEntity appointment : appts)
+                                {
+                                    appointmentEntitySessionBeanRemote.cancelAppointment(appointment.getAppointmentNum());
+                                }
+                                
+                                System.out.println("All appointments are cancalled.\n");
+                                
+                                String blockedSp = serviceProviderSessionBeanRemote.blockServiceProviderById(id);
+                                System.out.println("Service Provider: " + blockedSp + " has been blocked.\n");
+                                break;
+                                
+                            }
+                            else if (response.equals("N"))
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                System.err.println("Please enter in Y or N only!");
+                            }
+                        }
                     }
-                    
-                    String blockedSp = serviceProviderSessionBeanRemote.blockServiceProviderById(id);
-                    System.out.println("Service Provider: " + blockedSp + " has been blocked.\n");
-                    break;
+                    else
+                    {
+                        String blockedSp = serviceProviderSessionBeanRemote.blockServiceProviderById(id);
+                        System.out.println("Service Provider: " + blockedSp + " has been blocked.\n");
+                        break;
+                    }
                 }
-                catch (ServiceProviderEntityNotFoundException | ServiceProviderAlreadyBlockedException ex)
+                catch (ServiceProviderEntityNotFoundException | ServiceProviderAlreadyBlockedException | AppointmentNotFoundException ex)
                 {
                     System.err.println("Error occured while blocking Service Provider: " + ex.getMessage());
                 }
