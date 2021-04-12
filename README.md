@@ -1,10 +1,10 @@
 # IS2103-AY20-21-Sem2-Group9
 
-## Database Connection
+### Database Connection
 - Create new database -> New Database Name: easyappointment
 - User: root , Password: password
 
-## updating gitignore to ignore project properties later on
+### updating gitignore to ignore project properties later on
 1. everyone clone the project and make sure it works on their computer first
 2. update gitignore to include `project.properties` and `project.xml`.
 3. `git rm -r --cached .`
