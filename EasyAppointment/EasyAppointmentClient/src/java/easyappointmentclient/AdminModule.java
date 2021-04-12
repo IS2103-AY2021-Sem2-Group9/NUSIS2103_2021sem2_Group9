@@ -549,53 +549,65 @@ public class AdminModule {
                 System.out.println("Enter 0 to go back to the previous menu.\n");
                 System.out.print("Enter the category ID you want to remove> ");
 
-                Long categoryId = scanner.nextLong();
-                scanner.nextLine();
-
                 try
                 {
-                    BusinessCategoryEntity toBeRemoved = businessCategorySessionBeanRemote.retrieveBusinessCategoryById(categoryId);
-                    List<ServiceProviderEntity> spEntities = businessCategorySessionBeanRemote.retrieveServiceProvidersByBusinessCategory(categoryId);
+                    Long categoryId = scanner.nextLong();
+                    scanner.nextLine();
                     
-                    if (spEntities.isEmpty())
+                    if (categoryId.equals(Long.valueOf(0)))
                     {
-                        String removedName = businessCategorySessionBeanRemote.deleteBusinessCategory(toBeRemoved.getCategoryName());
-                        System.out.println("Business Category " + removedName + " has been removed.\n");
-                        
+                        break;
                     }
-                    else
+                    else 
                     {
-                        System.out.println("Several Service Providers are currently under this category!");
-                        System.out.println("List of Service Providers under " + toBeRemoved.getCategoryName() + ":\n");
-                        System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-13s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone", "| Status");
+                        BusinessCategoryEntity toBeRemoved = businessCategorySessionBeanRemote.retrieveBusinessCategoryById(categoryId);
+                        List<ServiceProviderEntity> spEntities = businessCategorySessionBeanRemote.retrieveServiceProvidersByBusinessCategory(categoryId);
 
-                        for (ServiceProviderEntity sp : spEntities)
-                        {
-                            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-13s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber(), "| " + sp.getStatus());
-                        }
-                        
-                        System.out.println("Are you sure you want to remove the " + toBeRemoved.getCategoryName() + " category?");
-                        System.out.println("Removing this category will delete all related Service Providers as well as their related appointments!");
-                        System.out.print("Enter Y/N> ");
-                        String response = scanner.nextLine().trim().toUpperCase();
-                        if (response.equals("Y"))
+                        if (spEntities.isEmpty())
                         {
                             String removedName = businessCategorySessionBeanRemote.deleteBusinessCategory(toBeRemoved.getCategoryName());
-                            System.out.println("Business Category " + removedName + ", its associated Service Providers and Appointments have been removed.\n");
-                        }
-                        else if (response.equals("N"))
-                        {
-                            break;
+                            System.out.println("Business Category " + removedName + " has been removed.\n");
+
                         }
                         else
                         {
-                            System.err.println("Please key in Y or N only.");
-                        }
+                            System.out.println("Several Service Providers are currently under this category!");
+                            System.out.println("List of Service Providers under " + toBeRemoved.getCategoryName() + ":\n");
+                            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-13s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone", "| Status");
+
+                            for (ServiceProviderEntity sp : spEntities)
+                            {
+                                System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-13s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber(), "| " + sp.getStatus());
+                            }
+
+                            System.out.println("Are you sure you want to remove the " + toBeRemoved.getCategoryName() + " category?");
+                            System.out.println("Removing this category will delete all related Service Providers as well as their related appointments!");
+                            System.out.print("Enter Y/N> ");
+                            String response = scanner.nextLine().trim().toUpperCase();
+                            if (response.equals("Y"))
+                            {
+                                String removedName = businessCategorySessionBeanRemote.deleteBusinessCategory(toBeRemoved.getCategoryName());
+                                System.out.println("Business Category " + removedName + ", its associated Service Providers and Appointments have been removed.\n");
+                            }
+                            else if (response.equals("N"))
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                System.err.println("Please key in Y or N only.");
+                            }
+                        }                       
                     }
+
+                }
+                catch (InputMismatchException ex)
+                {
+                    System.err.println("Please only enter digits for the Service Provider ID.");
                 }
                 catch (BusinessCategoryNotFoundException ex)
                 {
-                    System.out.println("Error removing Business Category: " + ex.getMessage() + "\n");
+                    System.err.println("Error removing Business Category: " + ex.getMessage() + "\n");
                 }
             }
         }

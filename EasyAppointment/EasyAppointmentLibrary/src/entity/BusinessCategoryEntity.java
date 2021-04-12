@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
 public class BusinessCategoryEntity implements Serializable {
@@ -20,7 +21,7 @@ public class BusinessCategoryEntity implements Serializable {
     private Long id;
     @Column(nullable = false, length = 32, unique = true)
     private String categoryName;
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "category", orphanRemoval = true)
     @JoinColumn(nullable = false)
     private List<ServiceProviderEntity> serviceProviderEntities; 
 
@@ -73,6 +74,7 @@ public class BusinessCategoryEntity implements Serializable {
         this.categoryName = categoryName;
     }
 
+    @XmlTransient
     public List<ServiceProviderEntity> getServiceProviderEntities() {
         return serviceProviderEntities;
     }

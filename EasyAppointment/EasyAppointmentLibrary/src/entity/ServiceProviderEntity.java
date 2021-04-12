@@ -42,7 +42,7 @@ public class ServiceProviderEntity implements Serializable {
     private String password; 
     @Column (nullable = false)
     private ServiceProviderStatus status;
-    @OneToMany(mappedBy = "serviceProviderEntity")
+    @OneToMany(mappedBy = "serviceProviderEntity", orphanRemoval = true)
     private List<AppointmentEntity> appointmentEntities; 
 
     public ServiceProviderEntity() {
