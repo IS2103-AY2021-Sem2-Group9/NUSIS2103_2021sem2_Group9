@@ -20,6 +20,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.exception.AppointmentCannotBeCancelledException;
 import util.exception.AppointmentExistException;
+import util.exception.AppointmentNotCompletedException;
 import util.exception.AppointmentNotFoundException;
 import util.exception.CustomerNotFoundException;
 import util.exception.ServiceProviderEntityNotFoundException;
@@ -142,9 +143,14 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
     }
     
     @Override
-    public void rateAppointment(long appointmentEntityId, int rating) {
+    public void rateAppointment(long appointmentEntityId, int rating) throws AppointmentNotCompletedException {
         AppointmentEntity appt = em.find(AppointmentEntity.class,appointmentEntityId);
-        appt.setRating(rating);
+        String status = getStatus(appt);
+        if (status.equals("COMPLETED")) {
+            appt.setRating(rating);
+        } else {
+            throw new AppointmentNotCompletedException("Appointment has not been completed!");
+        }
     }
     
     @Override

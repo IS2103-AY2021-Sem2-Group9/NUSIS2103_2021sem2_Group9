@@ -14,6 +14,7 @@ import ws.client.BusinessCategoryEntity;
 import ws.client.CustomerEntity;
 import ws.client.ServiceProviderEntity;
 import ws.client.AppointmentExistException_Exception;
+import ws.client.AppointmentNotCompletedException_Exception;
 import ws.client.AppointmentNotFoundException_Exception;
 import ws.client.BusinessCategoryNotFoundException_Exception;
 import ws.client.CustomerNotFoundException_Exception;
@@ -408,7 +409,7 @@ public class CustomerModule {
 
             createAppointmentEntity(date.toString(), timeStr, loggedInCustomerEntity.getId(), spEntity.getServiceProviderId());
 
-            System.out.printf("The appointment with %s %s at %s on %s is confirmed.", this.loggedInCustomerEntity.getFirstName(), this.loggedInCustomerEntity.getLastName(), timeStr, date.toString());
+            System.out.printf("The appointment with %s at %s on %s is confirmed.", spEntity.getName(), timeStr, date.toString());
             System.out.println();
 
             System.out.println("Enter 0 to go back to previous menu");
@@ -622,11 +623,11 @@ public class CustomerModule {
                     Integer rating;
                     while (true) {
                         try {
-                            System.out.print("Enter rating> ");
+                            System.out.print("Enter rating 1-5> ");
                             rating = sc.nextInt();
                             break;
                         } catch (InputMismatchException ex) {
-                            System.err.println("Please input a digit.");
+                            System.err.println("Please input rating from 1 - 5.");
                             sc.next();
                         }
                     }
@@ -634,7 +635,7 @@ public class CustomerModule {
                     while (rating < 1 || rating > 5) {
                         while (true) {
                             try {
-                                System.err.print("Invalid rating. Enter rating again> ");
+                                System.err.print("Invalid rating. Enter rating again from 1-5.> ");
                                 rating = sc.nextInt();
                                 break;
                             } catch (InputMismatchException ex) {
@@ -646,8 +647,13 @@ public class CustomerModule {
 
                     System.out.println();
                     AppointmentEntity apptEntity = apptsToRate.get(index - 1);
-                    rateAppointment(apptEntity.getId(), rating);
-                    System.out.println("You have rated Appointment " + apptEntity.getAppointmentNum() + " a rating of " + rating + ".");
+                    try {
+                        rateAppointment(apptEntity.getId(), rating);
+                        System.out.println("You have rated Appointment " + apptEntity.getAppointmentNum() + " a rating of " + rating + ".");
+                    } catch (AppointmentNotCompletedException_Exception ex) {
+                        System.err.println("Error rating appointment: " + ex.getMessage());
+                        
+                    }
                 }
             }
 
@@ -715,11 +721,7 @@ public class CustomerModule {
         return port.createAppointmentEntity(appointmentDate, apptTime, customerId, spId);
     }
 
-    private static void rateAppointment(long apptEntityId, int rating) {
-        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
-        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
-        port.rateAppointment(apptEntityId, rating);
-    }
+    
 
     private static String getApptStatus(java.lang.Long apptId) {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
@@ -733,6 +735,10 @@ public class CustomerModule {
         return port.retrieveAllAvailableServiceProvidersForTheDay(appointmentDate, category, city);
     }
 
-    
+    private static void rateAppointment(long apptEntityId, int rating) throws AppointmentNotCompletedException_Exception {
+        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
+        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
+        port.rateAppointment(apptEntityId, rating);
+    }
 
 }

@@ -27,8 +27,8 @@ public class CustomerTerminal {
             response = 0;
 
             while (response < 1 || response > 3) {
+                System.out.print("> ");
                 try {
-                    System.out.print("> ");
                     response = scanner.nextInt();
                 } catch (InputMismatchException ex) {
                     System.err.println("Please input digits only.");
@@ -159,10 +159,18 @@ public class CustomerTerminal {
         while (true) {
             System.out.print("Enter Phone Number> ");
             phoneNum = scanner.nextLine().trim();
-            if (phoneNum.length() > 0) {
-                break;
+            try {
+                if (phoneNum.length() > 0) {
+                    Integer testPhoneNumber = Integer.parseInt(phoneNum);
+                    if (phoneNum.length() > 0) {
+                        break;
+                    }
+                } else {
+                        System.err.println("Please input a Phone Number.");
+                } 
+            } catch (NumberFormatException ex) {
+                System.err.println("Please input a Phone Number consisting of digits only.");
             }
-            System.err.println("Please input a Phone Number.");
         }
 
         String address;

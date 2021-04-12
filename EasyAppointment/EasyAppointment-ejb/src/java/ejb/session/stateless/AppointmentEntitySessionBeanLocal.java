@@ -5,6 +5,7 @@ import entity.ServiceProviderEntity;
 import java.util.List;
 import util.exception.AppointmentCannotBeCancelledException;
 import util.exception.AppointmentExistException;
+import util.exception.AppointmentNotCompletedException;
 import util.exception.AppointmentNotFoundException;
 import util.exception.UnknownPersistenceException;
 
@@ -26,7 +27,7 @@ public interface AppointmentEntitySessionBeanLocal {
 
     public List<AppointmentEntity> retrieveAllAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
     
-    public void rateAppointment(long appointmentEntityId, int rating);
+    public void rateAppointment(long appointmentEntityId, int rating) throws AppointmentNotCompletedException;
     
     public String retrieveAppointmentDateWithApptNum(String apptNum) throws AppointmentNotFoundException;
     

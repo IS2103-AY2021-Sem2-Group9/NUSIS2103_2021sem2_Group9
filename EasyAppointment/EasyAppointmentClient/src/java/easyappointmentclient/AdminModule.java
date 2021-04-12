@@ -629,6 +629,7 @@ public class AdminModule {
         {
             try
             {
+                System.out.println("Enter 0 to go back to previous menu.");
                 System.out.print("Enter customer ID> ");
                 customerId = sc.nextLong();
                 sc.nextLine();
@@ -664,6 +665,7 @@ public class AdminModule {
             {
                 System.err.println("An error occured while trying to send email: " + ex.getMessage());
             }
+            
         }
     }
     
