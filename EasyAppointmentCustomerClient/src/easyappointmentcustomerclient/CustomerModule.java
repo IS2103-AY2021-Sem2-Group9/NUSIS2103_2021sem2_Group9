@@ -219,7 +219,6 @@ public class CustomerModule {
             if (serviceProviders.isEmpty()) {
                 System.out.println("There are no Service Providers available.\n");
                 return null;
-            }
 
             // Print headers
             System.out.printf("%-20s | %-20s | %-20s | %-20s | %s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
