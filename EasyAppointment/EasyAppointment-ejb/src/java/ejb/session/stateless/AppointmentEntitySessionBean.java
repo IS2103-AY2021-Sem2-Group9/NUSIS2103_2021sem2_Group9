@@ -18,6 +18,7 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import util.exception.AppointmentCannotBeCancelledException;
 import util.exception.AppointmentExistException;
 import util.exception.AppointmentNotFoundException;
 import util.exception.CustomerNotFoundException;
@@ -57,13 +58,37 @@ public class AppointmentEntitySessionBean implements AppointmentEntitySessionBea
     }
 
     @Override
-    public void cancelAppointment(String appointmentNum) throws AppointmentNotFoundException {
+    public void cancelAppointment(String appointmentNum) throws AppointmentNotFoundException, AppointmentCannotBeCancelledException {
         AppointmentEntity appt = retrieveAppointmentByAppointmentNum(appointmentNum);
         
-        appt.getCustomerEntity().getAppointments().remove(appt);
-        appt.getServiceProviderEntity().getAppointmentEntities().remove(appt);
+        LocalDate dateNow= LocalDate.now(); 
+        LocalTime timeNow = LocalTime.now(); 
         
-        em.remove(appt);
+        LocalDate apptDate = appt.getAppointmentDate();
+        LocalTime apptTime = appt.getAppointmentTime();
+        
+        Long yearDiff = ChronoUnit.YEARS.between(dateNow, apptDate); 
+        Long monthDiff = ChronoUnit.MONTHS.between(dateNow, apptDate);
+        Long dayDiff = ChronoUnit.DAYS.between(dateNow, apptDate);
+        
+        System.out.println(dayDiff);
+        
+        int compareDate = dateNow.compareTo(apptDate); 
+        double hoursDiff = ChronoUnit.HOURS.between(timeNow, apptTime);
+        
+        System.out.println(hoursDiff); // testing
+        
+        if (dayDiff > 1) {
+            appt.getCustomerEntity().getAppointments().remove(appt);
+            appt.getServiceProviderEntity().getAppointmentEntities().remove(appt);
+            em.remove(appt);
+        } else if (dayDiff == 1 && hoursDiff >= 0) { // accounting for same date and > 24 hours 
+            appt.getCustomerEntity().getAppointments().remove(appt);
+            appt.getServiceProviderEntity().getAppointmentEntities().remove(appt);
+            em.remove(appt);
+        } else {
+            throw new AppointmentCannotBeCancelledException("Appointment number " + appointmentNum + " cannot be cancelled as it is less than 24 hours before the scheduled time.");
+        }
     }
 
     

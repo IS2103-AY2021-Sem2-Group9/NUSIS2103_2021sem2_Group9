@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import util.exception.AppointmentCannotBeCancelledException;
 import util.exception.AppointmentExistException;
 import util.exception.AppointmentNotFoundException;
 import util.exception.BusinessCategoryNotFoundException;
@@ -403,6 +404,8 @@ public class CustomerModule {
             System.out.println("Appointment " + appointmentNum + " has been cancelled successfully.\n");
         } catch (AppointmentNotFoundException ex) {
             System.out.println("An error has occured when cancelling the appointment: " + ex.getMessage());
+        } catch (AppointmentCannotBeCancelledException ex) {
+            System.out.println("Error cancelling appointment: " + ex.getMessage());
         }
     }
 

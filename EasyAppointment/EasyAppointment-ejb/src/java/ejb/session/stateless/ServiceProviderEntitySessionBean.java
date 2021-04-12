@@ -79,7 +79,7 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         {
             if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
                 if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
-                    throw new BusinessCategoryNotFoundException("Error! Businesss category cannot be found!");
+                    throw new BusinessCategoryNotFoundException("Businesss category cannot be found!");
                 } else {
                     throw new UnknownPersistenceException(ex.getMessage());
                 }
@@ -139,32 +139,39 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     public void updateServiceProvider(ServiceProviderEntity serviceProviderEntity) throws ServiceProviderEntityNotFoundException, UpdateServiceProviderException, InvalidPasswordFormatException {
         if (serviceProviderEntity.getServiceProviderId() != null) {
             ServiceProviderEntity serviceProviderEntityToUpdate = retrieveServiceProviderByServiceProviderId(serviceProviderEntity.getServiceProviderId());
-
+            
             if (serviceProviderEntityToUpdate.getServiceProviderId().equals(serviceProviderEntity.getServiceProviderId())) {
-                String unencryptedPassword = serviceProviderEntity.getPassword();
-                try 
-                {
-                    Integer intPw = Integer.valueOf(unencryptedPassword);
-                    String salt = passwordEncrypt.getSalt(30);
-                    String encryptedPassword = passwordEncrypt.generateSecurePassword(unencryptedPassword, salt);
+            
+                if(!serviceProviderEntity.getPassword().equalsIgnoreCase(serviceProviderEntityToUpdate.getPassword())) {
+                    String unencryptedPassword = serviceProviderEntity.getPassword();
+                    try 
+                    {
+                        Integer intPw = Integer.valueOf(unencryptedPassword);
+                        String salt = passwordEncrypt.getSalt(30);
+                        String encryptedPassword = passwordEncrypt.generateSecurePassword(unencryptedPassword, salt);
+                        serviceProviderEntityToUpdate.setCity(serviceProviderEntity.getCity());
+                        serviceProviderEntityToUpdate.setAddress(serviceProviderEntity.getAddress());
+                        serviceProviderEntityToUpdate.setEmail(serviceProviderEntity.getEmail());
+                        serviceProviderEntityToUpdate.setPhoneNumber(serviceProviderEntity.getPhoneNumber());
+                        serviceProviderEntityToUpdate.setPassword(salt + encryptedPassword);
+                    }
+                    catch (NumberFormatException ex)
+                    {
+                        throw new InvalidPasswordFormatException("Password can only be digits.");
+                    }
                     
+                } else {
                     serviceProviderEntityToUpdate.setCity(serviceProviderEntity.getCity());
                     serviceProviderEntityToUpdate.setAddress(serviceProviderEntity.getAddress());
                     serviceProviderEntityToUpdate.setEmail(serviceProviderEntity.getEmail());
                     serviceProviderEntityToUpdate.setPhoneNumber(serviceProviderEntity.getPhoneNumber());
-                    serviceProviderEntityToUpdate.setPassword(salt + encryptedPassword);
                 }
-                catch (NumberFormatException ex)
-                {
-                    throw new InvalidPasswordFormatException("Password can only be digits.");
-                }
-
             } else {
-                throw new UpdateServiceProviderException("Username of service provider to be updated does not match the existing record");
+                throw new UpdateServiceProviderException("ID of service provider to be updated does not match the existing record");
             }
         } else {
             throw new ServiceProviderEntityNotFoundException("Service Provider does not exist!");
-        }
+        }     
     }
 
     @Override
@@ -209,10 +216,11 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     @Override
     public List<ServiceProviderEntity> retrieveAllAvailableServiceProvidersForTheDay(LocalDate appointmentDate, Long category, String city) throws BusinessCategoryNotFoundException {
         BusinessCategoryEntity bcEntity = businessCategorySessionBeanLocal.retrieveBusinessCategoryById(category);
-        Query query = em.createQuery("SELECT sp FROM ServiceProviderEntity sp WHERE sp.category = :bcEntity AND sp.city = :city");
+        Query query = em.createQuery("SELECT sp FROM ServiceProviderEntity sp WHERE sp.category = :bcEntity AND sp.city = :city AND sp.status = :status");
         query.setParameter("bcEntity", bcEntity);
         query.setParameter("city", city);
-
+        query.setParameter("status", ServiceProviderStatus.APPROVED);
+        
         List<ServiceProviderEntity> results = query.getResultList();
         List<ServiceProviderEntity> availableServiceProviders = new ArrayList<>();
         for (ServiceProviderEntity serviceProvider : results) {
@@ -347,4 +355,47 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         }
         return result;
     }
+    
+    @Override
+    public boolean checkEmail(String email) {
+        boolean valid = true;
+        Query query = em.createQuery("SELECT sp.email FROM ServiceProviderEntity sp");
+        List<String> result = query.getResultList();
+        for (String e : result) {
+            if (e.equals(email)) {
+                valid = false;
+                break;
+            }
+        }
+        return valid;
+    }
+    
+    @Override 
+    public boolean checkUen(String uen) {
+        boolean valid = true;
+        Query query = em.createQuery("SELECT sp.uen FROM ServiceProviderEntity sp");
+        List<String> result = query.getResultList();
+        for (String u : result) {
+            if(u.equals(uen)) {
+                valid = false; 
+                break;
+            }
+        }
+        return valid; 
+    }
+    
+    @Override
+    public boolean checkPhoneNumber(String phone) {
+        boolean valid = true;
+        Query query = em.createQuery("SELECT sp.phoneNumber FROM ServiceProviderEntity sp");
+        List<String> result = query.getResultList();
+        for (String p : result) {
+            if(p.equals(phone)) {
+                valid = false; 
+                break;
+            }
+        }
+        return valid; 
+    }
 }
+
