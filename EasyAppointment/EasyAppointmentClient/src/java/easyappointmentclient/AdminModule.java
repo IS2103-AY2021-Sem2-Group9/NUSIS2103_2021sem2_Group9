@@ -430,6 +430,7 @@ public class AdminModule {
                             }
                             else if (response.equals("N"))
                             {
+                                System.out.println("Service Provider not blocked.\n");
                                 break;
                             }
                             else
@@ -591,6 +592,7 @@ public class AdminModule {
                             }
                             else if (response.equals("N"))
                             {
+                                System.out.println("Business Category not deleted.\n");
                                 break;
                             }
                             else
@@ -685,16 +687,42 @@ public class AdminModule {
                     break;
                 }
                 deletingCustomer = customerEntitySessionBeanRemote.retrieveCustomerEntityById(id);
-                System.out.printf("Confirm deletion of " + deletingCustomer.getFirstName() + " " + deletingCustomer.getLastName() + " (Enter 'Y' to delete)> ");
-                response = scanner.nextLine().trim().toUpperCase();
-                if (response.equals("Y"))
+                List<AppointmentEntity> appts = customerEntitySessionBeanRemote.retrieveCustomerEntityAppointments(id);
+                
+                if (!appts.isEmpty())
                 {
-                    customerEntitySessionBeanRemote.deleteCustomerEntity(id);
-                    System.out.println("Customer " + deletingCustomer.getFirstName() + " deleted successfully!\n");
-                }
+                    System.out.println("Customer has existing appointment records, deleting of customer will remove these records: \n");
+                    System.out.printf("%-18s%-18s%-15s%-15s%-10s%-15s\n", "Appointment No.", "| Customer Name", "| Phone Number", "| Date", "| Time", "| Status");
+
+                    for(AppointmentEntity appointment : appts)
+                    {
+                        String status = appointmentEntitySessionBeanRemote.getStatus(appointment);
+                        System.out.printf("%-18s%-18s%-15s%-15s%-10s%-15s\n", appointment.getAppointmentNum(), "| " + deletingCustomer.getFirstName() + " " + deletingCustomer.getLastName(), "| " + deletingCustomer.getPhoneNumber(), "| " + appointment.getAppointmentDate(), "| " + appointment.getAppointmentTime(), "| " + status);
+                    }
+
+                    System.out.println("These appointments will be deleted / cancelled upon deletion of customer!");
+                    System.out.print("Confirm deletion? Enter Y/N >");
+                    response = scanner.nextLine().trim().toUpperCase();
+                    
+                    if (response.equals("Y"))
+                    {
+                        customerEntitySessionBeanRemote.deleteCustomerEntity(id);
+                        System.out.println("Customer " + deletingCustomer.getFirstName() + " and all their associated appointments are deleted successfully\n");
+                    }
+                    else if (response.equals("N"))
+                    {
+                        System.out.println("Customer " + deletingCustomer.getFirstName() + " not deleted!\n");
+                        break;
+                    }
+                    else 
+                    {
+                        System.err.println("Please key in Y or N only.");
+                    }
+                } 
                 else
                 {
-                    System.out.println("Customer " + deletingCustomer.getFirstName() + " not deleted!\n");
+                    customerEntitySessionBeanRemote.deleteCustomerEntity(id);
+                    System.out.println("Customer " + deletingCustomer.getFirstName() + " is deleted successfully\n");
                 }
             }
             catch (CustomerNotFoundException | DeleteCustomerException ex)

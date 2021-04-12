@@ -122,15 +122,7 @@ public class CustomerEntitySessionBean implements CustomerEntitySessionBeanLocal
     public void deleteCustomerEntity(Long CustomerId) throws CustomerNotFoundException, DeleteCustomerException
     {
         CustomerEntity CustomerEntityToRemove = retrieveCustomerEntityById(CustomerId);
-        
-        if(CustomerEntityToRemove.getAppointments().isEmpty())
-        {
-            em.remove(CustomerEntityToRemove);
-        }
-        else
-        {
-            throw new DeleteCustomerException("Customer ID " + CustomerId + " is associated with existing sale transaction(s) and cannot be deleted!");
-        }
+        em.remove(CustomerEntityToRemove);
     }
     
     
