@@ -66,9 +66,15 @@ public class DataInitializationSessionBean {
         try {
             adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("terry@easyadmin.com", "654321", "Terry", "Tan"));
             adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("1", "123456", "Test", "Test"));
-            businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Health"));
-            businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Fashion"));
-            businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Education"));
+            BusinessCategoryEntity category1 = new BusinessCategoryEntity();
+            category1.setCategoryName("Health");
+            BusinessCategoryEntity category2 = new BusinessCategoryEntity();
+            category1.setCategoryName("Fashion");
+            BusinessCategoryEntity category3 = new BusinessCategoryEntity();
+            category1.setCategoryName("Education");
+            businessCategorySessionBeanLocal.createBusinessCategoryEntity(category1);
+            businessCategorySessionBeanLocal.createBusinessCategoryEntity(category2);
+            businessCategorySessionBeanLocal.createBusinessCategoryEntity(category3);
             
             CustomerEntity testCustomer = new CustomerEntity("S9898100B", "test@gmail.com", "123456", "John", "Doe", "M", 21, "97381199", "123A Temasek Hall", "Singapore");
             CustomerEntity newCustomer = new CustomerEntity("S9892011A", "1", "123456", "Test", "Customer", "M", 21, "90000009", "321A Eusoff Hall", "Clementi");
