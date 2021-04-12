@@ -207,6 +207,9 @@ public class CustomerModule {
             }
         }
 
+        // Print headers
+        System.out.printf("%-20s | %-20s | %-20s | %-20s | %s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
+        System.out.println("\n");
         try {
             List<ServiceProviderEntity> serviceProviders = retrieveAllAvailableServiceProvidersForTheDay(dateStr, category, city);
 
@@ -219,9 +222,6 @@ public class CustomerModule {
                 String address = currentSP.getAddress();
                 Double rating = generateOverallRating(currentSP);
 
-                // Print headers
-                System.out.printf("%-20s | %-20s | %-20s | %-20s | %s", "Service Provider Id", "Name", "First available Time", "Address", "Overall rating");
-                System.out.println("\n");
                 if (rating == 0) {
                     // Print records
                     System.out.printf("%-20d | %-20s | %-20s | %-20s | %s", spId, name, firstAvaiTime, address, "No Ratings");
@@ -301,7 +301,7 @@ public class CustomerModule {
                     }
 
                     spEntity = retrieveServiceProviderByServiceProviderId(spId);
-                    
+
                     // Only allow user to enter spid that is shown - SP must be approved/City must be correct/Category must be correct
                     if (!spEntity.getStatus().equals(ServiceProviderStatus.APPROVED) || !spEntity.getCity().equals(city) || spEntity.getCategory().getId() != category) {
                         System.err.println("No such Service Provider ID. Please enter another.");
@@ -419,7 +419,7 @@ public class CustomerModule {
             if (!appointments.isEmpty()) {
 
                 // Print headers
-                System.out.printf("%-20s | %-20s | %-20s | %s", "Appointment Number", "Appointment Date", "Appointment Time", "Service Provider");
+                System.out.printf("%-20s | %-20s | %-20s | %-20s | %s", "Appointment Number", "Appointment Date", "Appointment Time", "Service Provider", "Status");
                 System.out.println("\n");
                 for (int i = 0; i < appointments.size(); i++) {
                     AppointmentEntity appt = appointments.get(i);
@@ -427,9 +427,10 @@ public class CustomerModule {
                     String dateStr = retrieveAppointmentDateWithApptNum(apptNum);
                     String timeStr = retrieveAppointmentTimeWithApptNum(apptNum);
                     String apptSPName = appt.getServiceProviderEntity().getName();
+                    String apptStatus = getApptStatus(appt.getId());
 
                     // Print records
-                    System.out.printf("%-20s | %-20s | %-20s | %s", apptNum, dateStr, timeStr, apptSPName);
+                    System.out.printf("%-20s | %-20s | %-20s | %-20s | %s", apptNum, dateStr, timeStr, apptSPName, apptStatus);
                     System.out.println();
                 }
             } else {
@@ -450,7 +451,7 @@ public class CustomerModule {
             if (!appointments.isEmpty()) {
                 haveAppts = true;
                 // Print headers
-                System.out.printf("%-20s | %-20s | %-20s | %s", "Appointment Number", "Appointment Date", "Appointment Time", "Service Provider");
+                System.out.printf("%-20s | %-20s | %-20s | %-20s | %s", "Appointment Number", "Appointment Date", "Appointment Time", "Service Provider", "Status");
                 System.out.println("\n");
                 for (int i = 0; i < appointments.size(); i++) {
                     AppointmentEntity appt = appointments.get(i);
@@ -458,9 +459,10 @@ public class CustomerModule {
                     String dateStr = retrieveAppointmentDateWithApptNum(apptNum);
                     String timeStr = retrieveAppointmentTimeWithApptNum(apptNum);
                     String apptSPName = appt.getServiceProviderEntity().getName();
+                    String apptStatus = getApptStatus(appt.getId());
 
                     // Print records
-                    System.out.printf("%-20s | %-20s | %-20s | %s", apptNum, dateStr, timeStr, apptSPName);
+                    System.out.printf("%-20s | %-20s | %-20s | %-20s | %s", apptNum, dateStr, timeStr, apptSPName, apptStatus);
                     System.out.println();
                 }
             } else {
@@ -483,10 +485,14 @@ public class CustomerModule {
 
         if (haveAppt) {
             while (true) {
-                
+
                 while (true) {
+                    System.out.println("Enter 0 to go back to previous menu");
                     System.out.print("Enter Appointment Number> ");
                     appointmentNum = sc.nextLine().trim();
+                    if (appointmentNum.equals("0")) {
+                        return;
+                    }
                     if (appointmentNum.length() > 0) {
                         break;
                     }
@@ -522,8 +528,12 @@ public class CustomerModule {
 
                 while (true) {
                     try {
+                        System.out.println("Enter 0 to go back to previous menu");
                         System.out.print("Enter Service Provider Id> ");
                         spId = sc.nextLong(); // need to check if there is such sp
+                        if (spId == 0) {
+                            return;
+                        }
                         retrieveServiceProviderByServiceProviderId(spId);
                         //if all retrievedSPId != spId no appt with this sp, try again
                         for (int i = 0; i < appts.size(); i++) {
@@ -630,7 +640,9 @@ public class CustomerModule {
 
     }
 
-    /************************************************************* Web Services **************************************************************/
+    /**
+     * *********************************************************** Web Services *************************************************************
+     */
     private static java.util.List<ws.client.BusinessCategoryEntity> retrieveAllBusinessCategories() {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();
@@ -697,4 +709,9 @@ public class CustomerModule {
         port.rateAppointment(apptEntityId, rating);
     }
 
+    private static String getApptStatus(java.lang.Long apptId) {
+        ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
+        ws.client.CustomerWebService port = service.getCustomerWebServicePort();
+        return port.getApptStatus(apptId);
+    }
 }

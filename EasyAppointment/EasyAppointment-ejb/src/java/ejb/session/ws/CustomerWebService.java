@@ -10,6 +10,7 @@ import entity.CustomerEntity;
 import entity.ServiceProviderEntity;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
@@ -192,5 +193,29 @@ public class CustomerWebService {
     @WebMethod(operationName = "retrieveAppointmentTimeWithApptNum")
     public String retrieveAppointmentTimeWithApptNum(@WebParam(name = "apptNum") String apptNum) throws AppointmentNotFoundException {
         return this.appointmentEntitySessionBeanLocal.retrieveAppointmentTimeWithApptNum(apptNum);
+    }
+
+    @WebMethod(operationName = "getApptStatus")
+    public String getApptStatus(@WebParam(name = "apptId") Long apptId) {
+        AppointmentEntity appt = em.find(AppointmentEntity.class, apptId);
+        
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        
+        LocalDate apptDate = appt.getAppointmentDate();
+        LocalTime apptTime = appt.getAppointmentTime();
+        
+        int compare = apptDate.compareTo(currentDate);
+        double hourDiff = Math.floor(ChronoUnit.HOURS.between(currentTime, apptTime) + ChronoUnit.MINUTES.between(currentTime, apptTime)/60);
+        
+        if(compare > 0 ) { 
+            return "UPCOMING";
+        } else if (compare == 0 && hourDiff > 0) {
+            return "UPCOMING"; 
+        } else if (compare == 0 && hourDiff >= -1 && hourDiff <= 0) {
+            return "ONGOING";
+        } else {
+            return "COMPLETED";
+        }
     }
 }
