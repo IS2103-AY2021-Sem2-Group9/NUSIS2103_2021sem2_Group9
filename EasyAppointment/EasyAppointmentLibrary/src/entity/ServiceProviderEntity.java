@@ -25,7 +25,7 @@ public class ServiceProviderEntity implements Serializable {
     private Long serviceProviderId;
     @Column(nullable = false, length = 32)
     private String name; 
-    @ManyToOne (optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private BusinessCategoryEntity category; 
     @Column(nullable = false, length = 32, unique = true)
@@ -42,7 +42,7 @@ public class ServiceProviderEntity implements Serializable {
     private String password; 
     @Column (nullable = false)
     private ServiceProviderStatus status;
-    @OneToMany(mappedBy = "serviceProviderEntity")
+    @OneToMany(mappedBy = "serviceProviderEntity", orphanRemoval = true)
     private List<AppointmentEntity> appointmentEntities; 
 
     public ServiceProviderEntity() {

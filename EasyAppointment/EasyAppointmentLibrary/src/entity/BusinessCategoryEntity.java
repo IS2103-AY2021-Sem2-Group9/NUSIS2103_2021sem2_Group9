@@ -1,12 +1,16 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
 public class BusinessCategoryEntity implements Serializable {
@@ -17,8 +21,12 @@ public class BusinessCategoryEntity implements Serializable {
     private Long id;
     @Column(nullable = false, length = 32, unique = true)
     private String categoryName;
+    @OneToMany(mappedBy = "category", orphanRemoval = true)
+    @JoinColumn(nullable = false)
+    private List<ServiceProviderEntity> serviceProviderEntities; 
 
     public BusinessCategoryEntity() {
+        this.serviceProviderEntities = new ArrayList<>();
     }
 
     public BusinessCategoryEntity(String categoryName) {
@@ -64,6 +72,15 @@ public class BusinessCategoryEntity implements Serializable {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    @XmlTransient
+    public List<ServiceProviderEntity> getServiceProviderEntities() {
+        return serviceProviderEntities;
+    }
+
+    public void setServiceProviderEntities(List<ServiceProviderEntity> serviceProviderEntities) {
+        this.serviceProviderEntities = serviceProviderEntities;
     }
     
 }

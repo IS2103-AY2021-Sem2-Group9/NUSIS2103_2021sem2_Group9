@@ -1,6 +1,7 @@
 package ejb.session.stateless;
 
 import entity.BusinessCategoryEntity;
+import entity.ServiceProviderEntity;
 import java.util.List;
 import util.exception.BusinessCategoryExistException;
 import util.exception.BusinessCategoryNotFoundException;
@@ -15,4 +16,6 @@ public interface BusinessCategorySessionBeanLocal {
     public String deleteBusinessCategory(String businessCategoryName) throws BusinessCategoryNotFoundException;
 
     public BusinessCategoryEntity retrieveBusinessCategoryById(Long category) throws BusinessCategoryNotFoundException;
+
+    public List<ServiceProviderEntity> retrieveServiceProvidersByBusinessCategory(Long categoryId) throws BusinessCategoryNotFoundException;
 }
