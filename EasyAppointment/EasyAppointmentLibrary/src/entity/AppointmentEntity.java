@@ -31,6 +31,7 @@ public class AppointmentEntity implements Serializable {
     private Integer rating; 
     
     @ManyToOne
+    @JoinColumn(nullable = false)
     private CustomerEntity customerEntity;
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
