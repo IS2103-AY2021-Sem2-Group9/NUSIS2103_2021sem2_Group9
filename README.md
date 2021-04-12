@@ -12,13 +12,3 @@ Marcus Lee Jian Wen, A0206229J, marcusmljw98@gmail.com<br/>
 
 View the application documentation [here](https://docs.google.com/document/d/1FdaKg5QVEzFWqFyOBEddU0wPv92A_7HtS9DQIKa-Wss/edit#heading=h.c19fjemcq6h8)
 
-### Database Connection
-- Create new database -> New Database Name: easyappointment
-- User: root , Password: password
-
-### Updating gitignore to ignore project properties later on
-1. everyone clone the project and make sure it works on their computer first
-2. update gitignore to include `project.properties` and `project.xml`.
-3. `git rm -r --cached .`
-4. git commit -m "reinstanstiated remote repo with updated gitignore"
-5. Pushing should remove the files from the repo. 
