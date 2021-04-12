@@ -115,8 +115,15 @@ public class CustomerModule {
 
         sc.nextLine();
 
-        System.out.print("Enter city> ");
-        String city = sc.nextLine();
+        String city;
+        while (true) {
+            System.out.print("Enter city> ");
+            city = sc.nextLine();
+            if (city.length() > 0) {
+                System.out.println("city is not empty");
+                break;
+            }
+        }
 
         LocalDate date = LocalDate.now();
         String dateStr = "";
@@ -180,8 +187,15 @@ public class CustomerModule {
 
             while (true) {
                 try {
-                    System.out.print("Enter date> ");
-                    dateStr = sc.nextLine().trim();
+
+                    while (true) {
+                        System.out.print("Enter date> ");
+                        dateStr = sc.nextLine().trim();
+                        if (dateStr.length() > 0) {
+                            break;
+                        }
+                    }
+
                     date = LocalDate.parse(dateStr);
                     break;
                 } catch (DateTimeParseException ex) {
@@ -268,8 +282,14 @@ public class CustomerModule {
 
         sc.nextLine();
 
-        System.out.print("Enter city> ");
-        String city = sc.nextLine().trim();
+        String city;
+        while (true) {
+            System.out.print("Enter city> ");
+            city = sc.nextLine().trim();
+            if (city.length() > 0) {
+                break;
+            }
+        }
 
         LocalDate date = this.searchForAddingAppt(category, city);
 
@@ -466,8 +486,15 @@ public class CustomerModule {
 
         if (haveAppt) {
             while (true) {
-                System.out.print("Enter Appointment Number> ");
-                appointmentNum = sc.nextLine().trim();
+                
+                while (true) {
+                    System.out.print("Enter Appointment Number> ");
+                    appointmentNum = sc.nextLine().trim();
+                    if (appointmentNum.length() > 0) {
+                        break;
+                    }
+                }
+
                 try {
                     cancelAppointment(appointmentNum);
                     System.out.println("Appointment " + appointmentNum + " has been cancelled successfully.\n");
@@ -524,7 +551,7 @@ public class CustomerModule {
                         System.err.println("There is no such Service Provider. Please try again.");
                     }
                 }
-                
+
                 System.out.println("Appointments that you have yet to rate:");
                 // Print Headers
                 System.out.printf("%-5s | %-20s | %-20s | %-20s | %s", "Index", "Appointment Number", "Appointment Date", "Appointment Time", "Service Provider");
