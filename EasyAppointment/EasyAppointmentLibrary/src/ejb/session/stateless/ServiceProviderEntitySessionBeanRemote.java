@@ -60,4 +60,8 @@ public interface ServiceProviderEntitySessionBeanRemote
     public List<AppointmentEntity> retrieveUpcomingAppointmentsForServiceProvider(ServiceProviderEntity serviceProviderEntity);
 
     public boolean checkEmail(String email);
+    
+    public boolean checkUen(String uen);
+    
+    public boolean checkPhoneNumber(String phone);
 }

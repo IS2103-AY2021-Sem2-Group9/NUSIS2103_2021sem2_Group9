@@ -19,6 +19,7 @@ import javax.jws.WebParam;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import util.exception.AppointmentCannotBeCancelledException;
 import util.exception.AppointmentExistException;
 import util.exception.AppointmentNotFoundException;
 import util.exception.BusinessCategoryNotFoundException;
@@ -173,7 +174,7 @@ public class CustomerWebService {
     }
 
     @WebMethod(operationName = "cancelAppointment")
-    public void cancelAppointment(@WebParam(name = "appointmentNum") String appointmentNum) throws AppointmentNotFoundException {
+    public void cancelAppointment(@WebParam(name = "appointmentNum") String appointmentNum) throws AppointmentNotFoundException, AppointmentCannotBeCancelledException {
         this.appointmentEntitySessionBeanLocal.cancelAppointment(appointmentNum);
     }
 

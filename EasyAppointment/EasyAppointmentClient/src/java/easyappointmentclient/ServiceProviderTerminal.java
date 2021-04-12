@@ -41,7 +41,7 @@ public class ServiceProviderTerminal {
             System.out.println("2: Login");
             System.out.println("3: Exit");
             response = 0;
-                
+           
             while (response < 1 || response > 3) {
                 System.out.print("> ");
                 try {
@@ -66,7 +66,7 @@ public class ServiceProviderTerminal {
                     }
                     catch (InvalidLoginCredentialException | InvalidPasswordFormatException ex)
                     {
-                        System.err.println("An error occured while logging in: " + ex.getMessage());
+                        System.out.println("An error occured while logging in: " + ex.getMessage());
                         continue;
                     }
                 } else if (response == 3) 
@@ -137,13 +137,18 @@ public class ServiceProviderTerminal {
         
         while (true) {
             System.out.print("Enter Business Registration Number> ");
-            uen = scanner.nextLine();
+            uen = scanner.nextLine(); 
             if (uen.length() > 0) {
-                spEntity.setUen(uen);
-                break;
+                if (serviceProviderEntitySessionBeanRemote.checkUen(uen)) {
+                    spEntity.setUen(uen);
+                    break;
+                } else {
+                    System.err.println("Business registration number inputed has already been registered, try again with a different business registration number.");
+                }
             } else {
                 System.err.println("Please input a Business Registration Number");
             }
+            
         }
         
         while (true) {
@@ -161,11 +166,15 @@ public class ServiceProviderTerminal {
             System.out.print("Enter Phone> ");
             phone = scanner.nextLine(); 
             if (phone.length() > 0) {
-                spEntity.setPhoneNumber(phone);
-                break;
+                if (serviceProviderEntitySessionBeanRemote.checkPhoneNumber(phone)) {
+                    spEntity.setPhoneNumber(phone);
+                    break;
+                } else {
+                    System.err.println("Phone number inputed has already been registered, try again with a different phone number.");
+                }
             } else {
-                System.err.println("Please input a Phone Number.");
-            }
+                System.err.println("Please input a phone number.");
+            }      
         }
 
         while (true) {
@@ -198,12 +207,21 @@ public class ServiceProviderTerminal {
         while (true) {
             System.out.print("Enter Password (6 digit)> ");
             password = scanner.nextLine(); 
-            if (password.length() ==  6) {
-                spEntity.setPassword(password);
-                break;
+            if (password.length() > 0) {
+                try {
+                    Integer intPassword = Integer.valueOf(password);
+                    if (password.length() == 6) {
+                        spEntity.setPassword(password);
+                        break;
+                    } else {
+                        System.err.println("Please input a 6 digit Password.");
+                    }
+                } catch (NumberFormatException ex) {
+                    System.err.println("Please input a password consisting of 6 digits only.");
+                }
             } else {
                 System.err.println("Please input a 6 digit Password.");
-            }
+            }                        
         }
         spEntity.setStatus(ServiceProviderStatus.PENDING);
         

@@ -345,4 +345,33 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
         }
         return valid;
     }
+    
+    @Override 
+    public boolean checkUen(String uen) {
+        boolean valid = true;
+        Query query = em.createQuery("SELECT sp.uen FROM ServiceProviderEntity sp");
+        List<String> result = query.getResultList();
+        for (String u : result) {
+            if(u.equals(uen)) {
+                valid = false; 
+                break;
+            }
+        }
+        return valid; 
+    }
+    
+    @Override
+    public boolean checkPhoneNumber(String phone) {
+        boolean valid = true;
+        Query query = em.createQuery("SELECT sp.phoneNumber FROM ServiceProviderEntity sp");
+        List<String> result = query.getResultList();
+        for (String p : result) {
+            if(p.equals(phone)) {
+                valid = false; 
+                break;
+            }
+        }
+        return valid; 
+    }
 }
+

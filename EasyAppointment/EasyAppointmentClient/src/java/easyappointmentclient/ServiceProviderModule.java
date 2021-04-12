@@ -11,6 +11,7 @@ import java.util.Scanner;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UpdateServiceProviderException;
 import java.util.List;
+import util.exception.AppointmentCannotBeCancelledException;
 import util.exception.AppointmentNotFoundException;
 
 public class ServiceProviderModule {
@@ -137,16 +138,34 @@ public class ServiceProviderModule {
             currentServiceProviderEntity.setAddress(newAddress);
         }
 
-        System.out.print("Enter Phone (blank if no change)> ");
-        newPhone = scanner.nextLine().trim();
-        if(newPhone.length() > 0) {
-            currentServiceProviderEntity.setPhoneNumber(newPhone);
+        while (true) {
+            System.out.print("Enter Phone (blank if no change)> ");
+            newPhone = scanner.nextLine().trim();
+            if(newPhone.length() > 0) {
+                if (serviceProviderEntitySessionBeanRemote.checkPhoneNumber(newPhone)) {
+                    currentServiceProviderEntity.setPhoneNumber(newPhone);
+                    break;
+                } else {
+                    System.err.println("Phone number inputed is currently registered to another account, please try again with a different phone number");
+                }
+            } else {
+                break;
+            }
         }
         
-        System.out.print("Enter Email Address (blank if no change)> ");
-        newEmail = scanner.nextLine().trim(); 
-        if (newEmail.length() > 0) {
-            currentServiceProviderEntity.setEmail(newEmail);
+        while (true) {
+            System.out.print("Enter Email Address (blank if no change)> ");
+            newEmail = scanner.nextLine().trim(); 
+            if (newEmail.length() > 0) {
+                if (serviceProviderEntitySessionBeanRemote.checkEmail(newEmail)) {
+                    currentServiceProviderEntity.setEmail(newEmail);
+                    break;
+                } else {
+                    System.err.println("Email address inputed is currently registered to another account, please try again with a different email address.");
+                }
+            } else {
+                break;
+            }
         }
 
         while (true) {
@@ -247,13 +266,13 @@ public class ServiceProviderModule {
                     break;
                 } else {
                     appointmentEntitySessionBeanRemote.cancelAppointment(appointmentNum);
-                    System.err.println("Appointment " + appointmentNum + " has been cancelled successfully.");
-                    sc.next();
+                    System.out.println("Appointment " + appointmentNum + " has been cancelled successfully.");
                 }
             } catch (AppointmentNotFoundException ex) {
                 System.out.println("An error has occured cancelling the appointment: " + ex.getMessage());
-            } 
+            } catch (AppointmentCannotBeCancelledException ex) {
+                System.err.println("Error cancelling appointment " + ex.getMessage());
+            }
         }
    }
-   
 }
