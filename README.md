@@ -1,5 +1,5 @@
 # IS2103-AY20-21-Sem2-Group9
-EasyAppoinment is a new e-commerce service to be launched by a local start-up company “Merlion Technology”. Due to the Covaid-19 restrictions, businesses need proper crowd handling solutions to reduce the waiting time and increase customer engagement with their services. The new solution “EasyAppointment” will allow residents to make appointments with many types of businesses such as family clinics, saloons, car services, restaurants, etc as a one-stop solution and obtain the necessary services with less waiting time.
+EasyAppoinment is a new e-commerce service to be launched by a local start-up company “Merlion Technology”. Due to the Covid-19 restrictions, businesses need proper crowd handling solutions to reduce the waiting time and increase customer engagement with their services. The new solution “EasyAppointment” will allow residents to make appointments with many types of businesses such as family clinics, saloons, car services, restaurants, etc as a one-stop solution and obtain the necessary services with less waiting time.
 
 ## Misc. Info
 ### Database Connection
