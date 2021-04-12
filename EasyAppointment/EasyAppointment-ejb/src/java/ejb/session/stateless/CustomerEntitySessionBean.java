@@ -15,7 +15,9 @@ import util.exception.CustomerExistException;
 import util.exception.CustomerNotFoundException;
 import util.exception.DeleteCustomerException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.InvalidPasswordFormatException;
 import util.exception.UnknownPersistenceException;
+import util.password.PasswordEncrypt;
 
 
 @Stateless
@@ -26,14 +28,34 @@ public class CustomerEntitySessionBean implements CustomerEntitySessionBeanLocal
     @PersistenceContext(unitName = "EasyAppointment-ejbPU")
     private EntityManager em;
     
+    private final PasswordEncrypt passwordEncrypt = new PasswordEncrypt();
+    
     @Override
-    public CustomerEntity createCustomerEntity(CustomerEntity customerEntity) throws UnknownPersistenceException, CustomerExistException {
-        try {
-            em.persist(customerEntity);            
-            em.flush();
-            return customerEntity;
-            
-        } catch (PersistenceException ex) {
+    public CustomerEntity createCustomerEntity(CustomerEntity customerEntity) throws UnknownPersistenceException, CustomerExistException, InvalidPasswordFormatException {
+        try 
+        {
+            String unencryptedPassword = customerEntity.getPassword();
+            if (unencryptedPassword.length() != 6)
+            {
+                throw new InvalidPasswordFormatException("Password length is not 6!");
+            }
+            else 
+            {
+                Integer intPassword = Integer.valueOf(unencryptedPassword);
+                String salt = passwordEncrypt.getSalt(30);
+                String encryptedPassword = passwordEncrypt.generateSecurePassword(unencryptedPassword, salt);
+                customerEntity.setPassword(salt + encryptedPassword);
+                em.persist(customerEntity);            
+                em.flush(); 
+            }   
+            return customerEntity;   
+        }
+        catch (NumberFormatException ex)
+        {
+            throw new InvalidPasswordFormatException("Password can only be digits!");
+        }
+        catch (PersistenceException ex) 
+        {
             if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) { // A database-related exception
                 if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) { // To get the internal error
                     throw new CustomerExistException("ID Number/Contact Number/Username already exists!");
@@ -70,20 +92,28 @@ public class CustomerEntitySessionBean implements CustomerEntitySessionBeanLocal
     }
     
     @Override
-    public CustomerEntity customerLogin(String email, Integer password) throws InvalidLoginCredentialException {
-        
-        try {
+    public CustomerEntity customerLogin(String email, Integer password) throws InvalidLoginCredentialException 
+    {
+        try 
+        {
+            String stringPassword = password.toString();
             CustomerEntity customerEntity = retrieveCustomerEntityByEmail(email);
-            if(customerEntity.getPassword().equals(password)) {
+            String saltAndPassword = customerEntity.getPassword();
+            String salt = saltAndPassword.substring(0, 30);
+            String encryptedPassword = saltAndPassword.substring(31);
+            Boolean passwordVerification = passwordEncrypt.verifyUserPassword(stringPassword, encryptedPassword, salt);
+            if(passwordVerification) 
+            {
                 customerEntity.getAppointments().size();
                 return customerEntity;
-                
-            }  else {
+            }  
+            else 
+            {
                 throw new InvalidLoginCredentialException("Email address does not exist or invalid password");
             }
-            
-           
-        } catch (CustomerNotFoundException ex) {
+        } 
+        catch (CustomerNotFoundException ex) 
+        {
             throw new InvalidLoginCredentialException("Invalid Login: " + ex.getMessage());
         }
     }

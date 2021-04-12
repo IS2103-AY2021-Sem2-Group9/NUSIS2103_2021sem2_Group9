@@ -7,11 +7,12 @@ import util.exception.CustomerExistException;
 import util.exception.CustomerNotFoundException;
 import util.exception.DeleteCustomerException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.InvalidPasswordFormatException;
 import util.exception.UnknownPersistenceException;
 
 public interface CustomerEntitySessionBeanRemote {
     
-    public CustomerEntity createCustomerEntity(CustomerEntity customerEntity) throws UnknownPersistenceException, CustomerExistException;
+    public CustomerEntity createCustomerEntity(CustomerEntity customerEntity) throws UnknownPersistenceException, CustomerExistException, InvalidPasswordFormatException;
     
     public CustomerEntity retrieveCustomerEntityById(Long customerId) throws CustomerNotFoundException;
     

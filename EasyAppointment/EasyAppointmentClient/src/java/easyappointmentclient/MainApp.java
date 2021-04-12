@@ -61,7 +61,7 @@ public class MainApp {
                     spTerminal = new ServiceProviderTerminal(serviceProviderSessionBeanRemote, businessCategorySessionBeanRemote, appointmentEntitySessionBeanRemote);
                     spTerminal.runApp();
                 } else if (response == 2) {
-                    adminTerminal = new AdminTerminal(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, queueCheckoutNotification, queueCheckoutNotificationFactory);
+                    adminTerminal = new AdminTerminal(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, appointmentEntitySessionBeanRemote, queueCheckoutNotification, queueCheckoutNotificationFactory);
                     adminTerminal.runApp();
                 } else if (response == 3) {
                     break;

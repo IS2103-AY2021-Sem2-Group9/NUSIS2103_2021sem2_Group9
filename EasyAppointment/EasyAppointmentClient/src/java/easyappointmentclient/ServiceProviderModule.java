@@ -13,6 +13,7 @@ import util.exception.UpdateServiceProviderException;
 import java.util.List;
 import util.exception.AppointmentCannotBeCancelledException;
 import util.exception.AppointmentNotFoundException;
+import util.exception.InvalidPasswordFormatException;
 
 public class ServiceProviderModule {
     
@@ -182,8 +183,7 @@ public class ServiceProviderModule {
                 break;
             }
         }
-        System.out.println();
-        
+        System.out.println();        
         if (newCity.length() > 0 || newAddress.length() > 0 || newPhone.length() > 0 || newEmail.length() > 0 || newPassword.length() > 0) {
             try {
                 serviceProviderEntitySessionBeanRemote.updateServiceProvider(currentServiceProviderEntity);

@@ -40,6 +40,8 @@ public class ServiceProviderTerminal {
             System.out.println("1: Registration");
             System.out.println("2: Login");
             System.out.println("3: Exit");
+            System.out.flush();
+            System.err.flush();
             response = 0;
            
             while (response < 1 || response > 3) {

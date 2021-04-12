@@ -1,6 +1,7 @@
 package easyappointmentclient;
 
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
+import ejb.session.stateless.AppointmentEntitySessionBeanRemote;
 import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
@@ -17,6 +18,7 @@ public class AdminTerminal {
     private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
     private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
     private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
+    private AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote;
     private Queue queueCheckoutNotification;
     private ConnectionFactory queueCheckoutNotificationFactory;
     
@@ -27,11 +29,12 @@ public class AdminTerminal {
     {
     }
 
-    public AdminTerminal(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, Queue queueCheckoutNotification, ConnectionFactory queueCheckoutNotificationFactory) {
+    public AdminTerminal(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote, Queue queueCheckoutNotification, ConnectionFactory queueCheckoutNotificationFactory) {
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
         this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
         this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
         this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
+        this.appointmentEntitySessionBeanRemote = appointmentEntitySessionBeanRemote;
         this.queueCheckoutNotification = queueCheckoutNotification;
         this.queueCheckoutNotificationFactory = queueCheckoutNotificationFactory;
     }
@@ -65,12 +68,12 @@ public class AdminTerminal {
                         doLogin();
                         System.out.println("Login successful!\n");
                         
-                        adminModule = new AdminModule(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, loggedInAdminEntity, queueCheckoutNotification, queueCheckoutNotificationFactory);
+                        adminModule = new AdminModule(adminEntitySessionBeanRemote, businessCategorySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, appointmentEntitySessionBeanRemote, loggedInAdminEntity, queueCheckoutNotification, queueCheckoutNotificationFactory);
                         adminModule.mainMenu();
                     }
                     catch (InvalidLoginCredentialException ex)
                     {
-                        System.out.println("An error has occurred while logging in: " + ex.getMessage() + "\n");
+                        System.err.println("An error has occurred while logging in: " + ex.getMessage() + "\n");
                     }
                 } else if (response == 2) {
                     break;
