@@ -1,9 +1,8 @@
-# IS2103 AY20/21 Sem2 Group9
-# EasyAppointment
+# EasyAppointment IS2103 AY20/21 Sem2 Group9. 
 
 ## Group Members:
-Terry Tan Jun Wei A0199745H
-Lawson Teo Khay Wee A0204928B
+Terry Tan Jun Wei A0199745H. 
+Lawson Teo Khay Wee A0204928B.
 Marcus Lee Jian Wen A0206229J
 
 ![Image of Appointment Application](https://images.ctfassets.net/lzny33ho1g45/KEdTxpBOq7rxuCwHi22wd/2eca075d1d094e5f4c9c30ed9764bd9d/best-appointment-scheduling-apps-00-hero.png?w=1520&fm=jpg&q=30&fit=thumb&h=760)
