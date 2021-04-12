@@ -132,16 +132,28 @@ public class ServiceProviderEntitySessionBean implements ServiceProviderEntitySe
     }
 
     @Override
-    public void updateServiceProvider(ServiceProviderEntity serviceProviderEntity) throws ServiceProviderEntityNotFoundException, UpdateServiceProviderException {
+    public void updateServiceProvider(ServiceProviderEntity serviceProviderEntity) throws ServiceProviderEntityNotFoundException, UpdateServiceProviderException, InvalidPasswordFormatException {
         if (serviceProviderEntity.getServiceProviderId() != null) {
             ServiceProviderEntity serviceProviderEntityToUpdate = retrieveServiceProviderByServiceProviderId(serviceProviderEntity.getServiceProviderId());
 
             if (serviceProviderEntityToUpdate.getServiceProviderId().equals(serviceProviderEntity.getServiceProviderId())) {
-                serviceProviderEntityToUpdate.setCity(serviceProviderEntity.getCity());
-                serviceProviderEntityToUpdate.setAddress(serviceProviderEntity.getAddress());
-                serviceProviderEntityToUpdate.setEmail(serviceProviderEntity.getEmail());
-                serviceProviderEntityToUpdate.setPhoneNumber(serviceProviderEntity.getPhoneNumber());
-                serviceProviderEntityToUpdate.setPassword(serviceProviderEntity.getPassword());
+                String unencryptedPassword = serviceProviderEntity.getPassword();
+                try 
+                {
+                    Integer intPw = Integer.valueOf(unencryptedPassword);
+                    String salt = passwordEncrypt.getSalt(30);
+                    String encryptedPassword = passwordEncrypt.generateSecurePassword(unencryptedPassword, salt);
+                    
+                    serviceProviderEntityToUpdate.setCity(serviceProviderEntity.getCity());
+                    serviceProviderEntityToUpdate.setAddress(serviceProviderEntity.getAddress());
+                    serviceProviderEntityToUpdate.setEmail(serviceProviderEntity.getEmail());
+                    serviceProviderEntityToUpdate.setPhoneNumber(serviceProviderEntity.getPhoneNumber());
+                    serviceProviderEntityToUpdate.setPassword(salt + encryptedPassword);
+                }
+                catch (NumberFormatException ex)
+                {
+                    throw new InvalidPasswordFormatException("Password can only be digits.");
+                }
 
             } else {
                 throw new UpdateServiceProviderException("Username of service provider to be updated does not match the existing record");

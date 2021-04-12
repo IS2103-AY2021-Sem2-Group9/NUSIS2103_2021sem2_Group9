@@ -8,6 +8,7 @@ import entity.CustomerEntity;
 import java.util.Scanner;
 import util.exception.CustomerExistException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.InvalidPasswordFormatException;
 import util.exception.UnknownPersistenceException;
 
 public class CustomerTerminal {
@@ -54,7 +55,7 @@ public class CustomerTerminal {
                         
                         customerModule = new CustomerModule(appointmentEntitySessionBeanRemote, customerEntitySessionBeanRemote, serviceProviderSessionBeanRemote, businessCategorySessionBeanRemote, loggedInCustomerEntity);
                         customerModule.mainMenu();
-                    } catch (InvalidLoginCredentialException | CustomerExistException | UnknownPersistenceException ex) {
+                    } catch (InvalidLoginCredentialException | CustomerExistException | InvalidPasswordFormatException | UnknownPersistenceException ex) {
                         System.out.println(ex.getMessage());
                         System.out.println();
                     }
@@ -84,7 +85,7 @@ public class CustomerTerminal {
         }
     }
 
-    public void doRegistration() throws InvalidLoginCredentialException, CustomerExistException, UnknownPersistenceException {
+    public void doRegistration() throws InvalidLoginCredentialException, CustomerExistException, InvalidPasswordFormatException, UnknownPersistenceException {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("*** Customer Terminal :: Registration ***\n");
@@ -94,8 +95,7 @@ public class CustomerTerminal {
         System.out.print("Enter Email> ");
         String email = scanner.nextLine().trim();
         System.out.print("Enter Password> ");
-        Integer password = scanner.nextInt();
-        scanner.nextLine();
+        String password = scanner.nextLine().trim();
         System.out.print("Enter First Name> ");
         String firstName = scanner.nextLine().trim();
         System.out.print("Enter Last Name> ");
@@ -112,7 +112,7 @@ public class CustomerTerminal {
         System.out.print("Enter City> ");
         String city = scanner.nextLine().trim();
         
-        if (iDNum.length() > 0 && email.length() > 0 && password.toString().length() > 0
+        if (iDNum.length() > 0 && email.length() > 0 && password.length() > 0
                 && firstName.length() > 0 && lastName.length() > 0 && gender.length() > 0
                 && age.toString().length() > 0 && phoneNum.length() > 0 && address.length() > 0
                 && city.length() > 0) {

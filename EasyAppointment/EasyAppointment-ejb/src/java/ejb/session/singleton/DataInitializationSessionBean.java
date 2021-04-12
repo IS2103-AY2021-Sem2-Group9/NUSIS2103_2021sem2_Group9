@@ -64,14 +64,14 @@ public class DataInitializationSessionBean {
     public void initializeData() 
     {
         try {
-            adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("terry@easyadmin.com", "password", "Terry", "Tan"));
-            adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("1", "1", "Test", "Test"));
+            adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("terry@easyadmin.com", "654321", "Terry", "Tan"));
+            adminEntitySessionBeanLocal.createAdminEntity(new AdminEntity("1", "123456", "Test", "Test"));
             businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Health"));
             businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Fashion"));
             businessCategorySessionBeanLocal.createBusinessCategoryEntity(new BusinessCategoryEntity("Education"));
             
-            CustomerEntity testCustomer = new CustomerEntity("S9898100B", "test@gmail.com", 123, "John", "Doe", "M", 21, "97381199", "123A Temasek Hall", "Singapore");
-            CustomerEntity newCustomer = new CustomerEntity("S9892011A", "1", 1, "Test", "Customer", "M", 21, "90000009", "321A Eusoff Hall", "Clementi");
+            CustomerEntity testCustomer = new CustomerEntity("S9898100B", "test@gmail.com", "123456", "John", "Doe", "M", 21, "97381199", "123A Temasek Hall", "Singapore");
+            CustomerEntity newCustomer = new CustomerEntity("S9892011A", "1", "123456", "Test", "Customer", "M", 21, "90000009", "321A Eusoff Hall", "Clementi");
             customerEntitySessionBeanLocal.createCustomerEntity(testCustomer);
             customerEntitySessionBeanLocal.createCustomerEntity(newCustomer);
             

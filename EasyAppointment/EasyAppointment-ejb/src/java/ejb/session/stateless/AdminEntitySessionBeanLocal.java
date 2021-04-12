@@ -3,9 +3,10 @@ package ejb.session.stateless;
 import entity.AdminEntity;
 import util.exception.AdminNotFoundException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.InvalidPasswordFormatException;
 
 public interface AdminEntitySessionBeanLocal {
-    public Long createAdminEntity(AdminEntity adminEntity);
+    public Long createAdminEntity(AdminEntity adminEntity) throws InvalidPasswordFormatException;
     
     public AdminEntity retrieveAdminEntityByAdminId(Long adminId) throws AdminNotFoundException;
 

@@ -12,6 +12,8 @@
 
 <xs:element name="InvalidLoginCredentialException" type="tns:InvalidLoginCredentialException"/>
 
+<xs:element name="InvalidPasswordFormatException" type="tns:InvalidPasswordFormatException"/>
+
 <xs:element name="ServiceProviderEntityNotFoundException" type="tns:ServiceProviderEntityNotFoundException"/>
 
 <xs:element name="UnknownPersistenceException" type="tns:UnknownPersistenceException"/>
@@ -118,7 +120,7 @@
 <xs:element name="id" type="xs:long" minOccurs="0"/>
 <xs:element name="identityNumber" type="xs:string" minOccurs="0"/>
 <xs:element name="lastName" type="xs:string" minOccurs="0"/>
-<xs:element name="password" type="xs:int" minOccurs="0"/>
+<xs:element name="password" type="xs:string" minOccurs="0"/>
 <xs:element name="phoneNumber" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
@@ -286,18 +288,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="retrieveServiceProviderByServiceProviderId">
-<xs:sequence>
-<xs:element name="serviceProviderId" type="xs:long" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="retrieveServiceProviderByServiceProviderIdResponse">
-<xs:sequence>
-<xs:element name="return" type="tns:serviceProviderEntity" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="retrieveAppointmentTimeWithApptNum">
 <xs:sequence>
 <xs:element name="apptNum" type="xs:string" minOccurs="0"/>
@@ -307,6 +297,18 @@
 <xs:complexType name="retrieveAppointmentTimeWithApptNumResponse">
 <xs:sequence>
 <xs:element name="return" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveServiceProviderByServiceProviderId">
+<xs:sequence>
+<xs:element name="serviceProviderId" type="xs:long" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveServiceProviderByServiceProviderIdResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:serviceProviderEntity" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
@@ -337,6 +339,16 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="retrieveAllBusinessCategories">
+<xs:sequence/>
+</xs:complexType>
+
+<xs:complexType name="retrieveAllBusinessCategoriesResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:businessCategoryEntity" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="createCustomerEntity">
 <xs:sequence>
 <xs:element name="customerEntity" type="tns:customerEntity" minOccurs="0"/>
@@ -355,13 +367,9 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="retrieveAllBusinessCategories">
-<xs:sequence/>
-</xs:complexType>
-
-<xs:complexType name="retrieveAllBusinessCategoriesResponse">
+<xs:complexType name="InvalidPasswordFormatException">
 <xs:sequence>
-<xs:element name="return" type="tns:businessCategoryEntity" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 

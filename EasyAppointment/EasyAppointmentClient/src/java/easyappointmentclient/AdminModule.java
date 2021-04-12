@@ -2,6 +2,7 @@ package easyappointmentclient;
 
 import Enumeration.ServiceProviderStatus;
 import ejb.session.stateless.AdminEntitySessionBeanRemote;
+import ejb.session.stateless.AppointmentEntitySessionBeanRemote;
 import ejb.session.stateless.BusinessCategorySessionBeanRemote;
 import ejb.session.stateless.CustomerEntitySessionBeanRemote;
 import ejb.session.stateless.ServiceProviderEntitySessionBeanRemote;
@@ -25,6 +26,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.naming.NamingException;
+import util.exception.AppointmentNotFoundException;
 import util.exception.BusinessCategoryExistException;
 import util.exception.BusinessCategoryNotFoundException;
 import util.exception.CustomerNotFoundException;
@@ -38,6 +40,7 @@ public class AdminModule {
     private BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote;
     private CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote;
     private ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote;
+    private AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote;
     private AdminEntity loggedInAdminEntity;
     private Queue queueCheckoutNotification;
     private ConnectionFactory queueCheckoutNotificationFactory;
@@ -48,11 +51,12 @@ public class AdminModule {
     {
     }
 
-    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AdminEntity loggedInAdminEntity, Queue queueCheckoutNotification, ConnectionFactory queueCheckoutNotificationFactory) {
+    public AdminModule(AdminEntitySessionBeanRemote adminEntitySessionBeanRemote, BusinessCategorySessionBeanRemote businessCategorySessionBeanRemote, CustomerEntitySessionBeanRemote customerEntitySessionBeanRemote, ServiceProviderEntitySessionBeanRemote serviceProviderSessionBeanRemote, AppointmentEntitySessionBeanRemote appointmentEntitySessionBeanRemote, AdminEntity loggedInAdminEntity, Queue queueCheckoutNotification, ConnectionFactory queueCheckoutNotificationFactory) {
         this.adminEntitySessionBeanRemote = adminEntitySessionBeanRemote;
         this.businessCategorySessionBeanRemote = businessCategorySessionBeanRemote;
         this.customerEntitySessionBeanRemote = customerEntitySessionBeanRemote;
         this.serviceProviderSessionBeanRemote = serviceProviderSessionBeanRemote;
+        this.appointmentEntitySessionBeanRemote = appointmentEntitySessionBeanRemote;
         this.loggedInAdminEntity = loggedInAdminEntity;
         this.queueCheckoutNotification = queueCheckoutNotification;
         this.queueCheckoutNotificationFactory = queueCheckoutNotificationFactory;
@@ -230,12 +234,18 @@ public class AdminModule {
                     if (!appointments.isEmpty())
                     {
                         System.out.println("Viewing Appointments for " + serviceProviderName + ":\n");
-                        System.out.printf("%-18s%-18s%-15s%-15s%-10s%-10s\n", "Appointment No.", "| Customer Name", "| Phone Number", "| Date", "| Time", "| Status", "| Rating");
+                        System.out.printf("%-18s%-18s%-15s%-15s%-10s%-15s%-10s\n", "Appointment No.", "| Customer Name", "| Phone Number", "| Date", "| Time", "| Status", "| Rating");
 
                         for(AppointmentEntity appointment : appointments)
                         {
                             CustomerEntity customer = appointment.getCustomerEntity();
-                            System.out.printf("%-18s%-18s%-15s%-15s%-10s%-10s\n", appointment.getAppointmentNum(), "| " + customer.getFirstName() + " " + customer.getLastName(), "| " + customer.getPhoneNumber(), "| " + appointment.getAppointmentDate(), "| " + appointment.getAppointmentTime(), "| " + "<status>", "| " + appointment.getRating());
+                            String status = appointmentEntitySessionBeanRemote.getStatus(appointment);
+                            String rating = appointment.getRating().toString();
+                            if (rating.equals("0"))
+                            {
+                                rating = "UNRATED";
+                            }
+                            System.out.printf("%-18s%-18s%-15s%-15s%-10s%-15s%-10s\n", appointment.getAppointmentNum(), "| " + customer.getFirstName() + " " + customer.getLastName(), "| " + customer.getPhoneNumber(), "| " + appointment.getAppointmentDate(), "| " + appointment.getAppointmentTime(), "| " + status, "| " + rating);
                         }
                     }
                     else
@@ -273,7 +283,8 @@ public class AdminModule {
 
             for (ServiceProviderEntity sp : serviceProviders)
             {
-                System.out.printf("%-18s%-20s%-15s%-18s%-10s\n", sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getCity(), "| " + "<rating>", "| " + sp.getStatus());
+                Double rating = serviceProviderSessionBeanRemote.generateOverallRating(sp);
+                System.out.printf("%-18s%-20s%-15s%-18s%-10s\n", sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getCity(), "| " + (rating.toString().equals("0.0") ? "UNRATED" : rating.toString()), "| " + sp.getStatus());
             }
         }
         System.out.println();
@@ -335,7 +346,7 @@ public class AdminModule {
         }   
     }
     
-        private void blockServiceProvider()
+    private void blockServiceProvider()
     {
         System.out.println("*** Admin Terminal :: Block Service Provider ***\n");
         Scanner scanner = new Scanner(System.in);
@@ -345,18 +356,18 @@ public class AdminModule {
         List<ServiceProviderEntity> totalServiceProviders = new ArrayList<>();
         totalServiceProviders.addAll(approvedServiceProviders);
         totalServiceProviders.addAll(pendingServiceProviders);
-        
+
         if (totalServiceProviders.isEmpty())
         {
             System.out.println("There are no existing pending/approved service providers to block.\n");
         }
         else
         {
-            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone", "| Status");
+            System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-13s%-10s\n", "ID", "| Name", "| Business Category", "| Business Reg. Num", "| City", "| Address", "| Email", "| Phone", "| Status");
 
             for (ServiceProviderEntity sp : totalServiceProviders)
             {
-                System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-10s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber(), "| " + sp.getStatus());
+                System.out.printf("%-3s%-18s%-20s%-22s%-15s%-22s%-20s%-13s%-10s\n", sp.getServiceProviderId().toString(), "| " + sp.getName(), "| " + sp.getCategory().getCategoryName(), "| " + sp.getUen() , "| " + sp.getCity(), "| " + sp.getAddress(), "| " + sp.getEmail(), "| " + sp.getPhoneNumber(), "| " + sp.getStatus());
             }
 
             System.out.println();
@@ -374,11 +385,67 @@ public class AdminModule {
                     {
                        break;
                     }
-                    String blockedSp = serviceProviderSessionBeanRemote.blockServiceProviderById(id);
-                    System.out.println("Service Provider: " + blockedSp + " has been blocked.\n");
-                    break;
+
+                    ServiceProviderEntity toBlockSp = serviceProviderSessionBeanRemote.retrieveServiceProviderByServiceProviderId(id);
+                    if (toBlockSp.getStatus() == ServiceProviderStatus.APPROVED)
+                    {
+                        List<AppointmentEntity> appts = serviceProviderSessionBeanRemote.retrieveUpcomingAppointmentsForServiceProvider(toBlockSp);
+                        if (appts.isEmpty())
+                        {
+                            String blockedSp = serviceProviderSessionBeanRemote.blockServiceProviderById(id);
+                            System.out.println("Service Provider: " + blockedSp + " has been blocked.\n");
+                            break;
+                        }
+                        else
+                        {
+                            System.out.println("Are you sure you want to block service provider: " + toBlockSp.getName() + "?");
+                            System.out.println(toBlockSp.getName() + " currently has these upcoming appointments:\n");
+                            System.out.printf("%-18s%-18s%-15s%-15s%-10s%-15s\n", "Appointment No.", "| Customer Name", "| Phone Number", "| Date", "| Time", "| Status");
+
+                            for(AppointmentEntity appointment : appts)
+                            {
+                                CustomerEntity customer = appointment.getCustomerEntity();
+                                String status = appointmentEntitySessionBeanRemote.getStatus(appointment);
+                                System.out.printf("%-18s%-18s%-15s%-15s%-10s%-15s\n", appointment.getAppointmentNum(), "| " + customer.getFirstName() + " " + customer.getLastName(), "| " + customer.getPhoneNumber(), "| " + appointment.getAppointmentDate(), "| " + appointment.getAppointmentTime(), "| " + status);
+                            }
+
+                            System.out.println("These appointments will be cancelled upon blocking of service provider!");
+                            System.out.print("Block? Enter Y/N >");
+                            String response = scanner.nextLine().trim().toUpperCase();
+
+                            if (response.equals("Y"))
+                            {
+                                // have to catch unable to cancel 24hr appt
+                                for (AppointmentEntity appointment : appts)
+                                {
+                                    appointmentEntitySessionBeanRemote.cancelAppointment(appointment.getAppointmentNum());
+                                }
+                                
+                                System.out.println("All appointments are cancalled.\n");
+                                
+                                String blockedSp = serviceProviderSessionBeanRemote.blockServiceProviderById(id);
+                                System.out.println("Service Provider: " + blockedSp + " has been blocked.\n");
+                                break;
+                                
+                            }
+                            else if (response.equals("N"))
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                System.err.println("Please enter in Y or N only!");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        String blockedSp = serviceProviderSessionBeanRemote.blockServiceProviderById(id);
+                        System.out.println("Service Provider: " + blockedSp + " has been blocked.\n");
+                        break;
+                    }
                 }
-                catch (ServiceProviderEntityNotFoundException | ServiceProviderAlreadyBlockedException ex)
+                catch (ServiceProviderEntityNotFoundException | ServiceProviderAlreadyBlockedException | AppointmentNotFoundException ex)
                 {
                     System.err.println("Error occured while blocking Service Provider: " + ex.getMessage());
                 }

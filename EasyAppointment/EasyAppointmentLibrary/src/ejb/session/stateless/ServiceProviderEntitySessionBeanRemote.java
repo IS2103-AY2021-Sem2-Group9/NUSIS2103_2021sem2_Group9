@@ -33,7 +33,7 @@ public interface ServiceProviderEntitySessionBeanRemote
     
     public ServiceProviderEntity retrieveServiceProviderByServiceProviderId(Long serviceProviderId) throws ServiceProviderEntityNotFoundException;
 
-    public void updateServiceProvider(ServiceProviderEntity serviceProviderEntity) throws ServiceProviderEntityNotFoundException, UpdateServiceProviderException;
+    public void updateServiceProvider(ServiceProviderEntity serviceProviderEntity) throws ServiceProviderEntityNotFoundException, UpdateServiceProviderException, InvalidPasswordFormatException;
     
     public List<ServiceProviderEntity> retrieveAllServiceProviders();
     

@@ -16,7 +16,7 @@ public class AdminEntity implements Serializable {
     private Long id;
     @Column(nullable = false, length = 32, unique = true)
     private String adminEmail;
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false, length = 286)
     private String password;
     @Column(nullable = false, length = 32)
     private String firstName;
