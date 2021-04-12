@@ -11,6 +11,8 @@ import java.util.Scanner;
 import util.exception.ServiceProviderEntityNotFoundException;
 import util.exception.UpdateServiceProviderException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import util.exception.AppointmentCannotBeCancelledException;
 import util.exception.AppointmentNotFoundException;
 import util.exception.InvalidPasswordFormatException;
@@ -190,7 +192,9 @@ public class ServiceProviderModule {
                 System.out.println("Service Provider Profile updated successfully!\n");
             } catch(ServiceProviderEntityNotFoundException | UpdateServiceProviderException ex) {
                 System.out.println("An error has occured while updating staff: " + ex.getMessage() + "\n");
-            }
+            } catch (InvalidPasswordFormatException ex) {
+               System.out.println("An error has occured while updating staff:" + ex.getMessage() + "\n");
+           }
         } else {
             System.out.println("No changes has been made.");
         }
