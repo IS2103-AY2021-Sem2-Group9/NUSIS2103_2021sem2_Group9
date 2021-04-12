@@ -105,7 +105,7 @@ public class CustomerModule {
                 category = sc.nextLong();
                 break;
             } catch (InputMismatchException ex) {
-                System.err.println("Please input a digit.");
+                System.err.println("Please input a number.");
                 sc.next();
             }
         }
@@ -272,7 +272,7 @@ public class CustomerModule {
                 category = sc.nextLong();
                 break;
             } catch (InputMismatchException ex) {
-                System.err.println("Please input a digit.");
+                System.err.println("Please input a number.");
                 sc.next();
             }
         }
@@ -311,7 +311,7 @@ public class CustomerModule {
                     sc.nextLine();
                     break;
                 } catch (InputMismatchException ex) {
-                    System.err.println("Please input a digit\n");
+                    System.err.println("Please input a number");
                     sc.next();
                 } catch (ServiceProviderEntityNotFoundException_Exception ex) {
                     System.err.println("No such Service Provider ID. Please enter another.");
@@ -542,7 +542,7 @@ public class CustomerModule {
                         }
                         break;
                     } catch (InputMismatchException ex) {
-                        System.err.println("Please input a digit.");
+                        System.err.println("Please input a number.");
                         sc.next();
                     } catch (ServiceProviderEntityNotFoundException_Exception ex) {
                         System.err.println("There is no such Service Provider. Please try again.");
@@ -574,7 +574,7 @@ public class CustomerModule {
                             index = sc.nextInt();
                             break;
                         } catch (InputMismatchException ex) {
-                            System.err.println("Please input a digit.");
+                            System.err.println("Please input a number.");
                             sc.next();
                         }
                     }
@@ -586,7 +586,7 @@ public class CustomerModule {
                                 index = sc.nextInt();
                                 break;
                             } catch (InputMismatchException ex) {
-                                System.err.println("Please input a digit.");
+                                System.err.println("Please input a number.");
                                 sc.next();
                             }
                         }
@@ -630,7 +630,7 @@ public class CustomerModule {
 
     }
 
-    // WS
+    /************************************************************* Web Services **************************************************************/
     private static java.util.List<ws.client.BusinessCategoryEntity> retrieveAllBusinessCategories() {
         ws.client.CustomerWebService_Service service = new ws.client.CustomerWebService_Service();
         ws.client.CustomerWebService port = service.getCustomerWebServicePort();

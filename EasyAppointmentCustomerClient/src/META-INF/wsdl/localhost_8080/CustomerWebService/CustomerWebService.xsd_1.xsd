@@ -296,15 +296,15 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="retrieveCustomerEntityAppointments">
+<xs:complexType name="retrieveServiceProviderByServiceProviderId">
 <xs:sequence>
-<xs:element name="customerId" type="xs:long" minOccurs="0"/>
+<xs:element name="serviceProviderId" type="xs:long" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="retrieveCustomerEntityAppointmentsResponse">
+<xs:complexType name="retrieveServiceProviderByServiceProviderIdResponse">
 <xs:sequence>
-<xs:element name="return" type="tns:appointmentEntity" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="return" type="tns:serviceProviderEntity" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
